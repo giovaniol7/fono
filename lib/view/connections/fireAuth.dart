@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firedart/firedart.dart' as fd;
 
 import 'package:flutter/foundation.dart';
@@ -50,6 +51,7 @@ autenticarConta(context, email, senha) async {
       }
     });
   }else{
+    await Firebase.initializeApp();
     fd.FirebaseAuth.instance.signIn(email, senha).then((res) async {
       sucesso(context, 'Usuário autenticado com sucesso!');
       final emailSave = await SharedPreferences.getInstance();
@@ -77,14 +79,27 @@ autenticarConta(context, email, senha) async {
 }
 
 signOut(context) async {
-  try {
-    await FirebaseAuth.instance.signOut();
-    deleteValor();
-    sucesso(context, 'O usuário deslogado!');
-    Navigator.pushReplacementNamed(context, '/login');
-  } catch (e) {
-    // ignore: avoid_print
-    print(e.toString());
-    return null;
+  if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+    try {
+      await FirebaseAuth.instance.signOut();
+      deleteValor();
+      sucesso(context, 'O usuário deslogado!');
+      Navigator.pushReplacementNamed(context, '/login');
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  } else {
+    //fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
+    //fd.Firestore.initialize('programafono-7be09');
+    try {
+      fd.FirebaseAuth.instance.signOut();
+      deleteValor();
+      sucesso(context, 'O usuário deslogado!');
+      Navigator.pushReplacementNamed(context, '/login');
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
   }
 }

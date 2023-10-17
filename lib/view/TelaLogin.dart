@@ -70,7 +70,7 @@ class _TelaLoginState extends State<TelaLogin> {
                 : const EdgeInsets.fromLTRB(32, 10, 32, 10),
             margin: const EdgeInsets.only(top: 20, bottom: 10),
             onPressed: () {
-              autenticarConta(context, txtEmail, txtSenha);
+              autenticarConta(context, txtEmail.text, txtSenha.text);
             },
           ),
           Align(
@@ -126,7 +126,7 @@ class _TelaLoginState extends State<TelaLogin> {
                   children: [
                     const logoCapa(),
                     Container(
-                      decoration: BoxDecoration(color: cores('cor_1')),
+                      decoration: BoxDecoration(color: cores('rosa_fraco')),
                       child: Column(
                         children: [
                           form,
@@ -147,7 +147,8 @@ class _TelaLoginState extends State<TelaLogin> {
                     const Text(
                       "Login",
                       style: TextStyle(
-                        fontFamily: 'Satisfy',
+                        color: Color(0xFF37513F),
+                        fontFamily: 'Adage',
                         fontSize: 128,
                       ),
                     ),

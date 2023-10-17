@@ -158,55 +158,55 @@ class _TelaCadastroState extends State<TelaCadastro> {
               ),
             ],
           ),
-          Center(
-            child: Text(
-              'Sexo:',
-              style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
-            ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: RadioListTile<Gender>(
-                  title: Text(
-                    'Masculino',
-                    style: TextStyle(color: cores('verde')),
-                  ),
-                  value: Gender.male,
-                  groupValue: _selectedGeneroFono,
-                  activeColor: cores('verde'),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedGeneroFono = value;
-                    });
-                  },
-                ),
-              ),
-              Expanded(
-                child: RadioListTile<Gender>(
-                  title: Text(
-                    'Feminino',
-                    style: TextStyle(color: cores('verde')),
-                  ),
-                  value: Gender.female,
-                  groupValue: _selectedGeneroFono,
-                  activeColor: cores('verde'),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedGeneroFono = value;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10,),
           Container(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.all(10),
             child: Center(
               child: Column(
                 children: [
-                  const SizedBox(height: 20),
+                  Center(
+                    child: Text(
+                      'Sexo:',
+                      style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: RadioListTile<Gender>(
+                          title: Text(
+                            'Masculino',
+                            style: TextStyle(color: cores('verde')),
+                          ),
+                          value: Gender.male,
+                          groupValue: _selectedGeneroFono,
+                          activeColor: cores('verde'),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGeneroFono = value;
+                            });
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: RadioListTile<Gender>(
+                          title: Text(
+                            'Feminino',
+                            style: TextStyle(color: cores('verde')),
+                          ),
+                          value: Gender.female,
+                          groupValue: _selectedGeneroFono,
+                          activeColor: cores('verde'),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedGeneroFono = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
                   campoTexto(
                     'Nome Completo',
                     txtNome,

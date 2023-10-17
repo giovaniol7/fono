@@ -732,7 +732,7 @@ Future<void> adicionarPaciente(
   Navigator.pushReplacement(
     context,
     MaterialPageRoute(
-      builder: (context) => const TelaPaciente(),
+      builder: (context) => const TelaPacientes(),
     ),
   );
 }

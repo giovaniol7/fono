@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firedart/firedart.dart' as fd;
@@ -11,14 +10,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/TextFieldSuggestions.dart';
 import 'controllers/coresPrincipais.dart';
 
-class TelaPaciente extends StatefulWidget {
-  const TelaPaciente({super.key});
+class TelaPacientes extends StatefulWidget {
+  const TelaPacientes({super.key});
 
   @override
-  State<TelaPaciente> createState() => _TelaPacienteState();
+  State<TelaPacientes> createState() => _TelaPacientesState();
 }
 
-class _TelaPacienteState extends State<TelaPaciente> {
+class _TelaPacientesState extends State<TelaPacientes> {
   var windowsIdFono;
   var pacientes;
   var pacientesOrdem;

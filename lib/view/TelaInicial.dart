@@ -1,18 +1,16 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firedart/firestore/token_authenticator.dart';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fono/view/TelaAgenda.dart';
-import 'package:fono/view/TelaContas.dart';
-import 'package:fono/view/TelaPacientes.dart';
-import 'dart:io';
-import 'package:fono/view/controllers/coresPrincipais.dart';
-import 'package:fono/view/TelaEditarPerfil.dart';
-import '../widgets/mensagem.dart';
+
+import '../view/controllers/coresPrincipais.dart';
+import '../widgets/DrawerNavigation.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firedart/firedart.dart' as fd;
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'controllers/resolucoesTela.dart';
 
 class TelaInicial extends StatefulWidget {
   const TelaInicial({Key? key}) : super(key: key);
@@ -22,6 +20,8 @@ class TelaInicial extends StatefulWidget {
 }
 
 class _TelaInicialState extends State<TelaInicial> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   var uidFono;
   late String nomeUsuario = '';
   String urlImage = '';
@@ -97,329 +97,316 @@ class _TelaInicialState extends State<TelaInicial> {
     retornarNomeUsuario();
   }
 
+  ratioScreen ratio = ratioScreen();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Container(
-      child: ListView(
-        children: [
-          Column(
-            children: [
-              Container(
-                padding: EdgeInsets.only(left: 20, right: 20),
-                width: MediaQuery.of(context).size.width,
-                height: kIsWeb || Platform.isWindows
-                    ? MediaQuery.of(context).size.height * 0.4
-                    : MediaQuery.of(context).size.height * 0.3,
-                decoration: BoxDecoration(
-                    color: cores('rosa_medio'),
-                    boxShadow: [
-                      BoxShadow(offset: Offset(0, 3), color: cores('verde/azul'), blurRadius: 5),
+        key: _scaffoldKey,
+        drawer: DrawerNavigation(uidFono, urlImage, genero, nomeUsuario),
+        body: ListView(
+          children: [
+            Stack(
+              children: [
+                ratio.screen(context) == 'pequeno' ? Center(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 50,
+                      ),
+                      contaHome(context),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      calendarHome(context),
                     ],
-                    borderRadius: BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(padding: EdgeInsets.only(top: 5)),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.edit,
-                            color: cores('verde'),
-                          ),
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => TelaEditarPerfil()));
-                          },
-                        ),
-                      ],
-                    ),
-                    Padding(padding: EdgeInsets.only(top: 10)),
-                    Center(
-                      child: Container(
-                        width: kIsWeb || Platform.isWindows
-                            ? MediaQuery.of(context).size.width * 0.06
-                            : MediaQuery.of(context).size.width * 0.20,
-                        height: kIsWeb || Platform.isWindows
-                            ? MediaQuery.of(context).size.width * 0.06
-                            : MediaQuery.of(context).size.height * 0.1,
-                        decoration: BoxDecoration(
+                  ),
+                ) : Center(
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        height: 50,
+                      ),
+                      contaHome(context),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      calendarHome(context),
+                    ],
+                  ),
+                ),
+                SafeArea(
+                  child: GestureDetector(
+                    onTap: () {
+                      _scaffoldKey.currentState!.openDrawer();
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(left: 16, top: 16),
+                      height: 40,
+                      width: 40,
+                      decoration: BoxDecoration(
+                          color: cores('verde/azul'),
                           shape: BoxShape.circle,
-                          color: cores('verde'),
-                        ),
-                        child: urlImage.isEmpty
-                            ? Icon(
-                                Icons.person,
-                                color: cores('rosa_medio'),
-                                size: MediaQuery.of(context).size.height * 0.08,
-                              )
-                            : CircleAvatar(
-                                child: ClipOval(
-                                  child: Image.network(
-                                    urlImage,
-                                    width: kIsWeb || Platform.isWindows
-                                        ? MediaQuery.of(context).size.width * 0.2
-                                        : MediaQuery.of(context).size.width * 0.3,
-                                    height: kIsWeb || Platform.isWindows
-                                        ? MediaQuery.of(context).size.height * 0.4
-                                        : MediaQuery.of(context).size.height * 0.3,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
+                          boxShadow: [BoxShadow(color: cores('rosa_fraco'), offset: Offset(0, 3), blurRadius: 8)]),
+                      child: Icon(
+                        Icons.menu,
+                        color: cores('verde'),
                       ),
                     ),
-                    Padding(padding: EdgeInsets.only(top: 20)),
-                    Expanded(
-                      child: Center(
-                        child: Text(
-                          nomeUsuario.toString(),
-                          style: TextStyle(
-                              color: cores('verde'),
-                              fontSize: kIsWeb || Platform.isWindows
-                                  ? MediaQuery.of(context).size.height * 0.07
-                                  : MediaQuery.of(context).size.width * 0.07,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Center(
-                        child: Text(
-                          genero == 'Gender.male' ? 'Fonoaudiólogo' : 'Fonoaudióloga',
-                          style: TextStyle(
-                            color: cores('verde'),
-                            fontSize: kIsWeb || Platform.isWindows
-                                ? MediaQuery.of(context).size.height * 0.04
-                                : MediaQuery.of(context).size.width * 0.04,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Container(
-            padding: EdgeInsets.only(left: 5, right: 5),
-            height: MediaQuery.of(context).size.height * 0.5,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.30,
-                      height: MediaQuery.of(context).size.height * 0.10,
-                      child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll<Color>(cores('verde/azul')),
-                            elevation: MaterialStateProperty.all<double>(5),
-                            shadowColor: MaterialStatePropertyAll<Color>(cores('rosa_fraco')),
-                          ),
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => TelaPaciente()));
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.person,
-                                color: cores('verde'),
-                              ),
-                              Text(
-                                'Pacientes',
-                                style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          )),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.30,
-                      height: MediaQuery.of(context).size.height * 0.10,
-                      child: ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStatePropertyAll<Color>(cores('verde/azul')),
-                          elevation: MaterialStateProperty.all<double>(5),
-                          shadowColor: MaterialStatePropertyAll<Color>(cores('rosa_fraco')),
-                        ),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => TelaContas()));
-                        },
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.payments,
-                              color: cores('verde'),
-                            ),
-                            SizedBox(height: 5),
-                            Text(
-                              'Contas',
-                              style: TextStyle(
-                                color: cores('verde'),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.30,
-                      height: MediaQuery.of(context).size.height * 0.10,
-                      child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll<Color>(cores('verde/azul')),
-                            elevation: MaterialStateProperty.all<double>(5),
-                            shadowColor: MaterialStatePropertyAll<Color>(cores('rosa_fraco')),
-                          ),
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => TelaAgenda(uidFono)));
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.calendar_month,
-                                color: cores('verde'),
-                              ),
-                              MediaQuery.of(context).size.height >= 2
-                                  ? Text(
-                                      'Agenda',
-                                      style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold),
-                                    )
-                                  : Container(),
-                            ],
-                          )),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.30,
-                      height: MediaQuery.of(context).size.height * 0.10,
-                      child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll<Color>(cores('verde/azul')),
-                            elevation: MaterialStateProperty.all<double>(5),
-                            shadowColor: MaterialStatePropertyAll<Color>(cores('rosa_fraco')),
-                          ),
-                          onPressed: () {},
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.assignment,
-                                color: cores('verde'),
-                              ),
-                              Text(
-                                'Relatório',
-                                style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          )),
-                    ),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.30,
-                      height: MediaQuery.of(context).size.height * 0.10,
-                      child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll<Color>(cores('verde/azul')),
-                            elevation: MaterialStateProperty.all<double>(5),
-                            shadowColor: MaterialStatePropertyAll<Color>(cores('rosa_fraco')),
-                          ),
-                          onPressed: () {},
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.analytics_outlined,
-                                color: cores('verde'),
-                              ),
-                              Text(
-                                'Dados',
-                                style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          )),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.30,
-                      height: MediaQuery.of(context).size.height * 0.10,
-                      child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll<Color>(cores('verde/azul')),
-                            elevation: MaterialStateProperty.all<double>(5),
-                            shadowColor: MaterialStatePropertyAll<Color>(cores('rosa_fraco')),
-                          ),
-                          onPressed: () {
-                            signOut();
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.logout,
-                                color: cores('verde'),
-                              ),
-                              Text(
-                                'Sair',
-                                style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          )),
-                    )
-                  ],
+                  ),
                 ),
               ],
             ),
+          ],
+        ));
+  }
+}
+
+contaHome(context) {
+  return Container(
+    padding: EdgeInsets.all(10),
+    width: MediaQuery.of(context).size.width * 0.9,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12.0),
+      boxShadow: [
+        BoxShadow(
+          color: cores('rosa_medio'),
+          offset: Offset(0, 2),
+          blurRadius: 5.0,
+          spreadRadius: 3.0,
+        ),
+      ],
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Text('Resumo Financeiro',
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 40, fontWeight: FontWeight.bold)),
+        SizedBox(
+          height: 10,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Container(
+              alignment: Alignment.centerLeft,
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: cores('rosa_fraco'),
+                    offset: Offset(2, 3),
+                    blurRadius: 10.0,
+                    spreadRadius: 3.0,
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(
+                    Icons.trending_up,
+                    color: Colors.blue,
+                    size: 80,
+                  ),
+                  Text(
+                    'Receitas',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                    ),
+                  ),
+                  Text(
+                    'R\$ 0,00',
+                    style: TextStyle(color: Colors.blue, fontSize: 38, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: cores('rosa_fraco'),
+                    offset: Offset(2, 3),
+                    blurRadius: 10.0,
+                    spreadRadius: 3.0,
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(
+                    Icons.trending_down,
+                    color: Colors.red,
+                    size: 80,
+                  ),
+                  Text(
+                    'Despesas',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 17,
+                    ),
+                  ),
+                  Text(
+                    'R\$ 0,00',
+                    style: TextStyle(color: Colors.red, fontSize: 38, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              'Saldo: ',
+              style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              'R\$ 0,00',
+              style: TextStyle(color: Colors.black, fontSize: 26, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        Container(
+          width: MediaQuery.of(context).size.longestSide,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.0),
+            boxShadow: [
+              BoxShadow(
+                color: cores('rosa_medio'),
+                offset: Offset(0, 2),
+                blurRadius: 5.0,
+                spreadRadius: 3.0,
+              ),
+            ],
           ),
-        ],
-      ),
-    ));
-  }
+          child: Column(
+            children: [
+              Text('Fluxo de Caixa',
+                  style: TextStyle(color: Colors.grey.shade700, fontSize: 24, fontWeight: FontWeight.bold)),
+              SizedBox(
+                height: 10,
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Card(
+                    color: Colors.blue.shade100,
+                    elevation: 7,
+                    shadowColor: cores('rosa_fraco'),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    margin: EdgeInsets.all(5),
+                    child: ListTile(
+                      trailing: Icon(
+                        Icons.account_balance,
+                        color: Colors.black,
+                        size: 40,
+                      ),
+                      title: Expanded(
+                          child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'A Receber',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          Text(
+                            'R\$ 0,00',
+                            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.blue),
+                          ),
+                        ],
+                      )),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Card(
+                    color: Colors.red.shade100,
+                    elevation: 7,
+                    shadowColor: cores('rosa_fraco'),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    margin: EdgeInsets.all(5),
+                    child: ListTile(
+                      trailing: Icon(
+                        Icons.credit_card,
+                        color: Colors.black,
+                        size: 40,
+                      ),
+                      title: Expanded(
+                          child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'A Pagar',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          Text(
+                            'R\$ 0,00',
+                            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.red),
+                          ),
+                        ],
+                      )),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
-  void signOut() async {
-    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-      try {
-        await FirebaseAuth.instance.signOut();
-        saveValor();
-        sucesso(context, 'O usuário deslogado!');
-        Navigator.pushReplacementNamed(context, '/login');
-      } catch (e) {
-        // ignore: avoid_print
-        print(e.toString());
-        return null;
-      }
-    } else {
-      //fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
-      //fd.Firestore.initialize('programafono-7be09');
-      try {
-        fd.FirebaseAuth.instance.signOut();
-        saveValor();
-        sucesso(context, 'O usuário deslogado!');
-        Navigator.pushReplacementNamed(context, '/login');
-      } catch (e) {
-        // ignore: avoid_print
-        print(e.toString());
-        return null;
-      }
-    }
-  }
-
-  void saveValor() async {
-    SharedPreferences tokenSave = await SharedPreferences.getInstance();
-    await tokenSave.setString('token', '');
-  }
+calendarHome(context) {
+  return Container(
+    width: MediaQuery.of(context).size.width * 0.9,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12.0),
+      boxShadow: [
+        BoxShadow(
+          color: cores('rosa_medio'),
+          offset: Offset(0, 2),
+          blurRadius: 5.0,
+          spreadRadius: 3.0,
+        ),
+      ],
+    ),
+    child: Column(
+      children: [
+        Text('Próximos Horários'),
+      ],
+    ),
+  );
 }
