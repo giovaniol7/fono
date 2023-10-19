@@ -1,20 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
-import 'package:fono/view/controllers/coresPrincipais.dart';
-import '../view/TelaCadastro.dart';
+
+import '../controllers/estilos.dart';
+import '../controllers/resolucoesTela.dart';
+import '../connections/fireAuth.dart';
 import '../widgets/campoTexto.dart';
 import '../widgets/customButton.dart';
 import '../widgets/logoCapa.dart';
-import '../widgets/mensagem.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firedart/firedart.dart' as fd;
-
-import 'connections/fireAuth.dart';
-import 'connections/sharedPreference.dart';
-import 'controllers/resolucoesTela.dart';
 
 class TelaLogin extends StatefulWidget {
   const TelaLogin({Key? key}) : super(key: key);
@@ -139,7 +131,7 @@ class _TelaLoginState extends State<TelaLogin> {
             )
           : Row(
               children: [
-                SizedBox(width: width * 0.5, child: const Stack(children: [logoCapa()])),
+                SizedBox(width: width * 0.5, child: Stack(children: [logoCapa()])),
                 Expanded(
                     child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

@@ -3,7 +3,7 @@ import 'dart:js';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:fono/view/connections/sharedPreference.dart';
+import '../connections/sharedPreference.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../widgets/mensagem.dart';

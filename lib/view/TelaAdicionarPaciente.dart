@@ -11,7 +11,7 @@ import 'package:uuid/uuid.dart';
 import 'package:firedart/firedart.dart' as fd;
 
 import '../widgets/campoTexto.dart';
-import 'controllers/coresPrincipais.dart';
+import '../controllers/estilos.dart';
 import '../widgets/mensagem.dart';
 
 enum Gender { male, female }

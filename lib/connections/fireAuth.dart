@@ -7,12 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/mensagem.dart';
-import '../connections/sharedPreference.dart';
-import 'fireCloud.dart';
+import 'sharedPreference.dart';
+import 'fireCloudUser.dart';
+
+idUsuario() {
+  return FirebaseAuth.instance.currentUser!.uid;
+}
 
 criarConta(context, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage) {
   FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: senha).then((res) {
-    fireAddUsuario(res.user!.uid.toString(), genero, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage);
+    adicionarUsuario(res.user!.uid.toString(), genero, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage);
     sucesso(context, 'O usuário foi criado com sucesso!');
     Navigator.pop(context);
   }).catchError((e) {
@@ -30,7 +34,7 @@ criarConta(context, genero, nome, dtNascimento, email, cpf, crfa, telefone, senh
 }
 
 autenticarConta(context, email, senha) async {
-  if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+  //if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
     FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: senha).then((res) {
       sucesso(context, 'Usuário autenticado com sucesso!');
       saveValor();
@@ -50,8 +54,10 @@ autenticarConta(context, email, senha) async {
           erro(context, e.code.toString());
       }
     });
-  }else{
+  /*}else{
     await Firebase.initializeApp();
+    await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
+    await fd.Firestore.initialize('programafono-7be09');
     fd.FirebaseAuth.instance.signIn(email, senha).then((res) async {
       sucesso(context, 'Usuário autenticado com sucesso!');
       final emailSave = await SharedPreferences.getInstance();
@@ -75,7 +81,7 @@ autenticarConta(context, email, senha) async {
           erro(context, e.code.toString());
       }
     });
-  }
+  }*/
 }
 
 signOut(context) async {

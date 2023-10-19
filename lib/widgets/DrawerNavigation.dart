@@ -4,8 +4,8 @@ import 'package:fono/view/TelaContas.dart';
 import 'package:fono/view/TelaEditarPerfil.dart';
 import 'package:fono/view/TelaPacientes.dart';
 
-import '../view/connections/fireAuth.dart';
-import '../view/controllers/coresPrincipais.dart';
+import '../connections/fireAuth.dart';
+import '../controllers/estilos.dart';
 
 class DrawerNavigation extends StatefulWidget {
   final String uidFono;
@@ -22,16 +22,21 @@ class DrawerNavigation extends StatefulWidget {
 class _DrawerNavigationState extends State<DrawerNavigation> {
   double tamanhoLetra = 18;
 
+  String corTexto = 'corTexto';
+  String corSimbolo = 'corSimbolo';
+  String corLinha = 'verde';
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: cores('rosa_fraco'),
-      shadowColor: cores('verde'),
+      backgroundColor: cores('corTerciaria'),
+      shadowColor: cores('corDetalhe'),
+      surfaceTintColor: cores('corDetalhe'),
       child: ListView(
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              color: cores('rosa_fraco'),
+              color: cores('corTerciaria'),
             ),
             child: menuHeader(),
           ),
@@ -43,14 +48,15 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
 
   menuHeader() {
     return Container(
-      color: cores('rosa_fraco'),
-      padding: EdgeInsets.symmetric(vertical: 45),
+      alignment: Alignment.center,
+      color: cores('corTerciaria'),
+      padding: EdgeInsets.symmetric(vertical: 35),
       child: Row(
         children: [
           widget.urlImage.isEmpty
               ? Icon(
             Icons.person,
-            color: cores('rosa_medio'),
+            color: cores('corSecundaria'),
           )
               : CircleAvatar(
             radius: 30,
@@ -67,7 +73,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               Expanded(
                 child: Text(
                   widget.nomeUsuario.toString(),
-                  style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+                  style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
                 ),
               ),
               SizedBox(
@@ -76,7 +82,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               Text(
                 widget.genero == 'Gender.male' ? 'Fonoaudiólogo' : 'Fonoaudióloga',
                 style: TextStyle(
-                  color: cores('verde'),
+                  color: cores(corTexto),
                   fontSize: 16,
                 ),
               ),
@@ -94,17 +100,17 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
         runSpacing: 10,
         children: [
           Divider(
-            color: cores('verde'),
+            color: cores(corLinha),
             height: 10,
           ),
           ListTile(
             leading: Icon(
               Icons.person,
-              color: cores('verde'),
+              color: cores(corSimbolo),
             ),
             title: Text(
               'Pacientes',
-              style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
               Navigator.push(
@@ -116,11 +122,11 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
           ListTile(
             leading: Icon(
               Icons.calendar_month,
-              color: cores('verde'),
+              color: cores(corSimbolo),
             ),
             title: Text(
               'Agenda',
-              style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
               Navigator.push(
@@ -132,11 +138,11 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
           ListTile(
             leading: Icon(
               Icons.assignment,
-              color: cores('verde'),
+              color: cores(corSimbolo),
             ),
             title: Text(
               'Relatório',
-              style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
               //Navigator.push(context, MaterialPageRoute(builder: (context) => TelaPacientes()),);
@@ -145,11 +151,11 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
           ListTile(
             leading: Icon(
               Icons.analytics_outlined,
-              color: cores('verde'),
+              color: cores(corSimbolo),
             ),
             title: Text(
               'Dados',
-              style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
               //Navigator.push(context, MaterialPageRoute(builder: (context) => TelaPacientes()),);
@@ -158,12 +164,12 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
           ListTile(
             leading: Icon(
               Icons.payments,
-              color: cores('verde'),
+              color: cores(corSimbolo),
             ),
             title: Text(
               'Contas',
               style: TextStyle(
-                color: cores('verde'),
+                color: cores(corTexto),
                 fontWeight: FontWeight.bold,
                 fontSize: tamanhoLetra,
               ),
@@ -176,17 +182,17 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
             },
           ),
           Divider(
-            color: cores('verde'),
+            color: cores(corLinha),
             height: 10,
           ),
           ListTile(
             leading: Icon(
               Icons.edit,
-              color: cores('verde'),
+              color: cores(corSimbolo),
             ),
             title: Text(
               'Editar Perfil',
-              style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
               Navigator.push(
@@ -198,11 +204,11 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
           ListTile(
             leading: Icon(
               Icons.logout,
-              color: cores('verde'),
+              color: cores(corSimbolo),
             ),
             title: Text(
               'Sair',
-              style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
               signOut(context);

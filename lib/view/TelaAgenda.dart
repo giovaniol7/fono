@@ -12,7 +12,7 @@ import 'package:fono/view/TelaEditarAgenda.dart';
 import 'package:fono/view/TelaInicial.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
-import 'controllers/coresPrincipais.dart';
+import '../controllers/estilos.dart';
 
 class TelaAgenda extends StatefulWidget {
   final String uidFono;
@@ -53,18 +53,18 @@ class _TelaAgendaState extends State<TelaAgenda> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: cores('verde')),
+        iconTheme: IconThemeData(color: cores('corSimbolo')),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: cores('corSimbolo'),),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         title: Text(
           "Agenda",
-          style: TextStyle(color: cores('verde')),
+          style: TextStyle(color: cores('corTexto')),
         ),
-        backgroundColor: cores('rosa_fraco'),
+        backgroundColor: cores('corTerciaria'),
       ),
       body: FutureBuilder<List<Appointment>>(
         future: _futureAppointments,
@@ -76,11 +76,11 @@ class _TelaAgendaState extends State<TelaAgenda> {
               showDatePickerButton: true,
               showNavigationArrow: true,
               headerStyle: CalendarHeaderStyle(
-                  textStyle: TextStyle(color: cores('verde'), fontSize: 20),
+                  textStyle: TextStyle(color: cores('corTexto'), fontSize: 20),
                   textAlign: TextAlign.center,
-                  backgroundColor: cores('rosa_fraco')),
+                  backgroundColor: cores('corTerciaria')),
               headerDateFormat: 'MMMM y',
-              todayHighlightColor: cores('verde'),
+              todayHighlightColor: cores('corTexto'),
               view: CalendarView.week,
               allowedViews: [
                 CalendarView.day,

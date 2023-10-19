@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../view/controllers/resolucoesTela.dart';
+import '../controllers/resolucoesTela.dart';
 
 
 

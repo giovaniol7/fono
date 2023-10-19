@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
-import 'view/connections/firebase_options.dart';
+import '../connections/firebase_options.dart';
 import 'package:fono/view/TelaLogin.dart';
 import 'package:fono/view/TelaInicial.dart';
 import 'package:fono/view/TelaCadastro.dart';

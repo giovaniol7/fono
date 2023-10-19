@@ -7,10 +7,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fono/view/TelaAdicionarContas.dart';
-import 'package:fono/view/controllers/coresPrincipais.dart';
+import '../controllers/calcularFinanceiro.dart';
+import '../controllers/converterData.dart';
+import '../controllers/estilos.dart';
 import 'package:firedart/firedart.dart' as fd;
 import 'package:fono/widgets/mensagem.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../controllers/formatarMesAno.dart';
 
 class TelaContas extends StatefulWidget {
   const TelaContas({super.key});
@@ -30,134 +34,6 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
   double somaRenda = 0;
   late TabController _tabController;
   NumberFormat numberFormat = NumberFormat("#,##0.00", "pt_BR");
-
-  Map<int, String> nomeMeses = {
-    1: 'Janeiro',
-    2: 'Fevereiro',
-    3: 'Março',
-    4: 'Abril',
-    5: 'Maio',
-    6: 'Junho',
-    7: 'Julho',
-    8: 'Agosto',
-    9: 'Setembro',
-    10: 'Outubro',
-    11: 'Novembro',
-    12: 'Dezembro'
-  };
-
-  String formatarMesAno(String data) {
-    List<String> partes = data.split('/');
-    int numeroMes = int.parse(partes[0]);
-    String nomeMes = nomeMeses[numeroMes] ?? '';
-    String ano = partes[1];
-    int anoAtual = DateTime.now().year;
-
-    if (ano == anoAtual.toString()) {
-      return '$nomeMes';
-    } else {
-      return '$nomeMes $ano';
-    }
-  }
-
-  Future<void> calcularSomas() async {
-    double totalGanhos = 0;
-    double totalDespesas = 0;
-
-    try {
-      if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-        QuerySnapshot usersSnapshot = await FirebaseFirestore.instance
-            .collection('contas')
-            .where('uidFono', isEqualTo: uidFono)
-            .where('tipoTransacao', isEqualTo: 'Recebido')
-            .where('estadoPago', isEqualTo: true)
-            .get();
-
-        if (usersSnapshot.docs.isNotEmpty) {
-          usersSnapshot.docs.forEach((doc) {
-            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-            String precoST = data['preco'];
-            precoST = precoST.replaceAll('.', '');
-            precoST = precoST.replaceAll(',', '.');
-            double precoCompra = double.parse(precoST);
-            totalGanhos += precoCompra;
-          });
-        }
-
-        QuerySnapshot recebidosSnapshot = await FirebaseFirestore.instance
-            .collection('contas')
-            .where('uidFono', isEqualTo: uidFono)
-            .where('tipoTransacao', isEqualTo: 'Gasto')
-            .where('estadoPago', isEqualTo: false)
-            .get();
-
-        if (recebidosSnapshot.docs.isNotEmpty) {
-          recebidosSnapshot.docs.forEach((doc) {
-            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-            String precoST = data['preco'];
-            precoST = precoST.replaceAll('.', '');
-            precoST = precoST.replaceAll(',', '.');
-            double precoCompra = double.parse(precoST);
-            totalDespesas += precoCompra;
-          });
-        }
-        setState(() {
-          somaGanhos = totalGanhos;
-          somaDespesas = totalDespesas;
-          somaRenda = somaGanhos - somaDespesas;
-        });
-      } else {
-        //await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
-        //await fd.Firestore.initialize('programafono-7be09');
-        var auth = fd.FirebaseAuth.instance;
-        final emailSave = await SharedPreferences.getInstance();
-        var email = emailSave.getString('email');
-        final senhaSave = await SharedPreferences.getInstance();
-        var senha = senhaSave.getString('senha');
-        await auth.signIn(email!, senha!);
-        var user = await auth.getUser();
-        windowsIdFono = user.id;
-
-        var usersSnapshot = await fd.Firestore.instance
-            .collection('contas')
-            .where('uidFono', isEqualTo: uidFono)
-            .where('tipoTransacao', isEqualTo: 'Recebido')
-            .where('estadoPago', isEqualTo: true)
-            .get();
-
-        if (usersSnapshot.isNotEmpty) {
-          usersSnapshot.forEach((doc) {
-            Map<String, dynamic> data = doc as Map<String, dynamic>;
-            String precoST = data['preco'];
-            precoST = precoST.replaceAll('.', '');
-            precoST = precoST.replaceAll(',', '.');
-            double precoCompra = double.parse(precoST);
-            totalGanhos += precoCompra;
-          });
-        }
-
-        var recebidosSnapshot = await fd.Firestore.instance
-            .collection('contas')
-            .where('uidFono', isEqualTo: uidFono)
-            .where('tipoTransacao', isEqualTo: 'Gasto')
-            .where('estadoPago', isEqualTo: false)
-            .get();
-
-        if (recebidosSnapshot.isNotEmpty) {
-          recebidosSnapshot.forEach((doc) {
-            Map<String, dynamic> data = doc as Map<String, dynamic>;
-            String precoST = data['preco'];
-            precoST = precoST.replaceAll('.', '');
-            precoST = precoST.replaceAll(',', '.');
-            double precoCompra = double.parse(precoST);
-            totalDespesas += precoCompra;
-          });
-        }
-      }
-    } catch (e) {
-      print('Erro ao calcular somas: $e');
-    }
-  }
 
   retornarPacientes() async {
     DateTime now = DateTime.now();
@@ -196,7 +72,8 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
       contasCredito = fd.Firestore.instance
           .collection('contas')
           .where('uidFono', isEqualTo: windowsIdFono)
-          .where('tipoTransação', isEqualTo: 'Gasto').get();
+          .where('tipoTransação', isEqualTo: 'Gasto')
+          .get();
       contasDebito = fd.Firestore.instance
           .collection('contas')
           .where('uidFono', isEqualTo: windowsIdFono)
@@ -211,7 +88,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
     super.initState();
     _tabController = TabController(vsync: this, length: 3);
     retornarPacientes();
-    calcularSomas();
+    calcularFinanceiro();
   }
 
   @override
@@ -225,11 +102,11 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: cores('rosa_fraco'),
+        backgroundColor: cores('corTerciaria'),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_outlined,
-            color: cores('verde'),
+            color: cores('corSimbolo'),
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -254,11 +131,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
               height: kIsWeb || Platform.isWindows
                   ? MediaQuery.of(context).size.width * 0.2
                   : MediaQuery.of(context).size.height * 0.23,
-              decoration: BoxDecoration(
-                color: cores('rosa_fraco'),
-                borderRadius:
-                    const BorderRadius.only(bottomRight: Radius.circular(32), bottomLeft: Radius.circular(32)),
-              ),
+              decoration: BoxDecoration(color: cores('corTerciaria'),),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
@@ -271,7 +144,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                           children: <Widget>[
                             Icon(
                               Icons.money_off,
-                              color: cores('verde'),
+                              color: cores('corSimbolo'),
                               size: kIsWeb || Platform.isWindows
                                   ? MediaQuery.of(context).size.width * 0.03
                                   : MediaQuery.of(context).size.height * 0.03,
@@ -279,7 +152,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                             Text(
                               numberFormat.format(somaDespesas),
                               style: TextStyle(
-                                color: cores('verde'),
+                                color: cores('corTexto'),
                                 fontSize: kIsWeb || Platform.isWindows
                                     ? MediaQuery.of(context).size.width * 0.02
                                     : MediaQuery.of(context).size.height * 0.02,
@@ -294,7 +167,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                           children: <Widget>[
                             Icon(
                               Icons.monetization_on_rounded,
-                              color: cores('verde'),
+                              color: cores('corSimbolo'),
                               size: kIsWeb || Platform.isWindows
                                   ? MediaQuery.of(context).size.width * 0.03
                                   : MediaQuery.of(context).size.height * 0.03,
@@ -302,7 +175,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                             Text(
                               numberFormat.format(somaGanhos),
                               style: TextStyle(
-                                color: cores('verde'),
+                                color: cores('corTexto'),
                                 fontSize: kIsWeb || Platform.isWindows
                                     ? MediaQuery.of(context).size.width * 0.02
                                     : MediaQuery.of(context).size.height * 0.02,
@@ -321,7 +194,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                             Text(
                               'Renda',
                               style: TextStyle(
-                                  color: cores('verde'),
+                                  color: cores('corTexto'),
                                   fontSize: kIsWeb || Platform.isWindows
                                       ? MediaQuery.of(context).size.width * 0.025
                                       : MediaQuery.of(context).size.height * 0.025,
@@ -330,7 +203,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                             Text(
                               'R\$ ${numberFormat.format(somaRenda)}',
                               style: TextStyle(
-                                  color: cores('verde'),
+                                  color: cores('corTexto'),
                                   fontSize: kIsWeb || Platform.isWindows
                                       ? MediaQuery.of(context).size.width * 0.025
                                       : MediaQuery.of(context).size.height * 0.025,
@@ -339,31 +212,28 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                           ],
                         )),
                   ),
-                  Container(
-                    width: kIsWeb || Platform.isWindows
-                        ? MediaQuery.of(context).size.height * 0.9
-                        : MediaQuery.of(context).size.width * 0.9,
-                    decoration: BoxDecoration(
-                      color: cores('rosa_fraco'),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
-                      ),
-                    ),
-                    child: TabBar(
-                      controller: _tabController,
-                      tabs: const [
-                        Tab(text: 'Crédito'),
-                        Tab(text: 'Débito'),
-                        Tab(text: 'Geral'),
-                      ],
-                      indicatorColor: cores('verde'),
-                      labelColor: cores('verde/azul'),
-                      unselectedLabelColor: cores('verde'),
-                      labelStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  )
                 ],
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: cores('corTerciaria'),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                tabs: const [
+                  Tab(text: 'Crédito'),
+                  Tab(text: 'Débito'),
+                  Tab(text: 'Geral'),
+                ],
+                indicatorColor: cores('corTexto'),
+                labelColor: cores('corDetalhe'),
+                unselectedLabelColor: cores('corTexto'),
+                labelStyle: TextStyle(color: cores('corTexto'), fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
             Expanded(
@@ -494,7 +364,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                   ],
                 );
               });
-          calcularSomas();
+          calcularFinanceiro();
           //sucesso(context, 'Atualizado com sucesso!');
         },
         onTap: () {
@@ -526,7 +396,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
               'estadoPago': true,
             });
           }
-          calcularSomas();
+          calcularFinanceiro();
           //sucesso(context, 'Atualizado com sucesso!');
         },
         child: Container(
@@ -629,25 +499,6 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
             ],
           ),
         ));
-  }
-
-  String converterData(String dateTimeString) {
-    List<String> dateParts = dateTimeString.split('/');
-    int day = int.parse(dateParts[0]);
-    int month = int.parse(dateParts[1]);
-    int year = int.parse(dateParts[2]);
-
-    DateTime dateTime = DateTime(year, month, day);
-    DateTime now = DateTime.now();
-    DateTime yesterday = now.subtract(const Duration(days: 1));
-
-    var textToShow = (dateTime.year == now.year && dateTime.month == now.month && dateTime.day == now.day)
-        ? 'Hoje'
-        : (dateTime.year == yesterday.year && dateTime.month == yesterday.month && dateTime.day == yesterday.day)
-            ? 'Ontem'
-            : DateFormat('dd/MM/yyyy').format(dateTime);
-
-    return textToShow;
   }
 
 /*Widget listarContas(doc) {

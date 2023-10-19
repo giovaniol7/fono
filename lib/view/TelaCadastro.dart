@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../widgets/campoTexto.dart';
 import '../widgets/mensagem.dart';
-import 'package:fono/view/controllers/coresPrincipais.dart';
+import '../controllers/estilos.dart';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';

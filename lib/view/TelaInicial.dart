@@ -1,16 +1,14 @@
-import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fono/controllers/calcularFinanceiro.dart';
+import 'package:intl/intl.dart';
 
-import '../view/controllers/coresPrincipais.dart';
+import '../connections/fireAuth.dart';
+import '../connections/fireCloudUser.dart';
+import '../controllers/estilos.dart';
+import '../controllers/resolucoesTela.dart';
 import '../widgets/DrawerNavigation.dart';
-
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firedart/firedart.dart' as fd;
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'controllers/resolucoesTela.dart';
 
 class TelaInicial extends StatefulWidget {
   const TelaInicial({Key? key}) : super(key: key);
@@ -20,121 +18,119 @@ class TelaInicial extends StatefulWidget {
 }
 
 class _TelaInicialState extends State<TelaInicial> {
+  NumberFormat numberFormat = NumberFormat("#,##0.00", "pt_BR");
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  var uidFono;
-  late String nomeUsuario = '';
-  String urlImage = '';
-  late String genero = 'Gender.male';
+  ratioScreen ratio = ratioScreen();
 
-  /*late String CRFa = '';
-  late String dtNascimento = '';
-  late String idadeUsuario = '';*/
+  late var uidFono = '';
+  late String? nome = '';
+  late String? urlImage = '';
+  late String? genero = 'Gender.male';
+  late double? receitas = 0.0;
+  late double? despesas = 0.0;
+  late double? saldo = 0.0;
+  late double? aReceber = 0.0;
+  late double? aPagar = 0.0;
+  bool _obscureText = false;
 
-  /*calculateAge(DateTime birthDate) {
-    final now = DateTime.now();
-    int age = now.year - birthDate.year;
-    if (now.month < birthDate.month || (now.month == birthDate.month && now.day < birthDate.day)) {
-      age--;
-    }
+  carregarDados() async {
+    var financias = await calcularFinanceiro();
+    var usuario = await listarUsuario();
+    double rec = await calcularAReceber();
+    double pag = await calcularAPagar();
+
     setState(() {
-      idadeUsuario = age.toString();
+      receitas = financias['somaGanhos'];
+      despesas = financias['somaDespesas'];
+      saldo = financias['somaRenda'];
+
+      nome = usuario['nome'];
+      urlImage = usuario['urlImage'];
+      genero = usuario['genero'];
+
+      aReceber = rec;
+      aPagar = pag;
     });
-  }*/
+  }
 
-  retornarNomeUsuario() async {
-    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-      uidFono = FirebaseAuth.instance.currentUser!.uid.toString();
-      FirebaseFirestore.instance.collection('users').where('uid', isEqualTo: uidFono).get().then((q) {
-        if (q.docs.isNotEmpty) {
-          setState(() {
-            nomeUsuario = q.docs[0].data()['nome'];
-            urlImage = q.docs[0].data()['urlImage'];
-            print(urlImage);
-            genero = q.docs[0].data()['genero'];
-            /*dtNascimento = q.docs[0].data()['dtNascimento'];
-            List<String> partesData = dtNascimento.split('/');
-            int dia = int.parse(partesData[0]);
-            int mes = int.parse(partesData[1]);
-            int ano = int.parse(partesData[2]);
-            DateTime dataNascimento = DateTime(ano, mes, dia);
-            calculateAge(dataNascimento);
-            CRFa = q.docs[0].data()['crfa'];*/
-          });
-        }
-      });
-    } else {
-      await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
-      await fd.Firestore.initialize('programafono-7be09');
-      var auth = fd.FirebaseAuth.instance;
-      final emailSave = await SharedPreferences.getInstance();
-      var email = emailSave.getString('email');
-      final senhaSave = await SharedPreferences.getInstance();
-      var senha = senhaSave.getString('senha');
-      await auth.signIn(email!, senha!);
-      var user = await auth.getUser();
-      uidFono = user.id;
-
-      fd.Firestore.instance.collection('users').where('uid', isEqualTo: uidFono).get().then((q) {
-        if (q.isNotEmpty) {
-          q.forEach((doc) {
-            setState(() {
-              nomeUsuario = doc['nome'];
-              urlImage = doc['urlImage'];
-              genero = doc['genero'];
-              //dtNascimento = doc['dtNascimento'];
-              //calculateAge(DateTime.parse(dtNascimento));
-            });
-          });
-        }
-      });
-    }
+  void _toggle() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    retornarNomeUsuario();
+    carregarDados();
   }
-
-  ratioScreen ratio = ratioScreen();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         key: _scaffoldKey,
-        drawer: DrawerNavigation(uidFono, urlImage, genero, nomeUsuario),
+        drawer: DrawerNavigation(uidFono, urlImage!, genero!, nome!),
         body: ListView(
+          padding: EdgeInsets.only(bottom: 20),
           children: [
             Stack(
               children: [
-                ratio.screen(context) == 'pequeno' ? Center(
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 50,
+                ratio.screen(context) == 'pequeno'
+                    ? Center(
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 40,
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(right: 10),
+                              alignment: Alignment.topRight,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      _obscureText == false ? Icons.visibility_off : Icons.visibility,
+                                      color: cores('corSimbolo'),
+                                      size: 35,
+                                    ),
+                                    onPressed: _toggle,
+                                  ),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.help,
+                                      color: cores('corSimbolo'),
+                                      size: 30,
+                                    ),
+                                    onPressed: (){},
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            contaHome(context, setState, receitas, despesas, saldo, aReceber, aPagar, _obscureText),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            calendarHome(context),
+                          ],
+                        ),
+                      )
+                    : Row(
+                        children: [
+                          SizedBox(
+                            height: 50,
+                          ),
+                          contaHome(context, setState, receitas, despesas, saldo, aReceber, aPagar, _obscureText),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          calendarHome(context),
+                        ],
                       ),
-                      contaHome(context),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      calendarHome(context),
-                    ],
-                  ),
-                ) : Center(
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        height: 50,
-                      ),
-                      contaHome(context),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      calendarHome(context),
-                    ],
-                  ),
-                ),
                 SafeArea(
                   child: GestureDetector(
                     onTap: () {
@@ -144,13 +140,10 @@ class _TelaInicialState extends State<TelaInicial> {
                       margin: EdgeInsets.only(left: 16, top: 16),
                       height: 40,
                       width: 40,
-                      decoration: BoxDecoration(
-                          color: cores('verde/azul'),
-                          shape: BoxShape.circle,
-                          boxShadow: [BoxShadow(color: cores('rosa_fraco'), offset: Offset(0, 3), blurRadius: 8)]),
+                      decoration: decoracaoContainer('decDraw'),
                       child: Icon(
                         Icons.menu,
-                        color: cores('verde'),
+                        color: cores('corSimbolo'),
                       ),
                     ),
                   ),
@@ -162,27 +155,18 @@ class _TelaInicialState extends State<TelaInicial> {
   }
 }
 
-contaHome(context) {
+contaHome(context, setState, receitas, despesas, saldo, aReceber, aPagar, _obscureText) {
+  NumberFormat numberFormat = NumberFormat("#,##0.00", "pt_BR");
+
   return Container(
     padding: EdgeInsets.all(10),
     width: MediaQuery.of(context).size.width * 0.9,
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12.0),
-      boxShadow: [
-        BoxShadow(
-          color: cores('rosa_medio'),
-          offset: Offset(0, 2),
-          blurRadius: 5.0,
-          spreadRadius: 3.0,
-        ),
-      ],
-    ),
+    decoration: decoracaoContainer('decPadrao'),
     child: Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Text('Resumo Financeiro',
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 40, fontWeight: FontWeight.bold)),
+            style: textStyle('styleTitulo')),
         SizedBox(
           height: 10,
         ),
@@ -190,79 +174,55 @@ contaHome(context) {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Container(
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.center,
               width: 150,
-              height: 150,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: cores('rosa_fraco'),
-                    offset: Offset(2, 3),
-                    blurRadius: 10.0,
-                    spreadRadius: 3.0,
-                  ),
-                ],
-              ),
+              decoration: decoracaoContainer('decPadrao'),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Icon(
                     Icons.trending_up,
-                    color: Colors.blue,
+                    color: cores('corReceitas'),
                     size: 80,
                   ),
                   Text(
                     'Receitas',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: cores('corTextoPadrao'),
                       fontSize: 17,
                     ),
                   ),
                   Text(
-                    'R\$ 0,00',
-                    style: TextStyle(color: Colors.blue, fontSize: 38, fontWeight: FontWeight.bold),
+                    _obscureText == true ? 'R\$ ${numberFormat.format(receitas)}' : '${"⬮" * 4}',
+                    style: TextStyle(color: cores('corReceitas'), fontSize: 26, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
             Container(
-              alignment: Alignment.centerLeft,
+              alignment: Alignment.center,
               width: 150,
-              height: 150,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: cores('rosa_fraco'),
-                    offset: Offset(2, 3),
-                    blurRadius: 10.0,
-                    spreadRadius: 3.0,
-                  ),
-                ],
-              ),
+              decoration: decoracaoContainer('decPadrao'),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Icon(
                     Icons.trending_down,
-                    color: Colors.red,
+                    color: cores('corDespesas'),
                     size: 80,
                   ),
                   Text(
                     'Despesas',
                     style: TextStyle(
-                      color: Colors.black,
+                      color: cores('corTextoPadrao'),
                       fontSize: 17,
                     ),
                   ),
                   Text(
-                    'R\$ 0,00',
-                    style: TextStyle(color: Colors.red, fontSize: 38, fontWeight: FontWeight.bold),
+                    _obscureText == true ? 'R\$ ${numberFormat.format(despesas)}' : '${"⬮" * 4}',
+                    style: TextStyle(color: cores('corDespesas'), fontSize: 26, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -277,11 +237,11 @@ contaHome(context) {
           children: [
             Text(
               'Saldo: ',
-              style: TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(color: cores('corTextoPadrao'), fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Text(
-              'R\$ 0,00',
-              style: TextStyle(color: Colors.black, fontSize: 26, fontWeight: FontWeight.bold),
+              _obscureText == true ? 'R\$ ${numberFormat.format(saldo)}' : '${"⬮" * 4}',
+              style: TextStyle(color: cores('corTextoPadrao'), fontSize: 26, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -290,22 +250,11 @@ contaHome(context) {
         ),
         Container(
           width: MediaQuery.of(context).size.longestSide,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12.0),
-            boxShadow: [
-              BoxShadow(
-                color: cores('rosa_medio'),
-                offset: Offset(0, 2),
-                blurRadius: 5.0,
-                spreadRadius: 3.0,
-              ),
-            ],
-          ),
+          decoration: decoracaoContainer('decPadrao'),
           child: Column(
             children: [
               Text('Fluxo de Caixa',
-                  style: TextStyle(color: Colors.grey.shade700, fontSize: 24, fontWeight: FontWeight.bold)),
+                  style: textStyle('styleSubtitulo')),
               SizedBox(
                 height: 10,
               ),
@@ -313,9 +262,9 @@ contaHome(context) {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Card(
-                    color: Colors.blue.shade100,
+                    color: cores('corReceitasCard'),
                     elevation: 7,
-                    shadowColor: cores('rosa_fraco'),
+                    shadowColor: cores('corSombra'),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
@@ -323,57 +272,54 @@ contaHome(context) {
                     child: ListTile(
                       trailing: Icon(
                         Icons.account_balance,
-                        color: Colors.black,
+                        color: cores('corTextoPadrao'),
                         size: 40,
                       ),
-                      title: Expanded(
-                          child: Column(
+                      title: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'A Receber',
-                            style: TextStyle(fontSize: 18),
+                            style: TextStyle(color: cores('corTextoPadrao'), fontSize: 18),
                           ),
                           Text(
-                            'R\$ 0,00',
-                            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.blue),
+                            _obscureText == true ? 'R\$ ${numberFormat.format(aReceber)}' : '${"⬮" * 4}',
+                            style: TextStyle(color: cores('corReceitas'), fontSize: 26, fontWeight: FontWeight.bold),
                           ),
                         ],
-                      )),
+                      ),
                     ),
                   ),
                   SizedBox(
                     height: 5,
                   ),
                   Card(
-                    color: Colors.red.shade100,
+                    color: cores('corDespesasCard'),
                     elevation: 7,
-                    shadowColor: cores('rosa_fraco'),
+                    shadowColor: cores('corSombra'),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
                     margin: EdgeInsets.all(5),
                     child: ListTile(
-                      trailing: Icon(
-                        Icons.credit_card,
-                        color: Colors.black,
-                        size: 40,
-                      ),
-                      title: Expanded(
-                          child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'A Pagar',
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          Text(
-                            'R\$ 0,00',
-                            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.red),
-                          ),
-                        ],
-                      )),
-                    ),
+                        trailing: Icon(
+                          Icons.credit_card,
+                          color: cores('corTextoPadrao'),
+                          size: 40,
+                        ),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'A Pagar',
+                              style: TextStyle(color: cores('corTextoPadrao'), fontSize: 18),
+                            ),
+                            Text(
+                              _obscureText == true ? 'R\$ ${numberFormat.format(aPagar)}' : '${"⬮" * 4}',
+                              style: TextStyle(color: cores('corDespesas'), fontSize: 26, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        )),
                   ),
                 ],
               ),
@@ -391,21 +337,83 @@ contaHome(context) {
 calendarHome(context) {
   return Container(
     width: MediaQuery.of(context).size.width * 0.9,
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12.0),
-      boxShadow: [
-        BoxShadow(
-          color: cores('rosa_medio'),
-          offset: Offset(0, 2),
-          blurRadius: 5.0,
-          spreadRadius: 3.0,
-        ),
-      ],
-    ),
+    decoration: decoracaoContainer('decPadrao'),
     child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text('Próximos Horários'),
+        Text('Próximos Horários',
+            style: TextStyle(color: cores('corTitulo'), fontSize: 40, fontWeight: FontWeight.bold)),
+        Container(
+          alignment: Alignment.topCenter,
+          padding: EdgeInsets.all(5),
+          width: MediaQuery.of(context).size.width * 0.8,
+          decoration: decoracaoContainer('decPadrao'),
+          child: Padding(
+            padding: const EdgeInsets.all(1),
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('consulta')
+                  .where('uidFono', isEqualTo: idUsuario())
+                  .snapshots(),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                    return Center(
+                      child: Text('Não foi possível conectar.'),
+                    );
+                  case ConnectionState.waiting:
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  default:
+                    final dados = snapshot.requireData;
+                    if (dados.size > 0) {
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: dados.size,
+                        itemBuilder: (context, index) {
+                          String id = dados.docs[index].id;
+                          dynamic item = dados.docs[index].data();
+                          return Card(
+                            color: cores('corTerciaria'),
+                            elevation: 5,
+                            shadowColor: cores('corSombra'),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            margin: EdgeInsets.all(5),
+                            child: ListTile(
+                              leading: Icon(Icons.calendar_month, color: cores('corSimboloPadrao'),),
+                              title: Text(
+                                item['nomePaciente'],
+                                style: TextStyle(color: cores('corTextoPadrao'), fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Text(
+                                item['dataConsulta'],
+                                style: TextStyle(
+                                  color: cores('corTextoPadrao'),
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    } else {
+                      return Center(
+                        child: Text('Nenhuma tarefa encontrada.'),
+                      );
+                    }
+                }
+              },
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 20,
+        ),
       ],
     ),
   );

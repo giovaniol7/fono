@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fono/controllers/estilos.dart';
 
 class TextFieldSuggestions extends StatefulWidget {
   final List<String> list;
@@ -16,16 +17,16 @@ class TextFieldSuggestions extends StatefulWidget {
 
   const TextFieldSuggestions(
       {Key? key,
-        this.icone,
-        this.margem,
-        required this.list,
-        required this.labelText,
-        required this.textSuggetionsColor,
-        required this.suggetionsBackgroundColor,
-        required this.outlineInputBorderColor,
-        required this.returnedValue,
-        required this.onTap,
-        required this.height})
+      this.icone,
+      this.margem,
+      required this.list,
+      required this.labelText,
+      required this.textSuggetionsColor,
+      required this.suggetionsBackgroundColor,
+      required this.outlineInputBorderColor,
+      required this.returnedValue,
+      required this.onTap,
+      required this.height})
       : super(key: key);
 
   @override
@@ -68,19 +69,18 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
             return [];
           }
           // The logic to find out which ones should appear
-          return widget.list
-              .where((suggestion) => suggestion.contains(value.text));
+          return widget.list.where((suggestion) => suggestion.contains(value.text));
         },
-        fieldViewBuilder: (BuildContext context, textEditingController,
-            FocusNode focusNode, VoidCallback onFieldSubmitted) {
+        fieldViewBuilder:
+            (BuildContext context, textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
           return Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(color: Color(0xFFF5B2B0)),
-              color: Colors.white,
+              border: Border.all(color: cores('corPrimaria')),
+              color: cores('branco'),
               boxShadow: [
                 BoxShadow(
-                  color: Color(0xFFF8CAC7),
+                  color: cores('corSombra'),
                   blurRadius: 5,
                   offset: Offset(0, 3),
                 ),
@@ -88,30 +88,31 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
             ),
             child: TextField(
               controller: textEditingController,
-              style: const TextStyle(
-                color: Color(0xFF37513F),
+              style: TextStyle(
+                color: cores('corTexto'),
                 fontWeight: FontWeight.w400,
+                fontSize: 18,
               ),
               focusNode: focusNode,
               autofocus: true,
               textCapitalization: TextCapitalization.sentences,
               scrollPadding: const EdgeInsets.only(bottom: 200),
               decoration: InputDecoration(
-                focusedBorder: const OutlineInputBorder(
+                focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Color(0xFFF5B2B0),
+                    color: cores('corPrimaria'),
                     width: 2.0,
                   ),
                 ),
                 hintText: widget.labelText,
-                hintStyle: const TextStyle(
-                  color: Color(0xFFB4CABB),
+                hintStyle: TextStyle(
+                  color: cores('corTexto'),
                   fontWeight: FontWeight.bold,
                 ),
                 fillColor: widget.outlineInputBorderColor,
                 prefixIcon: Icon(
                   widget.icone,
-                  color: Color(0xFF37513F),
+                  color: cores('corSimbolo'),
                 ),
               ),
               onSubmitted: (String value) {
@@ -136,9 +137,8 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
             ),
           );
         },
-        optionsViewBuilder: (BuildContext context,
-            AutocompleteOnSelected<String> onSelected,
-            Iterable<String> options) {
+        optionsViewBuilder:
+            (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
           return Container(
             margin: const EdgeInsets.only(right: 93),
             child: Align(
@@ -149,15 +149,15 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
                   bottomLeft: Radius.circular(15),
                   bottomRight: Radius.circular(15),
                 ),
-                color: Colors.white,
+                color: cores('branco'),
                 child: SizedBox(
                   height: options.length == 1
                       ? 85
                       : options.length == 2
-                      ? 150
-                      : 200,
+                          ? 150
+                          : 200,
                   child: ListView.builder(
-                    // shrinkWrap: true,
+                      // shrinkWrap: true,
                       itemCount: options.length,
                       itemBuilder: (BuildContext context, int index) {
                         final String option = options.elementAt(index);
@@ -175,11 +175,11 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
                             title: Text(
                               option,
                               maxLines: 3,
-                              style: const TextStyle(
-                                  color: Color(0xff255A46),
+                              style: TextStyle(
+                                  color: cores('corTexto'),
                                   fontFamily: 'Quicksand',
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.normal),
                             ),
                           ),
                         );
@@ -197,9 +197,11 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
     List<String> words = text.toLowerCase().split(' ');
     List<String> capitalizedWords = [];
 
-    for (String word in words) {
-      String capitalizedWord = word[0].toUpperCase() + word.substring(1);
-      capitalizedWords.add(capitalizedWord);
+    if (text.isNotEmpty) {
+      for (String word in words) {
+        String capitalizedWord = word[0].toUpperCase() + word.substring(1);
+        capitalizedWords.add(capitalizedWord);
+      }
     }
 
     return capitalizedWords.join(' ');

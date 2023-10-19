@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import '../view/TelaAgenda.dart';
 import '../widgets/TextFieldSuggestions.dart';
 import '../widgets/campoTexto.dart';
-import 'controllers/coresPrincipais.dart';
+import '/controllers/estilos.dart';
 import '../widgets/mensagem.dart';
 import 'package:firedart/firedart.dart' as fd;
 import 'package:firebase_auth/firebase_auth.dart';
