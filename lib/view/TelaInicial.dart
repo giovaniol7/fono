@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fono/controllers/calcularFinanceiro.dart';
@@ -77,12 +79,11 @@ class _TelaInicialState extends State<TelaInicial> {
 
     return Scaffold(
         key: _scaffoldKey,
-        drawer: DrawerNavigation(uidFono, urlImage!, genero!, nome!),
+        drawer: DrawerNavigation(urlImage!, genero!, nome!),
         body: RefreshIndicator(
             color: cores('corSimbolo'),
             onRefresh: atualizarDados,
             child: ListView(
-              padding: EdgeInsets.all(10),
               children: [
                 Stack(
                   children: [
@@ -90,96 +91,73 @@ class _TelaInicialState extends State<TelaInicial> {
                         ? Center(
                             child: Column(
                               children: [
-                                SizedBox(
-                                  height: 30,
-                                ),
-                                Container(
-                                  alignment: Alignment.topRight,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      IconButton(
-                                        icon: Icon(
-                                          _obscureText == false ? Icons.visibility_off : Icons.visibility,
-                                          color: cores('corSimbolo'),
-                                          size: 35,
-                                        ),
-                                        onPressed: _toggle,
-                                      ),
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.help,
-                                          color: cores('corSimbolo'),
-                                          size: 30,
-                                        ),
-                                        onPressed: () {},
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 5,
+                                const SizedBox(
+                                  height: 60,
                                 ),
                                 calendarHome(context, tamanhoWidgets, tamanhoFonte),
-                                SizedBox(
-                                  height: 20,
+                                const SizedBox(
+                                  height: 10,
                                 ),
-                                contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas, despesas, saldo,
-                                    aReceber, aPagar, _obscureText),
+                                contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas, despesas,
+                                    saldo, aReceber, aPagar, _obscureText),
                               ],
                             ),
                           )
                         : Column(
                             children: [
-                              Container(
-                                alignment: Alignment.topRight,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.refresh,
-                                        color: cores('corSimbolo'),
-                                        size: tamanhoFonte.iconPequeno(context),
-                                      ),
-                                      onPressed: () {
-                                        atualizarDados();
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: Icon(
-                                        _obscureText == false ? Icons.visibility_off : Icons.visibility,
-                                        color: cores('corSimbolo'),
-                                        size: tamanhoFonte.iconPequeno(context),
-                                      ),
-                                      onPressed: _toggle,
-                                    ),
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.help,
-                                        color: cores('corSimbolo'),
-                                        size: tamanhoFonte.iconPequeno(context),
-                                      ),
-                                      onPressed: () {},
-                                    ),
-                                  ],
-                                ),
-                              ),
                               Row(
                                 children: [
-                                  SizedBox(
+                                  Expanded(
+                                    child: calendarHome(context, tamanhoWidgets, tamanhoFonte),
+                                  ),
+                                  const SizedBox(
                                     width: 10,
                                   ),
-                                  calendarHome(context, tamanhoWidgets, tamanhoFonte),
-                                  SizedBox(
-                                    width: 20,
+                                  Expanded(
+                                    child: contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas,
+                                        despesas, saldo, aReceber, aPagar, _obscureText),
                                   ),
-                                  contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas, despesas, saldo,
-                                      aReceber, aPagar, _obscureText),
                                 ],
                               ),
                             ],
                           ),
+                    Container(
+                      margin: EdgeInsets.only(right: 10, top: 10),
+                      alignment: Alignment.topRight,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          kIsWeb || Platform.isWindows
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons.refresh,
+                                    color: cores('corSimbolo'),
+                                    size: tamanhoFonte.iconPequeno(context),
+                                  ),
+                                  onPressed: () {
+                                    atualizarDados();
+                                  },
+                                )
+                              : Container(),
+                          IconButton(
+                            icon: Icon(
+                              _obscureText == false ? Icons.visibility_off : Icons.visibility,
+                              color: cores('corSimbolo'),
+                              size: tamanhoFonte.iconPequeno(context),
+                            ),
+                            onPressed: _toggle,
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.help,
+                              color: cores('corSimbolo'),
+                              size: tamanhoFonte.iconPequeno(context),
+                            ),
+                            onPressed: () {},
+                          ),
+                        ],
+                      ),
+                    ),
                     SafeArea(
                       child: GestureDetector(
                         onTap: () {
@@ -205,6 +183,8 @@ class _TelaInicialState extends State<TelaInicial> {
 }
 
 calendarHome(context, tamanhoWidgets, tamanhoFonte) {
+  final CalendarController _calendarController = CalendarController();
+
   return Container(
     width: tamanhoWidgets.getWidth(context),
     height: tamanhoWidgets.getHeight(context),
@@ -214,14 +194,8 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text('Próximos Horários', style: textStyle(context, 'styleTitulo')),
-        Container(
-          alignment: Alignment.topCenter,
-          padding: EdgeInsets.all(5),
-          width: tamanhoWidgets.outroWidth(context, 0.8),
-          height: tamanhoWidgets.outroHeight(context, 0.6),
-          decoration: decoracaoContainer('decPadrao'),
+        Expanded(
           child: Container(
-            padding: const EdgeInsets.all(1),
             child: FutureBuilder<DataSource>(
               future: getDataSource(),
               builder: (context, snapshot) {
@@ -242,6 +216,9 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                     } else {
                       DataSource dataSource = snapshot.data!;
                       return SfCalendar(
+                        showTodayButton: true,
+                        controller: _calendarController,
+                        showWeekNumber: false,
                         firstDayOfWeek: 7,
                         showDatePickerButton: true,
                         dataSource: dataSource,
@@ -294,11 +271,11 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
   );
 }
 
-contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas, despesas, saldo, aReceber, aPagar, _obscureText) {
+contaHome(
+    context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas, despesas, saldo, aReceber, aPagar, _obscureText) {
   NumberFormat numberFormat = NumberFormat("#,##0.00", "pt_BR");
 
   return Container(
-    padding: EdgeInsets.all(10),
     width: tamanhoWidgets.getWidth(context),
     height: tamanhoWidgets.getHeight(context),
     decoration: decoracaoContainer('decPadrao'),
@@ -314,8 +291,12 @@ contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas, desp
           children: [
             Container(
               alignment: Alignment.center,
-              width: ratio.screen(context) == 'pequeno' ? tamanhoWidgets.outroWidth(context, 0.37) : tamanhoWidgets.outroHeight(context, 0.25),
-              height: ratio.screen(context) == 'pequeno' ? tamanhoWidgets.outroWidth(context, 0.37) : tamanhoWidgets.outroHeight(context, 0.25),
+              width: ratio.screen(context) == 'pequeno'
+                  ? tamanhoWidgets.outroWidth(context, 0.37)
+                  : tamanhoWidgets.outroHeight(context, 0.25),
+              height: ratio.screen(context) == 'pequeno'
+                  ? tamanhoWidgets.outroWidth(context, 0.37)
+                  : tamanhoWidgets.outroHeight(context, 0.25),
               decoration: decoracaoContainer('decPadrao'),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -345,8 +326,12 @@ contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas, desp
             ),
             Container(
               alignment: Alignment.center,
-              width: ratio.screen(context) == 'pequeno' ? tamanhoWidgets.outroWidth(context, 0.37) : tamanhoWidgets.outroHeight(context, 0.25),
-              height: ratio.screen(context) == 'pequeno' ? tamanhoWidgets.outroWidth(context, 0.37) : tamanhoWidgets.outroHeight(context, 0.25),
+              width: ratio.screen(context) == 'pequeno'
+                  ? tamanhoWidgets.outroWidth(context, 0.37)
+                  : tamanhoWidgets.outroHeight(context, 0.25),
+              height: ratio.screen(context) == 'pequeno'
+                  ? tamanhoWidgets.outroWidth(context, 0.37)
+                  : tamanhoWidgets.outroHeight(context, 0.25),
               decoration: decoracaoContainer('decPadrao'),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -399,9 +384,10 @@ contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas, desp
           ],
         ),
         SizedBox(
-          height: 20,
+          height: 10,
         ),
         Container(
+          margin: EdgeInsets.all(10),
           decoration: decoracaoContainer('decPadrao'),
           child: Column(
             children: [
@@ -410,7 +396,7 @@ contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas, desp
                 height: 10,
               ),
               Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                //mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Card(
                     color: cores('corReceitasCard'),

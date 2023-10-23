@@ -7,6 +7,18 @@ recuperarPacientes() async {
   return await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario());
 }
 
+Future<String> buscarIdPaciente(context, nome) async {
+  String id = '';
+
+  await FirebaseFirestore.instance.collection(nomeColecao).where('nomePaciente', isEqualTo: nome).get().then((q) {
+    if (q.docs.isNotEmpty) {
+      id = q.docs[0].id;
+    }
+  });
+
+  return id;
+}
+
 Future<List<String>> fazerListaPacientes() async {
   List<String> list = [];
 

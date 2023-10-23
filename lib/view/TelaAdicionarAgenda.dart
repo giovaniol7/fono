@@ -1,21 +1,20 @@
-import 'dart:io';
-
 import 'package:brasil_fields/brasil_fields.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../view/TelaAgenda.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
+
+import '../connections/fireAuth.dart';
+import '../connections/fireCloudConsultas.dart';
+import '../connections/fireCloudPacientes.dart';
+import '../models/maps.dart';
 import '../widgets/TextFieldSuggestions.dart';
 import '../widgets/campoTexto.dart';
 import '/controllers/estilos.dart';
-import '../widgets/mensagem.dart';
-import 'package:firedart/firedart.dart' as fd;
-import 'package:firebase_auth/firebase_auth.dart';
 
 class TelaAdicionarAgenda extends StatefulWidget {
-  final String uidFono;
+  final String tipo;
+  final Appointment appointment;
 
-  const TelaAdicionarAgenda(this.uidFono, {super.key});
+  const TelaAdicionarAgenda(this.tipo, this.appointment, {super.key});
 
   @override
   State<TelaAdicionarAgenda> createState() => _TelaAdicionarAgendaState();
@@ -30,120 +29,86 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
   var horarioConsulta = TextEditingController();
   var duracaoConsulta = TextEditingController();
   var colorConsulta = TextEditingController();
-  var frequenciaConsulta = TextEditingController();
+  String labelText = "Nome do Paciente";
   Color selecioneCorConsulta = Colors.red;
   String selecioneFrequenciaConsulta = 'DAILY';
   String selecioneSemanaConsulta = 'SU';
   String _paciente = '';
-  List<String> _list = [];
-  var windowsIdFono;
-  var pacientes;
-  var uidFono;
+  List<String> listaPaciente = [];
+  var nome;
+  var id;
+  var uidPaciente;
+  var appointment;
+  var consulta;
 
-  final List<Color> colors = [
-    Colors.red,
-    Colors.green,
-    Colors.blue,
-    Colors.yellow,
-    Colors.orange,
-    Colors.purple,
-    Colors.pink,
-    Colors.grey,
-    Colors.black
-  ];
-
-  final List<FrequencyOption> frequencyOptions = [
-    FrequencyOption(value: "DAILY", label: "Diariamente"),
-    FrequencyOption(value: "WEEKLY", label: "Semanalmente"),
-    FrequencyOption(value: "MONTHLY", label: "Mensalmente"),
-    FrequencyOption(value: "YEARLY", label: "Anualmente"),
-  ];
-
-  final List<FrequencyOption> dayOptions = [
-    FrequencyOption(value: "SU", label: "Domingo"),
-    FrequencyOption(value: "MO", label: "Segunda-Feira"),
-    FrequencyOption(value: "TU", label: "Terça-Feira"),
-    FrequencyOption(value: "WE", label: "Quarta-Feira"),
-    FrequencyOption(value: "TH", label: "Quinta-Feira"),
-    FrequencyOption(value: "FR", label: "Sexta-Feira"),
-    FrequencyOption(value: "SA", label: "Sábado"),
-  ];
-
-  String getColorName(Color color) {
-    final Map<Color, String> colorNames = {
-      Colors.red: 'Vermelho',
-      Colors.green: 'Verde',
-      Colors.blue: 'Azul',
-      Colors.yellow: 'Amarelo',
-      Colors.orange: 'Laranja',
-      Colors.purple: 'Roxo',
-      Colors.pink: 'Rosa',
-      Colors.grey: 'Cinza',
-      Colors.black: 'Preto'
-    };
-
-    if (colorNames.containsKey(color)) {
-      return colorNames[color]!;
-    }
-
-    return color.toString();
+  Future<void> atualizarDados() async {
+    await carregarDados();
   }
 
-  retornarPacientes() async {
-    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('pacientes').where('uidFono', isEqualTo: uidFono).get();
-      for (var doc in querySnapshot.docs) {
-        String nome = doc['nomePaciente'];
-        _list.add(nome);
+  carregarDados() async {
+    List<String> lista = await fazerListaPacientes();
+    widget.tipo == 'editar' ? appointment = await carregarAppointment(widget.appointment) : null;
+    nome = widget.appointment.subject;
+    consulta = await buscarPorNomeConsultas(context, nome);
+
+    setState(() {
+      listaPaciente = lista;
+      id = consulta['id'];
+      uidPaciente = consulta['uidPaciente'];
+
+      if (widget.tipo == 'editar') {
+        labelText = appointment['nomeConsulta'];
+        _paciente = appointment['nomeConsulta'];
+        nomeConsulta.text = appointment['nomeConsulta'];
+        dataConsulta.text = appointment['dataConsulta'];
+        horarioConsulta.text = appointment['horarioConsulta'];
+        duracaoConsulta.text = appointment['duracaoConsulta'];
+        selecioneCorConsulta = appointment['selecioneCorConsulta'];
+        selecioneSemanaConsulta = appointment['selecioneSemanaConsulta'];
+        selecioneFrequenciaConsulta = appointment['selecioneFrequenciaConsulta'];
       }
-    } else {
-      List<fd.Document> querySnapshot = await fd.Firestore.instance.collection('pacientes').where('uidFono', isEqualTo: uidFono).get();
-      for (var doc in querySnapshot) {
-        String nome = doc['nomePaciente'];
-        _list.add(nome);
-      }
-    }
+    });
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     DateTime now = DateTime.now();
-    dataConsulta.text = "${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year.toString()}";
+    widget.tipo == 'adicionar'
+        ? dataConsulta.text =
+            "${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year.toString()}"
+        : null;
     selectedDate = DateTime.now();
     selectedTime = TimeOfDay.now();
-    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-      uidFono = FirebaseAuth.instance.currentUser!.uid.toString();
-      retornarPacientes();
-      duracaoConsulta.text = "00:50";
-    } else {
-      buscarId();
-      retornarPacientes();
-    }
-  }
-
-  Future<void> buscarId() async {
-    var userId = await fd.FirebaseAuth.instance.getUser();
-    windowsIdFono = userId.id;
+    carregarDados();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          actions: [
+            widget.tipo == 'editar'
+                ? IconButton(
+                    icon: Icon(Icons.delete, color: cores('corSimbolo'),),
+                    onPressed: () async {
+                      await apagarConsultas(context, id);
+                    },
+                  )
+                : Container(),
+          ],
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
-          iconTheme: IconThemeData(color: cores('verde')),
+          iconTheme: IconThemeData(color: cores('corSimbolo')),
           title: Text(
-            "Adicionar Horário",
-            style: TextStyle(color: cores('verde')),
+            widget.tipo == 'adicionar' ? "Adicionar Horário" : "Atualizar Horário",
+            style: TextStyle(color: cores('corTexto')),
           ),
-          backgroundColor: cores('rosa_fraco'),
+          backgroundColor: cores('corTerciaria'),
         ),
         body: ListView(
           padding: const EdgeInsets.all(10),
@@ -153,11 +118,11 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
               children: [
                 TextFieldSuggestions(
                     icone: Icons.label,
-                    list: _list,
-                    labelText: "Nome do Paciente",
-                    textSuggetionsColor: const Color(0xFF37513F),
-                    suggetionsBackgroundColor: const Color(0xFFFFFFFF),
-                    outlineInputBorderColor: const Color(0xFFF5B2B0),
+                    list: listaPaciente,
+                    labelText: labelText,
+                    textSuggetionsColor: cores('corSimbolo'),
+                    suggetionsBackgroundColor: cores('corCaixaPadrao'),
+                    outlineInputBorderColor: cores('corSombra'),
                     returnedValue: (String value) {
                       setState(() {
                         _paciente = value;
@@ -247,26 +212,26 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                       children: [
                         Text(
                           "Frequência",
-                          style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold),
+                          style: TextStyle(color: cores('corTexto'), fontWeight: FontWeight.bold),
                         ),
                         Container(
                           height: 40,
                           padding: const EdgeInsets.only(left: 10),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(color: cores('rosa_forte')),
+                              border: Border.all(color: cores('corPrimaria')),
                               color: Colors.white,
                               boxShadow: [
-                                BoxShadow(offset: const Offset(0, 3), color: cores('rosa_fraco'), blurRadius: 5)
+                                BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
                                 // changes position of shadow
                               ]),
                           child: DropdownButton(
                             hint: const Text('Selecione uma Frequência'),
                             icon: const Icon(Icons.arrow_drop_down),
                             iconSize: 30,
-                            iconEnabledColor: cores('verde'),
+                            iconEnabledColor: cores('corTexto'),
                             style: TextStyle(
-                              color: cores('verde'),
+                              color: cores('corTexto'),
                               fontWeight: FontWeight.w400,
                               fontSize: 18,
                             ),
@@ -298,26 +263,26 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                   children: [
                     Text(
                       "Dia da Semana:",
-                      style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold),
+                      style: TextStyle(color: cores('corTexto'), fontWeight: FontWeight.bold),
                     ),
                     Container(
                       height: 40,
                       padding: const EdgeInsets.only(left: 10),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(color: cores('rosa_forte')),
+                          border: Border.all(color: cores('corPrimaria')),
                           color: Colors.white,
                           boxShadow: [
-                            BoxShadow(offset: const Offset(0, 3), color: cores('rosa_fraco'), blurRadius: 5)
+                            BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
                             // changes position of shadow
                           ]),
                       child: DropdownButton(
                         hint: const Text('Selecione um Dia da Semana'),
                         icon: const Icon(Icons.arrow_drop_down),
                         iconSize: 30,
-                        iconEnabledColor: cores('verde'),
+                        iconEnabledColor: cores('corTexto'),
                         style: TextStyle(
-                          color: cores('verde'),
+                          color: cores('corTexto'),
                           fontWeight: FontWeight.w400,
                           fontSize: 18,
                         ),
@@ -345,26 +310,26 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                 const SizedBox(height: 20),
                 Text(
                   "Selecione uma Cor:",
-                  style: TextStyle(color: cores('verde'), fontWeight: FontWeight.bold),
+                  style: TextStyle(color: cores('corTexto'), fontWeight: FontWeight.bold),
                 ),
                 Container(
                   height: 40,
                   padding: const EdgeInsets.only(left: 10),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(color: cores('rosa_forte')),
+                      border: Border.all(color: cores('corPrimaria')),
                       color: Colors.white,
                       boxShadow: [
-                        BoxShadow(offset: const Offset(0, 3), color: cores('rosa_fraco'), blurRadius: 5)
+                        BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
                         // changes position of shadow
                       ]),
                   child: DropdownButton(
                     hint: const Text('Selecione uma Cor'),
                     icon: const Icon(Icons.arrow_drop_down),
                     iconSize: 30,
-                    iconEnabledColor: cores('verde'),
+                    iconEnabledColor: cores('corTexto'),
                     style: TextStyle(
-                      color: cores('verde'),
+                      color: cores('corTexto'),
                       fontWeight: FontWeight.w400,
                       fontSize: 18,
                     ),
@@ -397,26 +362,44 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                       width: 150,
                       child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('rosa_fraco'),
+                              primary: cores('corTextoBotao'),
                               minimumSize: const Size(200, 45),
-                              backgroundColor: cores('verde'),
+                              backgroundColor: cores('corBotao'),
                               elevation: 5,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
                               )),
-                          child: const Text(
-                            'Adicionar',
+                          child: Text(
+                            widget.tipo == 'adicionar' ? 'Adicionar' : 'Atualizar',
                             style: TextStyle(fontSize: 16),
                           ),
                           onPressed: () async {
                             String colorHex = selecioneCorConsulta.value.toRadixString(16).padLeft(8, '0');
-                            if (nomeConsulta.text.isNotEmpty &&
+                            if (widget.tipo == 'adicionar' &&
+                                nomeConsulta.text.isNotEmpty &&
                                 dataConsulta.text.isNotEmpty &&
                                 horarioConsulta.text.isNotEmpty &&
                                 duracaoConsulta.text.isNotEmpty) {
-                              adicionarAgenda(
+                              adicionarConsultas(
                                 context,
-                                widget.uidFono,
+                                nomeConsulta.text,
+                                dataConsulta.text,
+                                horarioConsulta.text,
+                                duracaoConsulta.text,
+                                selecioneFrequenciaConsulta,
+                                selecioneSemanaConsulta,
+                                colorHex,
+                              );
+                            } else if (widget.tipo == 'editar' &&
+                                nomeConsulta.text.isNotEmpty &&
+                                dataConsulta.text.isNotEmpty &&
+                                horarioConsulta.text.isNotEmpty &&
+                                duracaoConsulta.text.isNotEmpty) {
+                              editarConsultas(
+                                context,
+                                id,
+                                idUsuario(),
+                                uidPaciente,
                                 nomeConsulta.text,
                                 dataConsulta.text,
                                 horarioConsulta.text,
@@ -433,9 +416,9 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                       width: 150,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                            primary: cores('rosa_fraco'),
+                            primary: cores('corTextoBotao'),
                             minimumSize: const Size(200, 45),
-                            backgroundColor: cores('verde'),
+                            backgroundColor: cores('corBotao'),
                             elevation: 5,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
@@ -457,31 +440,4 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
           ],
         ));
   }
-}
-
-class FrequencyOption {
-  final String value;
-  final String label;
-
-  FrequencyOption({required this.value, required this.label});
-}
-
-Future<void> adicionarAgenda(
-    context, uidFono, nomePaciente, dataConsulta, horarioConsulta, duracaoConsulta, frequenciaConsulta, semanaConsulta, colorConsulta) async {
-  QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('pacientes').where('nomePaciente', isEqualTo: nomePaciente).get();
-  String uidPaciente = querySnapshot.docs[0].id;
-  Map<String, dynamic> data = {
-    'uidFono': uidFono,
-    'uidPaciente': uidPaciente,
-    'nomePaciente': nomePaciente,
-    'dataConsulta': dataConsulta,
-    'horarioConsulta': horarioConsulta,
-    'duracaoConsulta': duracaoConsulta,
-    'frequenciaConsulta': frequenciaConsulta,
-    'semanaConsulta': semanaConsulta,
-    'colorConsulta': colorConsulta,
-  };
-  FirebaseFirestore.instance.collection('consulta').add(data);
-  sucesso(context, 'O horário foi agendado com sucesso.');
-  Navigator.pop(context);
 }

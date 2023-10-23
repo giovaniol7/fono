@@ -2,6 +2,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:fono/view/TelaAgenda.dart';
+import 'package:fono/view/TelaContas.dart';
+import 'package:fono/view/TelaEditarPerfil.dart';
+import 'package:fono/view/TelaPacientes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 import '../connections/firebase_options.dart';
@@ -60,16 +64,16 @@ void main() async {
     token = tokenSave.getString('token');
 
     runApp(MaterialApp(
-      localizationsDelegates: const [
+      localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: const [
+      supportedLocales: [
         Locale('en'),
         Locale('pt'),
         Locale('es'),
       ],
-      locale: const Locale('pt', 'BR'),
+      locale: Locale('pt', 'BR'),
       debugShowCheckedModeBanner: false,
       title: 'Clínica Fonoaudiologia',
       initialRoute: token == null || token == '' ? '/login' : '/principal',
@@ -77,6 +81,10 @@ void main() async {
         '/login': (context) => const TelaLogin(),
         '/principal': (context) => const TelaInicial(),
         '/cadastro': (context) => const TelaCadastro(),
+        '/pacientes': (context) => const TelaPacientes(),
+        '/contas': (context) => const TelaContas(),
+        '/agenda': (context) => const TelaAgenda(),
+        '/editarPerfil': (context) => const TelaEditarPerfil(),
       },
     ));
   }

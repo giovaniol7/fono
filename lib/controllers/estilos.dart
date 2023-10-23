@@ -180,7 +180,7 @@ class TamanhoFonte {
 class TamanhoWidgets {
   double getWidth(BuildContext context) {
     if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
-      return MediaQuery.of(context).size.width * 0.5;
+      return MediaQuery.of(context).size.width * 0.48;
     } else {
       return MediaQuery.of(context).size.width * 0.9;
     }
@@ -188,7 +188,7 @@ class TamanhoWidgets {
 
   double getHeight(BuildContext context) {
     if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
-      return MediaQuery.of(context).size.height * 0.9;
+      return MediaQuery.of(context).size.height * 0.97;
     } else {
       return MediaQuery.of(context).size.height * 0.7;
     }
