@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:fono/view/TelaPacientes.dart';
 import 'package:search_cep/search_cep.dart';
-import 'package:uuid/uuid.dart';
-import 'package:firedart/firedart.dart' as fd;
 
+import '../controllers/uploadImage.dart';
+import '../models/maps.dart';
 import '../widgets/campoTexto.dart';
 import '../controllers/estilos.dart';
 import '../widgets/mensagem.dart';
@@ -51,42 +51,12 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
 
   DateTime dataAtual = DateTime.now();
 
-  final List<String> states = [
-    "AC",
-    "AL",
-    "AP",
-    "AM",
-    "BA",
-    "CE",
-    "DF",
-    "ES",
-    "GO",
-    "MA",
-    "MT",
-    "MS",
-    "MG",
-    "PA",
-    "PB",
-    "PR",
-    "PE",
-    "PI",
-    "RJ",
-    "RN",
-    "RS",
-    "RO",
-    "RR",
-    "SC",
-    "SP",
-    "SE",
-    "TO"
-  ];
-
   @override
   Widget build(BuildContext context) {
     String dataInicioPaciente = DateFormat('dd/MM/yyyy').format(dataAtual);
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: cores('verde')),
+        iconTheme: IconThemeData(color: cores('corTexto')),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -95,9 +65,9 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         ),
         title: Text(
           "Adicionar Paciente",
-          style: TextStyle(color: cores('verde')),
+          style: TextStyle(color: cores('corTexto')),
         ),
-        backgroundColor: cores('rosa_fraco'),
+        backgroundColor: cores('corTerciaria'),
       ),
       body: Container(
           child: ListView(
@@ -108,9 +78,9 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height * 0.2,
                 decoration: BoxDecoration(
-                    color: cores('rosa_medio'),
+                    color: cores('corSombra'),
                     boxShadow: [
-                      BoxShadow(offset: const Offset(0, 3), color: cores('verde/azul'), blurRadius: 5),
+                        BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5),
                     ],
                     borderRadius: const BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
                 child: Column(
@@ -122,11 +92,11 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                         height: 80.0,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: cores('verde'),
+                          color: cores('corBotao'),
                         ),
                         child: InkWell(
                           onTap: () async {
-                            urlImagePaciente = (await _uploadImage())!;
+                            urlImagePaciente = (await uploadImage())!;
                             setState(() {
                               urlImagePaciente = urlImagePaciente!;
                             });
@@ -134,7 +104,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                           child: urlImagePaciente.isEmpty
                               ? Icon(
                                   Icons.person_add_alt_rounded,
-                                  color: cores('rosa_fraco'),
+                                  color: cores('corTextoBotao'),
                                   size: 40.0,
                                 )
                               : CircleAvatar(
@@ -148,7 +118,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     const Padding(padding: EdgeInsets.only(top: 10)),
                     Text(
                       'Data: $dataInicioPaciente',
-                      style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -176,7 +146,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                 const SizedBox(height: 20),
                 Text(
                   'Sexo:',
-                  style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                 ),
                 Row(
                   children: [
@@ -184,7 +154,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                       child: RadioListTile<Gender>(
                         title: Text(
                           'Masculino',
-                          style: TextStyle(color: cores('verde')),
+                          style: TextStyle(color: cores('corTexto')),
                         ),
                         value: Gender.male,
                         groupValue: _selectedGeneroPaciente,
@@ -200,7 +170,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                       child: RadioListTile<Gender>(
                         title: Text(
                           'Feminino',
-                          style: TextStyle(color: cores('verde')),
+                          style: TextStyle(color: cores('corTexto')),
                         ),
                         value: Gender.female,
                         groupValue: _selectedGeneroPaciente,
@@ -243,26 +213,26 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                       children: [
                         Text(
                           'Selecione um Estado:',
-                          style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                         ),
                         Container(
                           height: 40,
                           padding: const EdgeInsets.only(left: 10),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(color: cores('rosa_forte')),
+                              border: Border.all(color: cores('corPrimaria')),
                               color: Colors.white,
                               boxShadow: [
-                                BoxShadow(offset: const Offset(0, 3), color: cores('rosa_fraco'), blurRadius: 5)
+                                BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 7)
                                 // changes position of shadow
                               ]),
                           child: DropdownButton(
-                            hint: const Text('Selecione um Estado'),
-                            icon: const Icon(Icons.arrow_drop_down),
+                            hint: Text('Selecione um Estado', style: TextStyle(color: cores('corTexto')),),
+                            icon: Icon(Icons.arrow_drop_down, color: cores('corTexto'),),
                             iconSize: 30,
-                            iconEnabledColor: cores('verde'),
+                            iconEnabledColor: cores('corTexto'),
                             style: TextStyle(
-                              color: cores('verde'),
+                              color: cores('corTexto'),
                               fontWeight: FontWeight.w400,
                               fontSize: 18,
                             ),
@@ -276,7 +246,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                                 selecioneEstadoPaciente = newValue!;
                               });
                             },
-                            items: states.map((state) {
+                            items: estados.map((state) {
                               return DropdownMenuItem(
                                 value: state,
                                 child: Text(state),
@@ -311,23 +281,23 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                 const SizedBox(height: 20),
                 Text(
                   'Selecione o tipo de Consulta:',
-                  style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                 ),
                 Container(
                   padding: const EdgeInsets.only(left: 10),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(color: cores('rosa_forte')),
+                      border: Border.all(color: cores('corPrimaria')),
                       color: Colors.white,
                       boxShadow: [
-                        BoxShadow(offset: const Offset(0, 3), color: cores('rosa_fraco'), blurRadius: 5) // changes position of shadow
+                        BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5) // changes position of shadow
                       ]),
                   child: DropdownButton<String>(
                     icon: const Icon(Icons.arrow_drop_down),
                     iconSize: 30,
-                    iconEnabledColor: cores('verde'),
+                    iconEnabledColor: cores('corTexto'),
                     style: TextStyle(
-                      color: cores('verde'),
+                      color: cores('corTexto'),
                       fontWeight: FontWeight.w400,
                       fontSize: 15,
                     ),
@@ -337,14 +307,14 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     isExpanded: true,
                     hint: const Text('Selecione uma Opção'),
                     value: selecioneTipoConsultaPaciente,
-                    items: const [
+                    items: [
                       DropdownMenuItem(
                         value: 'Convênio',
-                        child: Text('Convênio'),
+                        child: Text('Convênio', style: TextStyle(color: cores('corTexto')),),
                       ),
                       DropdownMenuItem(
                         value: 'Particular',
-                        child: Text('Particular'),
+                        child: Text('Particular', style: TextStyle(color: cores('corTexto')),),
                       ),
                     ],
                     onChanged: (value) {
@@ -359,11 +329,11 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                 Divider(
                   thickness: 2,
                   height: 50,
-                  color: cores('verde'),
+                  color: cores('corTexto'),
                 ),
                 Text(
                   'Dados dos Responsáveis:',
-                  style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                 ),
                 //------------------------------------------------------------------------------
                 columnResponsavel(),
@@ -372,9 +342,9 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     ? SizedBox(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('rosa_fraco'),
+                              primary: cores('corTextoBotao'),
                               minimumSize: const Size(45, 45),
-                              backgroundColor: cores('verde'),
+                              backgroundColor: cores('corBotao'),
                               elevation: 5,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
@@ -404,7 +374,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     : SizedBox(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('rosa_fraco'),
+                              primary: cores('corTextoBotao'),
                               minimumSize: const Size(45, 45),
                               backgroundColor: Colors.grey,
                               elevation: 5,
@@ -419,7 +389,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                 Divider(
                   thickness: 2,
                   height: 50,
-                  color: cores('verde'),
+                  color: cores('corTexto'),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -428,9 +398,9 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                       width: 150,
                       child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('rosa_fraco'),
+                              primary: cores('corTextoBotao'),
                               minimumSize: const Size(200, 45),
-                              backgroundColor: cores('verde'),
+                              backgroundColor: cores('corBotao'),
                               elevation: 5,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
@@ -491,9 +461,9 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                       width: 150,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                            primary: cores('rosa_fraco'),
+                            primary: cores('corTextoBotao'),
                             minimumSize: const Size(200, 45),
-                            backgroundColor: cores('verde'),
+                            backgroundColor: cores('corBotao'),
                             elevation: 5,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
@@ -518,40 +488,19 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
     );
   }
 
-  Future<String?> _uploadImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      // Crie uma referência única para a imagem no Firebase Storage
-      final ref = FirebaseStorage.instance.ref().child('users/${DateTime.now().toString()}');
-
-      // Faça o upload da imagem para o Firebase Storage
-      final uploadTask = ref.putFile(File(pickedFile.path));
-      final snapshot = await uploadTask.whenComplete(() => null);
-
-      // Recupere a URL da imagem no Firebase Storage
-      final url = await snapshot.ref.getDownloadURL();
-
-      return url;
-    } else {
-      return null;
-    }
-  }
-
   Widget columnResponsavel() {
     return Column(
       children: [
         Divider(
           thickness: 2,
           height: 50,
-          color: cores('verde'),
+          color: cores('corTexto'),
         ),
         Text(
           'Sexo:',
           style: TextStyle(
             fontSize: 16,
-            color: cores('verde'),
+            color: cores('corTexto'),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -561,11 +510,11 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
               child: RadioListTile<Gender>(
                 title: Text(
                   'Masculino',
-                  style: TextStyle(color: cores('verde')),
+                  style: TextStyle(color: cores('corTexto')),
                 ),
                 value: Gender.male,
                 groupValue: ListGeneroResponsavelPaciente[index],
-                activeColor: cores('verde'),
+                activeColor: cores('corTexto'),
                 onChanged: (value) {
                   setState(() {
                     ListGeneroResponsavelPaciente[index] = value!;
@@ -577,11 +526,11 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
               child: RadioListTile<Gender>(
                 title: Text(
                   'Feminino',
-                  style: TextStyle(color: cores('verde')),
+                  style: TextStyle(color: cores('corTexto')),
                 ),
                 value: Gender.female,
                 groupValue: ListGeneroResponsavelPaciente[index],
-                activeColor: cores('verde'),
+                activeColor: cores('corTexto'),
                 onChanged: (value) {
                   setState(() {
                     ListGeneroResponsavelPaciente[index] = value!;
@@ -598,18 +547,18 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         const SizedBox(height: 20),
         Text(
           'Qual a relação do Responsável com Paciente?',
-          style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
         ),
         Container(
           padding: const EdgeInsets.only(left: 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: cores('rosa_forte')),
+            border: Border.all(color: cores('corPrimaria')),
             color: Colors.white,
             boxShadow: [
               BoxShadow(
                 offset: const Offset(0, 3),
-                color: cores('rosa_fraco'),
+                color: cores('corSombra'),
                 blurRadius: 5,
               ), // changes position of shadow
             ],
@@ -617,9 +566,9 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
           child: DropdownButton<String>(
             icon: const Icon(Icons.arrow_drop_down),
             iconSize: 30,
-            iconEnabledColor: cores('verde'),
+            iconEnabledColor: cores('corSimbolo'),
             style: TextStyle(
-              color: cores('verde'),
+              color: cores('corTexto'),
               fontWeight: FontWeight.w400,
               fontSize: 15,
             ),
@@ -629,30 +578,30 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
             isExpanded: true,
             hint: const Text('Selecione uma Opção'),
             value: ListRelacaoResponsavelPaciente[index],
-            items: const [
+            items: [
               DropdownMenuItem(
                 value: 'Mãe',
-                child: Text('Mãe'),
+                child: Text('Mãe', style: TextStyle(color: cores('corTexto'))),
               ),
               DropdownMenuItem(
                 value: 'Pai',
-                child: Text('Pai'),
+                child: Text('Pai', style: TextStyle(color: cores('corTexto'))),
               ),
               DropdownMenuItem(
                 value: 'Avó',
-                child: Text('Avó'),
+                child: Text('Avó', style: TextStyle(color: cores('corTexto'))),
               ),
               DropdownMenuItem(
                 value: 'Avô',
-                child: Text('Avô'),
+                child: Text('Avô', style: TextStyle(color: cores('corTexto'))),
               ),
               DropdownMenuItem(
                 value: 'Tio',
-                child: Text('Tio'),
+                child: Text('Tio', style: TextStyle(color: cores('corTexto'))),
               ),
               DropdownMenuItem(
                 value: 'Tia',
-                child: Text('Tia'),
+                child: Text('Tia', style: TextStyle(color: cores('corTexto'))),
               ),
             ],
             onChanged: (value) {

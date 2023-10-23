@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/mensagem.dart';
 import 'fireAuth.dart';
 
-String nomeColecaoUsuario = 'consulta';
+String nomeColecao = 'contas';
 
 retornarIDContas() async {
   if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
@@ -31,7 +31,7 @@ retornarIDContas() async {
 
 listarContas() async {
   if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-    return FirebaseFirestore.instance.collection(nomeColecaoUsuario).where('uidFono', isEqualTo: idUsuario());
+    return FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario());
   } else {
     await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
     await fd.Firestore.initialize('programafono-7be09');
@@ -45,7 +45,7 @@ listarContas() async {
     var user = await auth.getUser();
     String uidFono = user.id;
 
-    return fd.Firestore.instance.collection(nomeColecaoUsuario).where('uidFono', isEqualTo: uidFono);
+    return fd.Firestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: uidFono);
   }
 }
 

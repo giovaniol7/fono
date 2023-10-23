@@ -10,17 +10,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/mensagem.dart';
 import 'fireAuth.dart';
 
-String nomeColecaoUsuario = 'users';
+String nomeColecao = 'users';
 
 retornarIDUser() async {
   if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-    FirebaseFirestore.instance.collection(nomeColecaoUsuario).where('uid', isEqualTo: idUsuario()).get().then((q) {
+    FirebaseFirestore.instance.collection(nomeColecao).where('uid', isEqualTo: idUsuario()).get().then((q) {
       if (q.docs.isNotEmpty) {
         return q.docs[0].id;
       }
     });
   } else {
-    fd.Firestore.instance.collection(nomeColecaoUsuario).where('uid', isEqualTo: idUsuario()).get().then((us) {
+    fd.Firestore.instance.collection(nomeColecao).where('uid', isEqualTo: idUsuario()).get().then((us) {
       if (us.isNotEmpty) {
         us.forEach((doc) {
           // return doc.id;
@@ -44,7 +44,7 @@ Future<Map<String, String>> listarUsuario() async {
   Map<String, String> usuario = {};
 
   //if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-    await FirebaseFirestore.instance.collection(nomeColecaoUsuario).where('uid', isEqualTo: idUsuario()).get().then((q) {
+    await FirebaseFirestore.instance.collection(nomeColecao).where('uid', isEqualTo: idUsuario()).get().then((q) {
       if (q.docs.isNotEmpty) {
         id = q.docs[0].id;
         uid = q.docs[0].data()['uid'];
@@ -84,7 +84,7 @@ Future<Map<String, String>> listarUsuario() async {
     var user = await auth.getUser();
     String uidFono = user.id;
 
-    fd.Firestore.instance.collection(nomeColecaoUsuario).where('uid', isEqualTo: uidFono).get().then((us) {
+    fd.Firestore.instance.collection(nomeColecao).where('uid', isEqualTo: uidFono).get().then((us) {
       if (us.isNotEmpty) {
         us.forEach((doc) {
           nome = doc['nome'];
@@ -121,7 +121,7 @@ editarUsuario(context, uid, nome, dtNascimento, email, cpf, crfa, telefone, senh
 }
 
 adicionarUsuario(res, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage) {
-  FirebaseFirestore.instance.collection(nomeColecaoUsuario).add({
+  FirebaseFirestore.instance.collection(nomeColecao).add({
     'uid': res,
     'genero': genero,
     'nome': nome,

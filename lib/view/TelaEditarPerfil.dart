@@ -76,7 +76,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
-        iconTheme: IconThemeData(color: cores('verde')),
+        iconTheme: IconThemeData(color: cores('corSimbolo')),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -85,9 +85,9 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
         ),
         title: Text(
           "Editar Perfil",
-          style: TextStyle(color: cores('verde')),
+          style: TextStyle(color: cores('corTexto')),
         ),
-        backgroundColor: cores('rosa_fraco'),
+        backgroundColor: cores('corTerciaria'),
       ),
       body: ListView(
         children: [
@@ -95,9 +95,9 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height * 0.2,
             decoration: BoxDecoration(
-                color: cores('rosa_medio'),
+                color: cores('corSecundaria'),
                 boxShadow: [
-                  BoxShadow(offset: Offset(0, 3), color: cores('verde/azul'), blurRadius: 5),
+                  BoxShadow(offset: Offset(0, 3), color: cores('corDetalhe'), blurRadius: 5),
                 ],
                 borderRadius: BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
             child: Center(
@@ -145,7 +145,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                     sufIcon: IconButton(
                       icon: Icon(
                         _obscureText ? Icons.visibility_off : Icons.visibility,
-                        color: cores('verde'),
+                        color: cores('corSimbolo'),
                       ),
                       onPressed: _toggle,
                     ),
@@ -155,7 +155,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                     sufIcon: IconButton(
                       icon: Icon(
                         _obscureText2 ? Icons.visibility_off : Icons.visibility,
-                        color: cores('verde'),
+                        color: cores('corSimbolo'),
                       ),
                       onPressed: _toggle2,
                     ),
@@ -168,16 +168,16 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                       width: 150,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                            primary: cores('rosa_medio'),
+                            primary: cores('corTextoBotao'),
                             minimumSize: const Size(200, 45),
-                            backgroundColor: cores('verde'),
+                            backgroundColor: cores('corBotao'),
                             elevation: 5,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
                             )),
                         child: const Text(
                           'Editar',
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 18),
                         ),
                         onPressed: () {
                           verificarDados(context, uid, txtNome.text, txtDtNascimento.text, txtEmail.text, txtCPF.text,
@@ -196,16 +196,16 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                       width: 150,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                            primary: cores('rosa_medio'),
+                            primary: cores('corSecundaria'),
                             minimumSize: const Size(200, 45),
-                            backgroundColor: cores('verde'),
+                            backgroundColor: cores('corTexto'),
                             elevation: 5,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
                             )),
                         child: const Text(
                           'Cancelar',
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 18),
                         ),
                         onPressed: () {
                           Navigator.pop(context);

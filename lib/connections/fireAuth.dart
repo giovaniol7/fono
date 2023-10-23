@@ -35,7 +35,7 @@ criarConta(context, genero, nome, dtNascimento, email, cpf, crfa, telefone, senh
 
 autenticarConta(context, email, senha) async {
   //if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-    FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: senha).then((res) {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: senha).then((res) {
       sucesso(context, 'Usuário autenticado com sucesso!');
       saveValor();
       Navigator.pushReplacementNamed(context, '/principal');

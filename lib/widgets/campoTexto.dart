@@ -17,18 +17,19 @@ campoTexto(texto, controller, icone,
   return Container(
     decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.0),
-        border: Border.all(color: cores('rosa_forte')),
+        border: Border.all(color: cores('corPrimaria')),
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-              offset: Offset(0, 3), color: cores('rosa_fraco'), blurRadius: 5)
+              offset: Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
           // changes position of shadow
         ]),
     child: TextFormField(
       controller: controller,
       obscureText: senha == true ? true : false,
       style: TextStyle(
-        color: cores('verde'),
+        color: cores('corTexto'),
+        fontSize: 18,
         fontWeight: FontWeight.w400,
       ),
       decoration: InputDecoration(
@@ -37,17 +38,17 @@ campoTexto(texto, controller, icone,
         suffixIcon: sufIcon,
         prefixIcon: GestureDetector(
           onTap: iconPressed,
-          child: Icon(icone, color: cores('verde')),
+          child: Icon(icone, color: cores('corSimbolo')),
         ),
-        prefixIconColor: cores('rosa_forte'),
+        prefixIconColor: cores('corSimbolo'),
         labelText: texto,
-        labelStyle: TextStyle(color: cores('verde/azul'), fontWeight: FontWeight.w500),
+        labelStyle: TextStyle(color: cores('corDetalhe'), fontSize: 18, fontWeight: FontWeight.w500),
         border: const OutlineInputBorder(),
         focusColor: Colors.grey[100],
         focusedBorder: OutlineInputBorder(
           borderSide: BorderSide(
-            color: cores('rosa_forte'),
-            width: 2.0,
+            color: cores('corPrimaria'),
+            width: 3.0,
           ),
         ),
       ),

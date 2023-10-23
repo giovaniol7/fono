@@ -24,6 +24,16 @@ void main() async {
     token = tokenSave.getString('token');
 
     runApp(MaterialApp(
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('pt'),
+        Locale('es'),
+      ],
+      locale: const Locale('pt', 'BR'),
       debugShowCheckedModeBanner: false,
       title: 'Clínica Fonoaudiologia',
       initialRoute: token == null || token == '' ? '/login' : '/principal',
@@ -33,35 +43,19 @@ void main() async {
         '/cadastro': (context) => const TelaCadastro(),
       },
     ));
-  } else if (Platform.isWindows || Platform.isMacOS) {
-
-    WidgetsFlutterBinding.ensureInitialized();
-    await windowManager.ensureInitialized();
-
-    WindowOptions windowOptions = const WindowOptions(
-      size: Size(800, 600),
-      center: true,
-      minimumSize: Size(800, 600),
-    );
-    windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.show();
-      await windowManager.focus();
-    });
-
-    final tokenSave = await SharedPreferences.getInstance();
-    token = tokenSave.getString('token');
-
-    runApp(MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Clínica Fonoaudiologia',
-      initialRoute: token == '' ? '/login' : '/principal',
-      routes: {
-        '/login': (context) => const TelaLogin(),
-        '/principal': (context) => const TelaInicial(),
-        '/cadastro': (context) => const TelaCadastro(),
-      },
-    ));
   } else {
+    if (Platform.isWindows || Platform.isMacOS) {
+      WindowOptions windowOptions = const WindowOptions(
+        size: Size(800, 600),
+        center: true,
+        minimumSize: Size(800, 600),
+      );
+      windowManager.waitUntilReadyToShow(windowOptions, () async {
+        await windowManager.show();
+        await windowManager.focus();
+      });
+    }
+
     final tokenSave = await SharedPreferences.getInstance();
     token = tokenSave.getString('token');
 

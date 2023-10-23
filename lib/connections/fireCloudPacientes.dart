@@ -1,15 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fono/connections/fireAuth.dart';
 
+String nomeColecao = 'pacientes';
+
 recuperarPacientes() async {
-  return await FirebaseFirestore.instance.collection('pacientes').where('uidFono', isEqualTo: idUsuario());
+  return await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario());
 }
 
 Future<List<String>> fazerListaPacientes() async {
   List<String> list = [];
 
   QuerySnapshot querySnapshot =
-      await FirebaseFirestore.instance.collection('pacientes').where('uidFono', isEqualTo: idUsuario()).get();
+      await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario()).get();
   querySnapshot.docs.forEach((doc) {
     String nome = doc['nomePaciente'];
     list.add(nome);

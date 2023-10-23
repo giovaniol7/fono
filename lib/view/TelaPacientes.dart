@@ -115,6 +115,7 @@ class _TelaPacientesState extends State<TelaPacientes> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        shape: CircleBorder(),
         onPressed: () {
           Navigator.push(
               context,
@@ -124,10 +125,10 @@ class _TelaPacientesState extends State<TelaPacientes> {
         },
         child: Icon(
           Icons.add,
-          color: cores('corSimbolo'),
-          size: 40,
+          color: cores('corTextoBotao'),
+          size: 35,
         ),
-        backgroundColor: cores('corDetalhe'),
+        backgroundColor: cores('corBotao'),
       ),
     );
   }
