@@ -64,7 +64,7 @@ class _TelaAgendaState extends State<TelaAgenda> {
           "Agenda",
           style: TextStyle(color: cores('corTexto')),
         ),
-        backgroundColor: cores('corTerciaria'),
+        backgroundColor: cores('corFundo'),
       ),
       body: FutureBuilder<List<Appointment>>(
         future: _futureAppointments,
@@ -88,7 +88,7 @@ class _TelaAgendaState extends State<TelaAgenda> {
                 headerStyle: CalendarHeaderStyle(
                     textStyle: TextStyle(color: cores('corTexto'), fontSize: 20),
                     textAlign: TextAlign.center,
-                    backgroundColor: cores('corTerciaria')),
+                    backgroundColor: cores('corFundo')),
                 headerDateFormat: 'MMMM y',
                 todayHighlightColor: cores('corTexto'),
                 view: CalendarView.week,
@@ -149,14 +149,12 @@ class _TelaAgendaState extends State<TelaAgenda> {
             endTime: DateTime.now(),
           );
           String adicionar = 'adicionar';
-          await Navigator.push(
+          Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => TelaAdicionarAgenda(adicionar, tappedAppointment),
               ));
-          setState(() {
-            _futureAppointments = getAppointmentsFromFirestore();
-          });
+          //atualizarDados();
         },
         child: Icon(
           Icons.add,

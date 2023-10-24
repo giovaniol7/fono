@@ -95,7 +95,8 @@ flutter:
     - images/social_media/whatsapp.png
     - images/logo.png
     - images/icon.png
-    - images/
+    - images/icons/profileBoy.png
+    - images/icons/profileGirl.png
 
   fonts:
     - family: La Belle Aurore

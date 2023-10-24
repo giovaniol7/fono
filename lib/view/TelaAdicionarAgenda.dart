@@ -55,6 +55,8 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
       listaPaciente = lista;
       id = consulta['id'];
       uidPaciente = consulta['uidPaciente'];
+      selecioneFrequenciaConsulta = 'WEEKLY';
+      duracaoConsulta.text = '00:50';
 
       if (widget.tipo == 'editar') {
         labelText = appointment['nomeConsulta'];
@@ -90,7 +92,10 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
           actions: [
             widget.tipo == 'editar'
                 ? IconButton(
-                    icon: Icon(Icons.delete, color: cores('corSimbolo'),),
+                    icon: Icon(
+                      Icons.delete,
+                      color: cores('corSimbolo'),
+                    ),
                     onPressed: () async {
                       await apagarConsultas(context, id);
                     },
@@ -108,7 +113,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
             widget.tipo == 'adicionar' ? "Adicionar Horário" : "Atualizar Horário",
             style: TextStyle(color: cores('corTexto')),
           ),
-          backgroundColor: cores('corTerciaria'),
+          backgroundColor: cores('corFundo'),
         ),
         body: ListView(
           padding: const EdgeInsets.all(10),
@@ -219,7 +224,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                           padding: const EdgeInsets.only(left: 10),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(color: cores('corPrimaria')),
+                              border: Border.all(color: cores('corBorda')),
                               color: Colors.white,
                               boxShadow: [
                                 BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
@@ -270,7 +275,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                       padding: const EdgeInsets.only(left: 10),
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(color: cores('corPrimaria')),
+                          border: Border.all(color: cores('corBorda')),
                           color: Colors.white,
                           boxShadow: [
                             BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
@@ -317,7 +322,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                   padding: const EdgeInsets.only(left: 10),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(color: cores('corPrimaria')),
+                      border: Border.all(color: cores('corBorda')),
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
@@ -362,7 +367,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                       width: 150,
                       child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('corTextoBotao'),
+                              foregroundColor: cores('corTextoBotao'),
                               minimumSize: const Size(200, 45),
                               backgroundColor: cores('corBotao'),
                               elevation: 5,
@@ -416,7 +421,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                       width: 150,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                            primary: cores('corTextoBotao'),
+                            foregroundColor: cores('corTextoBotao'),
                             minimumSize: const Size(200, 45),
                             backgroundColor: cores('corBotao'),
                             elevation: 5,

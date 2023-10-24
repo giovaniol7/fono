@@ -34,7 +34,7 @@ criarConta(context, genero, nome, dtNascimento, email, cpf, crfa, telefone, senh
 }
 
 autenticarConta(context, email, senha) async {
-  //if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+  if(email.isNotEmpty && senha.isNotEmpty){
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: senha).then((res) {
       sucesso(context, 'Usuário autenticado com sucesso!');
       saveValor();
@@ -51,10 +51,15 @@ autenticarConta(context, email, senha) async {
           erro(context, 'Senha incorreta.');
           break;
         default:
+          print(e.code.toString());
           erro(context, e.code.toString());
       }
     });
-  /*}else{
+  }
+}
+
+/*  //if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+      }else{
     await Firebase.initializeApp();
     await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
     await fd.Firestore.initialize('programafono-7be09');
@@ -82,7 +87,6 @@ autenticarConta(context, email, senha) async {
       }
     });
   }*/
-}
 
 signOut(context) async {
   if (kIsWeb || Platform.isAndroid || Platform.isIOS) {

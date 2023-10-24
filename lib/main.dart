@@ -76,6 +76,7 @@ void main() async {
       locale: Locale('pt', 'BR'),
       debugShowCheckedModeBanner: false,
       title: 'Clínica Fonoaudiologia',
+      //home: token == null || token == '' ? TelaLogin() : TelaInicial(),
       initialRoute: token == null || token == '' ? '/login' : '/principal',
       routes: {
         '/login': (context) => const TelaLogin(),

@@ -30,6 +30,65 @@ retornarIDUser() async {
   }
 }
 
+criarUsuario(context, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage){
+  FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: senha).then((res) {
+    FirebaseFirestore.instance.collection('users').add({
+      'uid': res.user!.uid.toString(),
+      'genero': genero,
+      'nome': nome,
+      'dtNascimento': dtNascimento,
+      'email': email,
+      'cpf': cpf,
+      'crfa': crfa,
+      'telefone': telefone,
+      'urlImage': urlImage,
+    });
+    sucesso(context, 'O usuário foi criado com sucesso!');
+    Navigator.pop(context);
+  }).catchError((e) {
+    switch (e.code) {
+      case 'email-already-in-use':
+        erro(context, 'O email já foi cadastrado.');
+        break;
+      case 'invalid-email':
+        erro(context, 'O formato do email é inválido.');
+        break;
+      default:
+        erro(context, e.code.toString());
+    }
+  });
+}
+
+/*if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+  } else {
+      FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: senha).then((res) {
+        fd.Firestore.instance.collection('users').add({
+          'uid': res.user!.uid.toString(),
+          'nome': nome,
+          'dtNascimento': dtNascimento,
+          'email': email,
+          'cpf': cpf,
+          'crfa': crfa,
+          'telefone': telefone,
+          'urlImage': urlImage,
+        });
+        sucesso(context, 'O usuário foi criado com sucesso!');
+        Navigator.pop(context);
+      }).catchError((e) {
+        switch (e.code) {
+          case 'email-already-in-use':
+            erro(context, 'O email já foi cadastrado.');
+            break;
+          case 'invalid-email':
+            erro(context, 'O formato do email é inválido.');
+            break;
+          default:
+            erro(context, e.code.toString());
+        }
+      });
+    }
+   */
+
 adicionarUsuario(res, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage) {
   FirebaseFirestore.instance.collection(nomeColecao).add({
     'uid': res,

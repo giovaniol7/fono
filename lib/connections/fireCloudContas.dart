@@ -67,8 +67,22 @@ editarContas(context, id, uidFono, uidPaciente, nomePaciente, dataConsulta, hora
   Navigator.pop(context);
 }
 
-adicionarContas(context, listUid, listNome, uidFono, selecioneTipoTransacao, estadoTipo, nomeConta, preco,
-    selecioneFormaPagamento, selecioneQntdParcelas, dataCompra, horaCompra, descricaoConta, estadoPago, estadoRecebido) async {
+adicionarContas(
+    context,
+    listUid,
+    listNome,
+    uidFono,
+    selecioneTipoTransacao,
+    estadoTipo,
+    nomeConta,
+    preco,
+    selecioneFormaPagamento,
+    selecioneQntdParcelas,
+    dataCompra,
+    horaCompra,
+    descricaoConta,
+    estadoPago,
+    estadoRecebido) async {
   if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
     CollectionReference contas = FirebaseFirestore.instance.collection('contas');
     NumberFormat numberFormat = NumberFormat('#,##0.00', 'pt_BR');
@@ -226,4 +240,26 @@ adicionarContas(context, listUid, listNome, uidFono, selecioneTipoTransacao, est
     sucesso(context, 'Conta adicionada com sucesso.');
     Navigator.pop(context);
   }
+}
+
+Stream<QuerySnapshot<Object?>> recuperarCredito() {
+  return FirebaseFirestore.instance
+      .collection('contas')
+      .where('uidFono', isEqualTo: idUsuario())
+      .where('tipoTransacao', isEqualTo: 'Gasto')
+      .orderBy('dataHora', descending: true)
+      .snapshots();
+}
+
+Stream<QuerySnapshot<Object?>> recuperarDebito() {
+  return FirebaseFirestore.instance
+      .collection('contas')
+      .where('uidFono', isEqualTo: idUsuario())
+      .where('tipoTransacao', isEqualTo: 'Recebido')
+      .orderBy('dataHora', descending: true)
+      .snapshots();
+}
+
+Stream<QuerySnapshot<Object?>> recuperarConta() {
+  return FirebaseFirestore.instance.collection('contas').where('uidFono', isEqualTo: idUsuario()).snapshots();
 }

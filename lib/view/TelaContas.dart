@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:fono/connections/fireAuth.dart';
+import 'package:fono/connections/fireCloudContas.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
@@ -40,59 +41,19 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
 
   carregarDados() async {
     var financias = await calcularFinanceiro();
+    contas = await recuperarConta();
+    contasDebito = await recuperarDebito();
+    contasCredito = await recuperarCredito();
 
     setState(() {
       saldo = financias['somaRenda'];
     });
   }
 
-  retornarPacientes() async {
-    DateTime now = DateTime.now();
-    DateTime startOfDay = DateTime(now.year, now.month, now.day);
-    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-      contasCredito = FirebaseFirestore.instance
-          .collection('contas')
-          .where('uidFono', isEqualTo: idUsuario())
-          .where('tipoTransacao', isEqualTo: 'Gasto')
-          .orderBy('dataHora', descending: true)
-          .snapshots();
-      contasDebito = FirebaseFirestore.instance
-          .collection('contas')
-          .where('uidFono', isEqualTo: idUsuario())
-          .where('tipoTransacao', isEqualTo: 'Recebido')
-          .orderBy('dataHora', descending: true)
-          .snapshots();
-    } else {
-      //await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
-      //await fd.Firestore.initialize('programafono-7be09');
-      var auth = fd.FirebaseAuth.instance;
-      final emailSave = await SharedPreferences.getInstance();
-      var email = emailSave.getString('email');
-      final senhaSave = await SharedPreferences.getInstance();
-      var senha = senhaSave.getString('senha');
-      await auth.signIn(email!, senha!);
-      var user = await auth.getUser();
-      windowsIdFono = user.id;
-
-      contasCredito = fd.Firestore.instance
-          .collection('contas')
-          .where('uidFono', isEqualTo: windowsIdFono)
-          .where('tipoTransação', isEqualTo: 'Gasto')
-          .get();
-      contasDebito = fd.Firestore.instance
-          .collection('contas')
-          .where('uidFono', isEqualTo: windowsIdFono)
-          .where('tipoTransação', isEqualTo: 'Recebido')
-          .get();
-      contas = fd.Firestore.instance.collection('contas').where('uidFono', isEqualTo: windowsIdFono);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     _tabController = TabController(vsync: this, length: 3);
-    retornarPacientes();
     calcularFinanceiro();
     carregarDados();
   }
@@ -105,10 +66,13 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    TamanhoWidgets tamanhoWidgets = TamanhoWidgets();
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+    
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: cores('corTerciaria'),
+        backgroundColor: cores('corFundo'),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_outlined,
@@ -134,61 +98,12 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
             Container(
               padding: const EdgeInsets.only(top: 5),
               width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(color: cores('corTerciaria'),),
+              decoration: BoxDecoration(
+                color: cores('corFundo'),
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
-                  /*Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Column(
-                          children: <Widget>[
-                            Icon(
-                              Icons.money_off,
-                              color: cores('corSimbolo'),
-                              size: kIsWeb || Platform.isWindows
-                                  ? MediaQuery.of(context).size.width * 0.03
-                                  : MediaQuery.of(context).size.height * 0.03,
-                            ),
-                            Text(
-                              numberFormat.format(somaDespesas),
-                              style: TextStyle(
-                                color: cores('corTexto'),
-                                fontSize: kIsWeb || Platform.isWindows
-                                    ? MediaQuery.of(context).size.width * 0.02
-                                    : MediaQuery.of(context).size.height * 0.02,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: Column(
-                          children: <Widget>[
-                            Icon(
-                              Icons.monetization_on_rounded,
-                              color: cores('corSimbolo'),
-                              size: kIsWeb || Platform.isWindows
-                                  ? MediaQuery.of(context).size.width * 0.03
-                                  : MediaQuery.of(context).size.height * 0.03,
-                            ),
-                            Text(
-                              numberFormat.format(somaGanhos),
-                              style: TextStyle(
-                                color: cores('corTexto'),
-                                fontSize: kIsWeb || Platform.isWindows
-                                    ? MediaQuery.of(context).size.width * 0.02
-                                    : MediaQuery.of(context).size.height * 0.02,
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    ],
-                  ),*/
                   Center(
                     child: Padding(
                         padding: const EdgeInsets.only(top: 5, bottom: 10),
@@ -199,14 +114,14 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                               'Saldo: ',
                               style: TextStyle(
                                   color: cores('corTexto'),
-                                  fontSize: MediaQuery.of(context).size.width * 0.05,
+                                  fontSize: tamanhoFonte.letraMedia(context),
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
                               'R\$ ${numberFormat.format(saldo)}',
                               style: TextStyle(
                                   color: cores('corTexto'),
-                                  fontSize: MediaQuery.of(context).size.width * 0.05,
+                                  fontSize: tamanhoFonte.letraMedia(context),
                                   fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -217,7 +132,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
             ),
             Container(
               decoration: BoxDecoration(
-                color: cores('corTerciaria'),
+                color: cores('corFundo'),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(20),
                   bottomRight: Radius.circular(20),
@@ -233,7 +148,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                 indicatorColor: cores('corTexto'),
                 labelColor: cores('corDetalhe'),
                 unselectedLabelColor: cores('corTexto'),
-                labelStyle: TextStyle(color: cores('corTexto'), fontSize: 16, fontWeight: FontWeight.bold),
+                labelStyle: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context), fontWeight: FontWeight.bold),
               ),
             ),
             Expanded(
@@ -252,10 +167,11 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
         onPressed: () {
+          String tipo = 'adicionar';
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => TelaAdicionarContas(idUsuario()),
+                builder: (context) => TelaAdicionarContas(tipo),
               ));
         },
         backgroundColor: cores('corBotao'),
@@ -345,7 +261,10 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                   content: const Text('Tem certeza de que deseja apagar esta transação?'),
                   actions: <Widget>[
                     TextButton(
-                      child: const Text('Cancelar', style: TextStyle(color: Colors.blue),),
+                      child: const Text(
+                        'Cancelar',
+                        style: TextStyle(color: Colors.blue),
+                      ),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -370,7 +289,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
           carregarDados();
           //sucesso(context, 'Atualizado com sucesso!');
         },
-        onTap: () {
+        /*onTap: () {
           showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -379,7 +298,10 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                   content: Text(doc.data()['descricaoConta']),
                   actions: <Widget>[
                     TextButton(
-                      child: const Text('Ok', style: TextStyle(color: Colors.blue),),
+                      child: const Text(
+                        'Ok',
+                        style: TextStyle(color: Colors.blue),
+                      ),
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
@@ -387,7 +309,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                   ],
                 );
               });
-        },
+        },*/
         onLongPress: () async {
           DocumentReference docRef = FirebaseFirestore.instance.collection('contas').doc(doc.data()['uidConta']);
           if (doc.data()['estadoPago'] == true) {
@@ -419,8 +341,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                         color: Color.fromARGB(255, 240, 241, 245),
                       ),
                       child: doc.data()['tipoTransacao'] == 'Recebido'
-                          ? Icon(Icons.attach_money,
-                              color: stiloPg)
+                          ? Icon(Icons.attach_money, color: stiloPg)
                           : Icon(
                               Icons.money_off,
                               color: stiloPg,
@@ -441,16 +362,15 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                                   softWrap: true,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 2,
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      color: stiloPg),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(fontWeight: FontWeight.w700, color: stiloPg),
                                 ),
                               ),
                               Text(
                                 converterData(doc.data()['data']),
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    fontSize: 15,
-                                    color: stiloPg),
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 15, color: stiloPg),
                               ),
                             ],
                           ),
@@ -465,10 +385,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                             children: [
                               Text(
                                 'R\$ ' + doc.data()['preco'],
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleSmall
-                                    ?.copyWith(color: stiloPg),
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(color: stiloPg),
                               ),
                               Icon(
                                 doc.data()['tipo'] == 'Trabalho'
@@ -483,10 +400,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                           const SizedBox(height: 5),
                           Text(
                             doc.data()['formaPagamento'].toUpperCase(),
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(color: stiloPg),
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: stiloPg),
                           ),
                         ],
                       ),
@@ -499,8 +413,61 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
           ),
         ));
   }
+}
 
-/*Widget listarContas(doc) {
+/*
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceAround,
+  children: <Widget>[
+    Padding(
+      padding: const EdgeInsets.only(left: 10),
+      child: Column(
+        children: <Widget>[
+          Icon(
+            Icons.money_off,
+            color: cores('corSimbolo'),
+            size: kIsWeb || Platform.isWindows
+                ? MediaQuery.of(context).size.width * 0.03
+                : MediaQuery.of(context).size.height * 0.03,
+          ),
+          Text(
+            numberFormat.format(somaDespesas),
+            style: TextStyle(
+              color: cores('corTexto'),
+              fontSize: kIsWeb || Platform.isWindows
+                  ? MediaQuery.of(context).size.width * 0.02
+                  : MediaQuery.of(context).size.height * 0.02,
+            ),
+          ),
+        ],
+      ),
+    ),
+    Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: Column(
+        children: <Widget>[
+          Icon(
+            Icons.monetization_on_rounded,
+            color: cores('corSimbolo'),
+            size: kIsWeb || Platform.isWindows
+                ? MediaQuery.of(context).size.width * 0.03
+                : MediaQuery.of(context).size.height * 0.03,
+          ),
+          Text(
+            numberFormat.format(somaGanhos),
+            style: TextStyle(
+              color: cores('corTexto'),
+              fontSize: kIsWeb || Platform.isWindows
+                  ? MediaQuery.of(context).size.width * 0.02
+                  : MediaQuery.of(context).size.height * 0.02,
+            ),
+          )
+        ],
+      ),
+    )
+  ],
+);
+Widget listarContas(doc) {
     return Container(
       child: Card(
         elevation: 7,
@@ -529,5 +496,5 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
         ),
       ),
     );
-  }*/
-}
+  }
+ */

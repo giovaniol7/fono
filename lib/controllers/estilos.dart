@@ -19,6 +19,12 @@ cores(cor) {
       //verde/azulado
       return Color(0xFFB4CABB);
 
+    case 'corBorda':
+    //rosa_forte
+      return Color(0xFFF5B2B0);
+    case 'corFundo':
+    //rosa_fraco
+      return Color(0xFFF9D5D2);
     case 'corSombra':
       //rosa_fraco
       return Color(0xFFF9D5D2);

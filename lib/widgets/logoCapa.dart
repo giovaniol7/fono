@@ -35,7 +35,7 @@ class _logoCapaState extends State<logoCapa> {
       // Atualiza a altura do container para iniciar a animação
       setState(() {
         if(ratio.screen(context) == 'pequeno'){
-          containerHeight = height * 0.45; // Altura desejada
+          containerHeight = height * 0.45;
         }else{
           containerWidth = width * 0.5;
         }

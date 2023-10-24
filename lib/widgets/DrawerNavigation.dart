@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fono/view/TelaAgenda.dart';
+import 'package:fono/view/TelaContas.dart';
+import 'package:fono/view/TelaEditarPerfil.dart';
+import 'package:fono/view/TelaPacientes.dart';
 
 import '../connections/fireAuth.dart';
 import '../controllers/estilos.dart';
@@ -24,14 +28,14 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: cores('corTerciaria'),
+      backgroundColor: cores('corFundo'),
       shadowColor: cores('corDetalhe'),
       surfaceTintColor: cores('corDetalhe'),
       child: ListView(
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              color: cores('corTerciaria'),
+              color: cores('corFundo'),
             ),
             child: menuHeader(),
           ),
@@ -44,20 +48,22 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
   menuHeader() {
     return Container(
       alignment: Alignment.center,
-      color: cores('corTerciaria'),
+      color: cores('corFundo'),
       padding: EdgeInsets.symmetric(vertical: 35),
       child: Row(
         children: [
           widget.urlImage.isEmpty
               ? Icon(
                   Icons.person,
-                  color: cores('corSecundaria'),
+                  color: cores('corSimbolo'),
                 )
               : CircleAvatar(
                   radius: 30,
-                  backgroundImage: NetworkImage(
-                    widget.urlImage,
-                  ),
+                  backgroundImage: widget.urlImage.isNotEmpty
+                      ? NetworkImage(widget.urlImage)
+                      : (widget.genero == 'Gender.male'
+                      ? AssetImage('images/icons/profileBoy.png')
+                      : AssetImage("images/icons/profileGirl.png") as ImageProvider)
                 ),
           SizedBox(
             width: 20,
@@ -108,7 +114,12 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
-              Navigator.pushNamed(context, '/pacientes');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TelaPacientes(),
+                  ));
+              //Navigator.pushNamed(context, '/pacientes');
             },
           ),
           ListTile(
@@ -121,7 +132,12 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
-              Navigator.pushNamed(context, '/agenda');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TelaAgenda(),
+                  ));
+              //Navigator.pushNamed(context, '/agenda');
             },
           ),
           ListTile(
@@ -167,7 +183,12 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               ),
             ),
             onTap: () {
-              Navigator.pushNamed(context, '/contas');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TelaContas(),
+                  ));
+              //Navigator.pushNamed(context, '/contas');
             },
           ),
           Divider(
@@ -184,7 +205,12 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
-              Navigator.pushNamed(context, '/editarPerfil');
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TelaEditarPerfil(),
+                  ));
+              //Navigator.pushNamed(context, '/editarPerfil');
             },
           ),
           ListTile(

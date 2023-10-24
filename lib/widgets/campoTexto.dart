@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../controllers/estilos.dart';
-import 'package:search_cep/search_cep.dart';
 
 campoTexto(texto, controller, icone,
     {senha,

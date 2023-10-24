@@ -1,13 +1,13 @@
-import 'dart:io';
+import 'package:flutter/material.dart';
+
 import 'package:intl/intl.dart';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:fono/view/TelaPacientes.dart';
 import 'package:search_cep/search_cep.dart';
 
+//import 'package:fono/view/TelaPacientes.dart';
+
+import '../connections/fireCloudPacientes.dart';
 import '../controllers/uploadImage.dart';
 import '../models/maps.dart';
 import '../widgets/campoTexto.dart';
@@ -67,7 +67,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
           "Adicionar Paciente",
           style: TextStyle(color: cores('corTexto')),
         ),
-        backgroundColor: cores('corTerciaria'),
+        backgroundColor: cores('corFundo'),
       ),
       body: Container(
           child: ListView(
@@ -80,9 +80,10 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                 decoration: BoxDecoration(
                     color: cores('corSombra'),
                     boxShadow: [
-                        BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5),
+                      BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5),
                     ],
-                    borderRadius: const BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
+                    borderRadius:
+                        const BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -139,7 +140,8 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     ),
                     const Padding(padding: EdgeInsets.only(right: 10)),
                     Expanded(
-                      child: campoTexto('Telefone', txtTelefonePaciente, Icons.phone, formato: TelefoneInputFormatter(), numeros: true),
+                      child: campoTexto('Telefone', txtTelefonePaciente, Icons.phone,
+                          formato: TelefoneInputFormatter(), numeros: true),
                     )
                   ],
                 ),
@@ -188,7 +190,8 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                 Row(
                   children: [
                     Expanded(
-                      child: campoTexto('CEP', txtCEPPaciente, Icons.mail, formato: CepInputFormatter(), numeros: true, onchaged: (value) async {
+                      child: campoTexto('CEP', txtCEPPaciente, Icons.mail, formato: CepInputFormatter(), numeros: true,
+                          onchaged: (value) async {
                         var cepSemFormatacao = value.replaceAll(RegExp(r'[^0-9]'), '');
                         var viaCepSearchCep = ViaCepSearchCep();
                         var result = await viaCepSearchCep.searchInfoByCep(cep: cepSemFormatacao);
@@ -220,15 +223,21 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                           padding: const EdgeInsets.only(left: 10),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(color: cores('corPrimaria')),
+                              border: Border.all(color: cores('corBorda')),
                               color: Colors.white,
                               boxShadow: [
                                 BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 7)
                                 // changes position of shadow
                               ]),
                           child: DropdownButton(
-                            hint: Text('Selecione um Estado', style: TextStyle(color: cores('corTexto')),),
-                            icon: Icon(Icons.arrow_drop_down, color: cores('corTexto'),),
+                            hint: Text(
+                              'Selecione um Estado',
+                              style: TextStyle(color: cores('corTexto')),
+                            ),
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: cores('corTexto'),
+                            ),
                             iconSize: 30,
                             iconEnabledColor: cores('corTexto'),
                             style: TextStyle(
@@ -287,10 +296,11 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                   padding: const EdgeInsets.only(left: 10),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(color: cores('corPrimaria')),
+                      border: Border.all(color: cores('corBorda')),
                       color: Colors.white,
                       boxShadow: [
-                        BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5) // changes position of shadow
+                        BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
+                        // changes position of shadow
                       ]),
                   child: DropdownButton<String>(
                     icon: const Icon(Icons.arrow_drop_down),
@@ -310,11 +320,17 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     items: [
                       DropdownMenuItem(
                         value: 'Convênio',
-                        child: Text('Convênio', style: TextStyle(color: cores('corTexto')),),
+                        child: Text(
+                          'Convênio',
+                          style: TextStyle(color: cores('corTexto')),
+                        ),
                       ),
                       DropdownMenuItem(
                         value: 'Particular',
-                        child: Text('Particular', style: TextStyle(color: cores('corTexto')),),
+                        child: Text(
+                          'Particular',
+                          style: TextStyle(color: cores('corTexto')),
+                        ),
                       ),
                     ],
                     onChanged: (value) {
@@ -325,7 +341,8 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                campoTexto('Descrição', txtDescricaoPaciente, Icons.description, maxPalavras: 200, maxLinhas: 5, tamanho: 20.0),
+                campoTexto('Descrição', txtDescricaoPaciente, Icons.description,
+                    maxPalavras: 200, maxLinhas: 5, tamanho: 20.0),
                 Divider(
                   thickness: 2,
                   height: 50,
@@ -342,7 +359,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     ? SizedBox(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('corTextoBotao'),
+                              foregroundColor: cores('corTextoBotao'),
                               minimumSize: const Size(45, 45),
                               backgroundColor: cores('corBotao'),
                               elevation: 5,
@@ -374,7 +391,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     : SizedBox(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('corTextoBotao'),
+                              foregroundColor: cores('corTextoBotao'),
                               minimumSize: const Size(45, 45),
                               backgroundColor: Colors.grey,
                               elevation: 5,
@@ -398,7 +415,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                       width: 150,
                       child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('corTextoBotao'),
+                              foregroundColor: cores('corTextoBotao'),
                               minimumSize: const Size(200, 45),
                               backgroundColor: cores('corBotao'),
                               elevation: 5,
@@ -461,7 +478,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                       width: 150,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                            primary: cores('corTextoBotao'),
+                            foregroundColor: cores('corTextoBotao'),
                             minimumSize: const Size(200, 45),
                             backgroundColor: cores('corBotao'),
                             elevation: 5,
@@ -553,7 +570,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
           padding: const EdgeInsets.only(left: 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0),
-            border: Border.all(color: cores('corPrimaria')),
+            border: Border.all(color: cores('corBorda')),
             color: Colors.white,
             boxShadow: [
               BoxShadow(
@@ -618,68 +635,4 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
       ],
     );
   }
-}
-
-Future<void> adicionarPaciente(
-    context,
-    uidFono,
-    dataInicio,
-    urlImage,
-    nomePaciente,
-    dataNascimento,
-    telefone,
-    genero,
-    lougradouro,
-    numero,
-    bairro,
-    cidade,
-    estado,
-    cep,
-    tipoConsulta,
-    descricao,
-    generoResponsavel,
-    nomeResponsavel,
-    dataNascimentoResponsavel,
-    relacaoResponsavel,
-    escolaridadeResponsavel,
-    profissaoResponsavel) async {
-  CollectionReference pacientes = FirebaseFirestore.instance.collection('pacientes');
-  String uidPaciente = '';
-  Map<String, dynamic> data = {
-    'uidFono': uidFono,
-    'dataInicioPaciente': dataInicio,
-    'urlImagePaciente': urlImage,
-    'nomePaciente': nomePaciente,
-    'dtNascimentoPaciente': dataNascimento,
-    'telefonePaciente': telefone,
-    'generoPaciente': genero,
-    'lougradouroPaciente': lougradouro,
-    'numeroPaciente': numero,
-    'bairroPaciente': bairro,
-    'cidadePaciente': cidade,
-    'estadoPaciente': estado,
-    'cepPaciente': cep,
-    'tipoConsultaPaciente': tipoConsulta,
-    'descricaoPaciente': descricao,
-  };
-  for (int i = 0; i < generoResponsavel.length; i++) {
-    data['generoResponsavel$i'] = generoResponsavel[i].toString();
-    data['nomeResponsavel$i'] = nomeResponsavel[i].text;
-    data['dataNascimentoResponsavel$i'] = dataNascimentoResponsavel[i].text;
-    data['relacaoResponsavel$i'] = relacaoResponsavel[i];
-    data['escolaridadeResponsavel$i'] = escolaridadeResponsavel[i].text;
-    data['profissaoResponsavel$i'] = profissaoResponsavel[i].text;
-  }
-  DocumentReference docRef = await pacientes.add(data);
-  await FirebaseFirestore.instance.collection('pacientes').where('nomePaciente', isEqualTo: nomePaciente).get().then((us) {
-    uidPaciente = us.docs[0].id;
-  });
-  await docRef.update({'uidPaciente': uidPaciente});
-  sucesso(context, 'O paciente foi adicionado com sucesso.');
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const TelaPacientes(),
-    ),
-  );
 }

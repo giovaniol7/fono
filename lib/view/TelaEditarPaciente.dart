@@ -374,7 +374,7 @@ class _TelaEditarPacienteState extends State<TelaEditarPaciente> {
                     ? SizedBox(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('rosa_fraco'),
+                              foregroundColor: cores('rosa_fraco'),
                               minimumSize: const Size(45, 45),
                               backgroundColor: cores('verde'),
                               elevation: 5,
@@ -406,7 +406,7 @@ class _TelaEditarPacienteState extends State<TelaEditarPaciente> {
                     : SizedBox(
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('rosa_fraco'),
+                              foregroundColor: cores('rosa_fraco'),
                               minimumSize: const Size(45, 45),
                               backgroundColor: Colors.grey,
                               elevation: 5,
@@ -430,7 +430,7 @@ class _TelaEditarPacienteState extends State<TelaEditarPaciente> {
                       width: 150,
                       child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('rosa_fraco'),
+                              foregroundColor: cores('rosa_fraco'),
                               minimumSize: const Size(200, 45),
                               backgroundColor: cores('verde'),
                               elevation: 5,
@@ -493,7 +493,7 @@ class _TelaEditarPacienteState extends State<TelaEditarPaciente> {
                       width: 150,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                            primary: cores('rosa_fraco'),
+                            foregroundColor: cores('rosa_fraco'),
                             minimumSize: const Size(200, 45),
                             backgroundColor: cores('verde'),
                             elevation: 5,

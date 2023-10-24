@@ -1,21 +1,16 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
+import 'package:intl/intl.dart';
+import 'package:brasil_fields/brasil_fields.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+
+import '../connections/fireAuth.dart';
+import '../controllers/uploadImage.dart';
 import '../widgets/campoTexto.dart';
 import '../widgets/mensagem.dart';
 import '../controllers/estilos.dart';
-
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firedart/firedart.dart' as fd;
-
-import 'package:brasil_fields/brasil_fields.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 enum Gender { male, female }
 
@@ -40,14 +35,12 @@ class _TelaCadastroState extends State<TelaCadastro> {
   bool _obscureText2 = true;
   Gender? _selectedGeneroFono;
 
-  @override
   void _toggle() {
     setState(() {
       _obscureText = !_obscureText;
     });
   }
 
-  @override
   void _toggle2() {
     setState(() {
       _obscureText2 = !_obscureText2;
@@ -76,7 +69,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
               erro(context, 'Senhas não coincidem.');
             } else {
               if (txtSenha.text.length >= 6) {
-                criarConta(_selectedGeneroFono, txtNome.text, txtDtNascimento.text, txtEmail.text, txtCPF.text,
+                criarConta(context, _selectedGeneroFono, txtNome.text, txtDtNascimento.text, txtEmail.text, txtCPF.text,
                     txtCRFa.text, txtTelefone.text, txtSenha.text, urlImage);
               } else {
                 erro(context, 'Senha deve possuir mais de 6 caracteres.');
@@ -95,7 +88,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: cores('verde')),
+        iconTheme: IconThemeData(color: cores('corTexto')),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -104,9 +97,9 @@ class _TelaCadastroState extends State<TelaCadastro> {
         ),
         title: Text(
           "Cadastro",
-          style: TextStyle(color: cores('verde')),
+          style: TextStyle(color: cores('corTexto')),
         ),
-        backgroundColor: cores('rosa_fraco'),
+        backgroundColor: cores('corFundo'),
       ),
       body: ListView(
         children: [
@@ -116,9 +109,9 @@ class _TelaCadastroState extends State<TelaCadastro> {
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height * 0.2,
                 decoration: BoxDecoration(
-                    color: cores('rosa_medio'),
+                    color: cores('corFundo'),
                     boxShadow: [
-                      BoxShadow(offset: Offset(0, 3), color: cores('verde/azul'), blurRadius: 5),
+                      BoxShadow(offset: Offset(0, 3), color: cores('corSombra'), blurRadius: 5),
                     ],
                     borderRadius: BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
                 child: Column(
@@ -130,11 +123,11 @@ class _TelaCadastroState extends State<TelaCadastro> {
                         height: 80.0,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: cores('verde'),
+                          color: cores('corBotao'),
                         ),
                         child: InkWell(
                           onTap: () async {
-                            urlImage = await _uploadImage();
+                            urlImage = await uploadImage();
                             setState(() {
                               urlImage = urlImage!;
                             });
@@ -142,7 +135,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
                           child: urlImage == null
                               ? Icon(
                                   Icons.person_add_alt_rounded,
-                                  color: cores('rosa_fraco'),
+                                  color: cores('corTextoBotao'),
                                   size: 40.0,
                                 )
                               : CircleAvatar(
@@ -167,7 +160,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
                   Center(
                     child: Text(
                       'Sexo:',
-                      style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                     ),
                   ),
                   Row(
@@ -176,11 +169,11 @@ class _TelaCadastroState extends State<TelaCadastro> {
                         child: RadioListTile<Gender>(
                           title: Text(
                             'Masculino',
-                            style: TextStyle(color: cores('verde')),
+                            style: TextStyle(color: cores('corTexto')),
                           ),
                           value: Gender.male,
                           groupValue: _selectedGeneroFono,
-                          activeColor: cores('verde'),
+                          activeColor: cores('corTexto'),
                           onChanged: (value) {
                             setState(() {
                               _selectedGeneroFono = value;
@@ -192,11 +185,11 @@ class _TelaCadastroState extends State<TelaCadastro> {
                         child: RadioListTile<Gender>(
                           title: Text(
                             'Feminino',
-                            style: TextStyle(color: cores('verde')),
+                            style: TextStyle(color: cores('corTexto')),
                           ),
                           value: Gender.female,
                           groupValue: _selectedGeneroFono,
-                          activeColor: cores('verde'),
+                          activeColor: cores('corTexto'),
                           onChanged: (value) {
                             setState(() {
                               _selectedGeneroFono = value;
@@ -239,7 +232,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
                       sufIcon: IconButton(
                         icon: Icon(
                           _obscureText ? Icons.visibility_off : Icons.visibility,
-                          color: cores('verde'),
+                          color: cores('corTexto'),
                         ),
                         onPressed: _toggle,
                       ),
@@ -249,7 +242,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
                       sufIcon: IconButton(
                         icon: Icon(
                           _obscureText2 ? Icons.visibility_off : Icons.visibility,
-                          color: cores('verde'),
+                          color: cores('corTexto'),
                         ),
                         onPressed: _toggle2,
                       ),
@@ -262,9 +255,9 @@ class _TelaCadastroState extends State<TelaCadastro> {
                         width: 150,
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('rosa_medio'),
+                              foregroundColor: cores('corTextoBotao'),
                               minimumSize: const Size(200, 45),
-                              backgroundColor: cores('verde'),
+                              backgroundColor: cores('corBotao'),
                               elevation: 5,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
@@ -283,9 +276,9 @@ class _TelaCadastroState extends State<TelaCadastro> {
                         width: 150,
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              primary: cores('rosa_medio'),
+                              foregroundColor: cores('corTextoBotao'),
                               minimumSize: const Size(200, 45),
-                              backgroundColor: cores('verde'),
+                              backgroundColor: cores('corBotao'),
                               elevation: 5,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
@@ -309,84 +302,5 @@ class _TelaCadastroState extends State<TelaCadastro> {
         ],
       ),
     );
-  }
-
-  Future<String?> _uploadImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      // Crie uma referência única para a imagem no Firebase Storage
-      final ref = FirebaseStorage.instance.ref().child('users/${DateTime.now().toString()}');
-
-      // Faça o upload da imagem para o Firebase Storage
-      final uploadTask = ref.putFile(File(pickedFile.path));
-      final snapshot = await uploadTask.whenComplete(() => null);
-
-      // Recupere a URL da imagem no Firebase Storage
-      final url = await snapshot.ref.getDownloadURL();
-
-      return url;
-    }
-  }
-
-  //
-  // CRIAR CONTA no Firebase Auth
-  //
-  void criarConta(genero, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage) {
-    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-      FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: senha).then((res) {
-        FirebaseFirestore.instance.collection('users').add({
-          'uid': res.user!.uid.toString(),
-          'genero': genero,
-          'nome': nome,
-          'dtNascimento': dtNascimento,
-          'email': email,
-          'cpf': cpf,
-          'crfa': crfa,
-          'telefone': telefone,
-          'urlImage': urlImage,
-        });
-        sucesso(context, 'O usuário foi criado com sucesso!');
-        Navigator.pop(context);
-      }).catchError((e) {
-        switch (e.code) {
-          case 'email-already-in-use':
-            erro(context, 'O email já foi cadastrado.');
-            break;
-          case 'invalid-email':
-            erro(context, 'O formato do email é inválido.');
-            break;
-          default:
-            erro(context, e.code.toString());
-        }
-      });
-    } else {
-      FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: senha).then((res) {
-        fd.Firestore.instance.collection('users').add({
-          'uid': res.user!.uid.toString(),
-          'nome': nome,
-          'dtNascimento': dtNascimento,
-          'email': email,
-          'cpf': cpf,
-          'crfa': crfa,
-          'telefone': telefone,
-          'urlImage': urlImage,
-        });
-        sucesso(context, 'O usuário foi criado com sucesso!');
-        Navigator.pop(context);
-      }).catchError((e) {
-        switch (e.code) {
-          case 'email-already-in-use':
-            erro(context, 'O email já foi cadastrado.');
-            break;
-          case 'invalid-email':
-            erro(context, 'O formato do email é inválido.');
-            break;
-          default:
-            erro(context, e.code.toString());
-        }
-      });
-    }
   }
 }

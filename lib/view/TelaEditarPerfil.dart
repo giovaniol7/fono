@@ -168,7 +168,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                       width: 150,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                            primary: cores('corTextoBotao'),
+                            foregroundColor: cores('corTextoBotao'),
                             minimumSize: const Size(200, 45),
                             backgroundColor: cores('corBotao'),
                             elevation: 5,
@@ -196,7 +196,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                       width: 150,
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
-                            primary: cores('corSecundaria'),
+                            foregroundColor: cores('corSecundaria'),
                             minimumSize: const Size(200, 45),
                             backgroundColor: cores('corTexto'),
                             elevation: 5,

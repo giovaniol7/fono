@@ -1,41 +1,34 @@
-import 'dart:io';
+import 'package:flutter/material.dart';
 
 import 'package:brasil_fields/brasil_fields.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
-import 'package:fono/widgets/TextFieldSuggestions.dart';
-import 'package:fono/widgets/campoTexto.dart';
+
+import '../widgets/toggleSwitch.dart';
+import '../widgets/TextFieldSuggestions.dart';
+import '../widgets/campoTexto.dart';
+import '../widgets/mensagem.dart';
+import '../connections/fireAuth.dart';
 import '../connections/fireCloudContas.dart';
-import '/controllers/estilos.dart';
-import 'package:firedart/firedart.dart' as fd;
-import 'package:fono/widgets/mensagem.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:toggle_switch/toggle_switch.dart';
+import '../connections/fireCloudPacientes.dart';
+import '../controllers/estilos.dart';
 
 class TelaAdicionarContas extends StatefulWidget {
-  final String uidFono;
+  final String tipo;
 
-  const TelaAdicionarContas(this.uidFono, {super.key});
+  const TelaAdicionarContas(this.tipo, {super.key});
 
   @override
   State<TelaAdicionarContas> createState() => _TelaAdicionarContasState();
 }
 
 class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
-  var contas;
-  var uidFono;
-  var windowsIdFono;
   var txtNome = TextEditingController();
   var txtPreco = TextEditingController();
   var txtData = TextEditingController();
   var txtDescricaoConta = TextEditingController();
   String _paciente = '';
-  List<String> _listNome = [];
-  List<String> _listUid = [];
+  List<String> listPacientes = [];
+  List<String> listUID = [];
   late DateTime now;
   late int hour;
   late int minute;
@@ -53,40 +46,15 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
   final List<String> formaPagamento = ["Cartão Débito", "Cartão Crédito", "Pix", "Dinheiro", "Carnê"];
   final List<String> qntdParcelas = ["1x", "2x", "3x", "4x", "5x", "6x", "7x", "8x", "9x", "10x", "11x", "12x"];
 
-  retornarPacientes() async {
-    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-      uidFono = await FirebaseAuth.instance.currentUser!.uid.toString();
-      contas = await FirebaseFirestore.instance.collection('contas').where('uidFono', isEqualTo: uidFono);
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('pacientes').where('uidFono', isEqualTo: uidFono).get();
-      for (var doc in querySnapshot.docs) {
-        String nome = doc['nomePaciente'];
-        String uid = doc['uidPaciente'];
-        _listNome.add(nome);
-        _listUid.add(uid);
-      }
-    } else {
-      await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
-      await fd.Firestore.initialize('programafono-7be09');
-      var auth = fd.FirebaseAuth.instance;
-      final emailSave = await SharedPreferences.getInstance();
-      var email = emailSave.getString('email');
-      final senhaSave = await SharedPreferences.getInstance();
-      var senha = senhaSave.getString('senha');
-      await auth.signIn(email!, senha!);
-      var user = await auth.getUser();
-      windowsIdFono = user.id;
+  Future<void> atualizarDados() async {
+    await carregarDados();
+  }
 
-      contas = await fd.Firestore.instance.collection('contas').where('uidFono', isEqualTo: windowsIdFono);
-      List<fd.Document> querySnapshot =
-          await fd.Firestore.instance.collection('pacientes').where('uidFono', isEqualTo: uidFono).get();
-      for (var doc in querySnapshot) {
-        String nome = doc['nomePaciente'];
-        String uid = doc['uidPaciente'];
-        _listNome.add(nome);
-        _listUid.add(uid);
-      }
-    }
+  carregarDados() async {
+    listPacientes = await fazerListaPacientes();
+    listUID = await fazerListaUIDPacientes();
+
+    setState(() {});
   }
 
   @override
@@ -96,24 +64,28 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
     hour = now.hour;
     minute = now.hour;
     horaCompra = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-    txtData.text = "${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year.toString()}";
-    retornarPacientes();
+    txtData.text =
+        "${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year.toString()}";
+    carregarDados();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: cores('verde')),
+        backgroundColor: cores('corFundo'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(
+            Icons.arrow_back,
+            color: cores('corSimbolo'),
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         title: Text(
           "Adicionar Contas",
-          style: TextStyle(color: cores('verde')),
+          style: TextStyle(color: cores('corTexto')),
         ),
         /*actions: <Widget>[
           Padding(
@@ -121,12 +93,11 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
             child: Center(
               child: Text(
                 horaCompra,
-                style: TextStyle(fontSize: 18, color: cores('verde')),
+                style: TextStyle(fontSize: 18, color: cores('corTexto')),
               ),
             ),
           ),
         ],*/
-        backgroundColor: cores('rosa_fraco'),
       ),
       body: ListView(
         children: [
@@ -137,24 +108,15 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                 children: [
                   Text(
                     'Selecione Tipo de Transação:',
-                    style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                   ),
-                  ToggleSwitch(
-                    minWidth: 150.0,
-                    initialLabelIndex: index,
-                    cornerRadius: 20.0,
-                    activeFgColor: Colors.white,
-                    inactiveBgColor: Colors.grey,
-                    inactiveFgColor: Colors.white,
-                    totalSwitches: 2,
-                    labels: ['Recebido', 'Gasto'],
-                    icons: [Icons.attach_money, Icons.money_off],
-                    radiusStyle: true,
-                    activeBgColors: [
-                      [Colors.green.shade400],
-                      [Colors.pink.shade400]
-                    ],
-                    onToggle: (value) {
+                  toggleSwitch2(
+                    index,
+                    'Recebido',
+                    'Gasto',
+                    Icons.attach_money,
+                    Icons.money_off,
+                    (value) {
                       setState(() {
                         selecioneTipoTransacao = value == 0 ? 'Recebido' : 'Gasto';
                         index = value!;
@@ -163,48 +125,32 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    selecioneTipoTransacao == 'Recebido' ? 'Selecione o Tipo de Recebimento:' : 'Selecione se o Gasto foi:',
-                    style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+                    selecioneTipoTransacao == 'Recebido'
+                        ? 'Selecione o Tipo de Recebimento:'
+                        : 'Selecione se o Gasto foi:',
+                    style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                   ),
                   selecioneTipoTransacao == 'Gasto'
-                      ? ToggleSwitch(
-                          minWidth: 150.0,
-                          initialLabelIndex: index2,
-                          cornerRadius: 20.0,
-                          activeFgColor: Colors.white,
-                          inactiveBgColor: Colors.grey,
-                          inactiveFgColor: Colors.white,
-                          totalSwitches: 2,
-                          labels: ['Pago', 'Não Pago'],
-                          icons: [Icons.attach_money, Icons.money_off],
-                          radiusStyle: true,
-                          activeBgColors: [
-                            [Colors.green.shade400],
-                            [Colors.pink.shade400]
-                          ],
-                          onToggle: (value) {
+                      ? toggleSwitch2(
+                          index2,
+                          'Pago',
+                          'Não Pago',
+                          Icons.attach_money,
+                          Icons.money_off,
+                          (value) {
                             setState(() {
                               estadoPago = value == 0 ? true : false;
                               index2 = value!;
                             });
                           },
                         )
-                      : ToggleSwitch(
-                          minWidth: 150.0,
-                          initialLabelIndex: index3,
-                          cornerRadius: 20.0,
-                          activeFgColor: Colors.white,
-                          inactiveBgColor: Colors.grey,
-                          inactiveFgColor: Colors.white,
-                          totalSwitches: 2,
-                          labels: ['Pacientes', 'Outros'],
-                          icons: [FontAwesomeIcons.child, FontAwesomeIcons.shuffle],
-                          radiusStyle: true,
-                          activeBgColors: [
-                            [Colors.blue],
-                            [Colors.pink]
-                          ],
-                          onToggle: (value) {
+                      : toggleSwitch2(
+                          index3,
+                          'Pacientes',
+                          'Outros',
+                          FontAwesomeIcons.child,
+                          FontAwesomeIcons.shuffle,
+                          (value) {
                             setState(() {
                               estadoRecebido = value == 0 ? 'Pacientes' : 'Outros';
                               index3 = value!;
@@ -214,25 +160,17 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                   const SizedBox(height: 20),
                   Text(
                     'Selecione o Tipo de ${selecioneTipoTransacao}:',
-                    style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                   ),
-                  ToggleSwitch(
-                    minWidth: 150.0,
-                    initialLabelIndex: index4,
-                    cornerRadius: 20.0,
-                    activeFgColor: Colors.white,
-                    inactiveBgColor: Colors.grey,
-                    inactiveFgColor: Colors.white,
-                    totalSwitches: 3,
-                    labels: ['Trabalho', 'Pessoal', 'Outros'],
-                    icons: [FontAwesomeIcons.briefcase, FontAwesomeIcons.solidUser, FontAwesomeIcons.shuffle],
-                    radiusStyle: true,
-                    activeBgColors: [
-                      [Colors.green],
-                      [Colors.blue],
-                      [Colors.red]
-                    ],
-                    onToggle: (value) {
+                  toggleSwitch3(
+                    index4,
+                    'Trabalho',
+                    'Pessoal',
+                    'Outros',
+                    FontAwesomeIcons.briefcase,
+                    FontAwesomeIcons.solidUser,
+                    FontAwesomeIcons.shuffle,
+                    (value) {
                       setState(() {
                         estadoTipo = value == 0 ? 'Trabalho' : (value == 1 ? 'Pessoal' : 'Outros');
                         index4 = value!;
@@ -243,11 +181,11 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                   estadoRecebido == 'Pacientes' && selecioneTipoTransacao == 'Recebido'
                       ? TextFieldSuggestions(
                           icone: Icons.label,
-                          list: _listNome,
+                          list: listPacientes,
                           labelText: "Nome do Paciente",
-                          textSuggetionsColor: const Color(0xFF37513F),
-                          suggetionsBackgroundColor: const Color(0xFFFFFFFF),
-                          outlineInputBorderColor: const Color(0xFFF5B2B0),
+                          textSuggetionsColor: cores('corTexto'),
+                          suggetionsBackgroundColor: cores('branco'),
+                          outlineInputBorderColor: cores('corTexto'),
                           returnedValue: (String value) {
                             setState(() {
                               _paciente = value;
@@ -279,27 +217,29 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                   Column(
                     children: [
                       Text(
-                        selecioneTipoTransacao == 'Recebido' ? 'Selecione Forma de Recebimento' : 'Selecione Forma de Pagamento:',
-                        style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+                        selecioneTipoTransacao == 'Recebido'
+                            ? 'Selecione Forma de Recebimento'
+                            : 'Selecione Forma de Pagamento:',
+                        style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                       ),
                       Container(
                         height: 40,
                         padding: const EdgeInsets.only(left: 10),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8.0),
-                            border: Border.all(color: cores('rosa_forte')),
+                            border: Border.all(color: cores('corBorda')),
                             color: Colors.white,
                             boxShadow: [
-                              BoxShadow(offset: const Offset(0, 3), color: cores('rosa_fraco'), blurRadius: 5)
+                              BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
                               // changes position of shadow
                             ]),
                         child: DropdownButton(
                           hint: const Text('Selecione Forma de Pagamento'),
                           icon: const Icon(Icons.arrow_drop_down),
                           iconSize: 30,
-                          iconEnabledColor: cores('verde'),
+                          iconEnabledColor: cores('corTexto'),
                           style: TextStyle(
-                            color: cores('verde'),
+                            color: cores('corTexto'),
                             fontWeight: FontWeight.w400,
                             fontSize: 18,
                           ),
@@ -329,26 +269,25 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                           children: [
                             Text(
                               'Selecione Quantidade de Parcelas:',
-                              style: TextStyle(fontSize: 16, color: cores('verde'), fontWeight: FontWeight.bold),
+                              style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                             ),
                             Container(
                               height: 40,
                               padding: const EdgeInsets.only(left: 10),
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8.0),
-                                  border: Border.all(color: cores('rosa_forte')),
-                                  color: Colors.white,
+                                  border: Border.all(color: cores('corBorda')),
+                                  color: cores('corCaixaPadrao'),
                                   boxShadow: [
-                                    BoxShadow(offset: const Offset(0, 3), color: cores('rosa_fraco'), blurRadius: 5)
-                                    // changes position of shadow
+                                    BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
                                   ]),
                               child: DropdownButton(
                                 hint: const Text('Selecione Quantidade de Parcelas'),
                                 icon: const Icon(Icons.arrow_drop_down),
                                 iconSize: 30,
-                                iconEnabledColor: cores('verde'),
+                                iconEnabledColor: cores('corTexto'),
                                 style: TextStyle(
-                                  color: cores('verde'),
+                                  color: cores('corTexto'),
                                   fontWeight: FontWeight.w400,
                                   fontSize: 18,
                                 ),
@@ -376,7 +315,8 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                   const SizedBox(height: 20),
                   campoTexto('Data', txtData, Icons.credit_card, formato: DataInputFormatter(), numeros: true),
                   const SizedBox(height: 20),
-                  campoTexto('Descrição', txtDescricaoConta, Icons.description, maxPalavras: 200, maxLinhas: 5, tamanho: 20.0),
+                  campoTexto('Descrição', txtDescricaoConta, Icons.description,
+                      maxPalavras: 200, maxLinhas: 5, tamanho: 20.0),
                   const SizedBox(height: 40),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -385,9 +325,9 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                         width: 150,
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              foregroundColor: cores('rosa_medio'),
+                              foregroundColor: cores('corTextoBotao'),
                               minimumSize: const Size(200, 45),
-                              backgroundColor: cores('verde'),
+                              backgroundColor: cores('corBotao'),
                               elevation: 5,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
@@ -407,9 +347,9 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                                 horaCompra.isNotEmpty) {
                               adicionarContas(
                                   context,
-                                  _listUid,
-                                  _listNome,
-                                  uidFono,
+                                  listUID,
+                                  listPacientes,
+                                  idUsuario(),
                                   selecioneTipoTransacao,
                                   estadoTipo,
                                   txtNome.text,
@@ -432,9 +372,9 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                         width: 150,
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                              foregroundColor: cores('rosa_medio'),
+                              foregroundColor: cores('corTextoBotao'),
                               minimumSize: const Size(200, 45),
-                              backgroundColor: cores('verde'),
+                              backgroundColor: cores('corBotao'),
                               elevation: 5,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),

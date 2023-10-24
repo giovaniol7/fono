@@ -12,11 +12,13 @@ Widget listarPaciente(doc) {
       ),
       margin: EdgeInsets.all(5),
       child: ListTile(
-        /*leading: CircleAvatar(
-            backgroundImage: NetworkImage(
-              doc.data()['urlImagePaciente'],
-            ),
-          ),*/
+        leading: CircleAvatar(
+          backgroundImage: doc.data()['urlImagePaciente'].toString().isNotEmpty
+              ? NetworkImage(doc.data()['urlImagePaciente'])
+              : (doc.data()['generoPaciente'] == 'Gender.male'
+              ? AssetImage('images/icons/profileBoy.png')
+              : AssetImage('images/icons/profileGirl.png') as ImageProvider),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -29,6 +31,15 @@ Widget listarPaciente(doc) {
               style: TextStyle(color: cores('corTexto'), fontSize: 16, fontWeight: FontWeight.normal),
             ),
           ],
+        ),
+        trailing: IconButton(
+          icon: Icon(
+            Icons.edit,
+            color: cores('corSimbolo'),
+          ),
+          onPressed: () {
+            print('Botão pressionado!');
+          },
         ),
         onTap: () {
           /* Navigator.push(
