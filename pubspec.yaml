@@ -30,17 +30,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cloud_firestore: ^4.11.0
-  firebase_auth: ^4.11.1
+  cloud_firestore: ^4.12.1
+  firebase_auth: ^4.12.0
   shared_preferences: ^2.2.2
   firebase_storage: ^11.3.1
   firebase_core: ^2.19.0
-  firedart: ^0.9.7
   cupertino_icons: ^1.0.6
   google_sign_in: ^6.1.5
   brasil_fields: ^1.14.0
   image_picker: ^1.0.4
-  syncfusion_flutter_calendar: ^23.1.41
+  syncfusion_flutter_calendar: ^23.1.42
   flutter_localization: ^0.1.14
   search_cep: ^4.0.2
   uuid: ^4.1.0

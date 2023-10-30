@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fono/view/TelaAdicionarPaciente.dart';
+import 'package:fono/view/TelaDadosPacientes.dart';
 import '../controllers/estilos.dart';
+import '../view/TelaProntuariosPaciente.dart';
 
-Widget listarPaciente(doc) {
+Widget listarPaciente(context, doc, tipoTela) {
   return Container(
     child: Card(
       color: Colors.red.shade50,
@@ -32,21 +35,30 @@ Widget listarPaciente(doc) {
             ),
           ],
         ),
-        trailing: IconButton(
+        trailing: tipoTela == 'pacientes' ? IconButton(
           icon: Icon(
             Icons.edit,
             color: cores('corSimbolo'),
           ),
           onPressed: () {
-            print('Botão pressionado!');
-          },
-        ),
-        onTap: () {
-          /* Navigator.push(
+            String tipo = 'editar';
+            Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => TelaEspecificoPaciente(doc.data()['uidPaciente']),
-                ));*/
+                  builder: (context) => TelaAdicionarPaciente(tipo, doc.data()['uidPaciente']),
+                ));
+          },
+        ) : null,
+        onTap: () {
+          tipoTela == 'pacientes' ? Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TelaDadosPacientes(doc.data()['uidPaciente']),
+                )) : Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TelaProntuariosPaciente(doc.data()['uidPaciente']),
+              ));
         },
       ),
     ),

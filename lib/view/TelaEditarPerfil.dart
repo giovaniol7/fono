@@ -1,10 +1,7 @@
-import 'package:flutter/foundation.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:brasil_fields/brasil_fields.dart';
-
-import 'package:fono/view/TelaInicial.dart';
 
 import '../connections/fireCloudUser.dart';
 import '../controllers/uploadImage.dart';
@@ -20,19 +17,20 @@ class TelaEditarPerfil extends StatefulWidget {
 }
 
 class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
-  var windowsId;
   var uid;
   var id;
-  var urlImage;
-  var txtNome = TextEditingController();
-  var txtEmail = TextEditingController();
-  var txtSenha = TextEditingController();
-  var txtDtNascimento = TextEditingController();
-  var genero;
-  var txtCPF = TextEditingController();
-  var txtCRFa = TextEditingController();
-  var txtTelefone = TextEditingController();
-  var txtSenhaCofirmar = TextEditingController();
+  var fileImage;
+  var apagarImagem;
+  String urlImage = '';
+  late var txtNome = TextEditingController();
+  late var txtEmail = TextEditingController();
+  late var txtSenha = TextEditingController();
+  late var txtDtNascimento = TextEditingController();
+  late var genero;
+  late var txtCPF = TextEditingController();
+  late var txtCRFa = TextEditingController();
+  late var txtTelefone = TextEditingController();
+  late var txtSenhaCofirmar = TextEditingController();
   bool _obscureText = true;
   bool _obscureText2 = true;
 
@@ -53,7 +51,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
     setState(() {
       id = usuario['id'];
       uid = usuario['uid'];
-      urlImage = usuario['urlImage'];
+      urlImage = usuario['urlImage']!;
       txtNome.text = usuario['nome']!;
       txtDtNascimento.text = usuario['dtNascimento']!;
       genero = usuario['genero'];
@@ -62,7 +60,6 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
       txtCPF.text = usuario['cpf']!;
       txtCRFa.text = usuario['crfa']!;
     });
-    print(usuario);
   }
 
   @override
@@ -73,6 +70,8 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
 
   @override
   Widget build(BuildContext context) {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
@@ -87,7 +86,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
           "Editar Perfil",
           style: TextStyle(color: cores('corTexto')),
         ),
-        backgroundColor: cores('corTerciaria'),
+        backgroundColor: cores('corFundo'),
       ),
       body: ListView(
         children: [
@@ -95,7 +94,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height * 0.2,
             decoration: BoxDecoration(
-                color: cores('corSecundaria'),
+                color: cores('corFundo'),
                 boxShadow: [
                   BoxShadow(offset: Offset(0, 3), color: cores('corDetalhe'), blurRadius: 5),
                 ],
@@ -106,27 +105,57 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                 height: 80.0,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: cores('verde'),
+                  color: cores('corBotao'),
                 ),
-                child: InkWell(
-                  onTap: () async {
-                    urlImage = await uploadImage();
-                    setState(() {
-                      urlImage = urlImage!;
-                    });
-                  },
-                  child: urlImage == null
-                      ? Icon(
-                          Icons.person_add_alt_rounded,
-                          color: cores('rosa_fraco'),
-                          size: 40.0,
-                        )
-                      : CircleAvatar(
-                          maxRadius: 5,
-                          minRadius: 1,
+                child: urlImage.isEmpty
+                    ? InkWell(
+                        onTap: () async {
+                          fileImage = await pickedImage();
+                          setState(() {
+                            fileImage = fileImage!;
+                          });
+                        },
+                        child: fileImage == null
+                            ? Icon(
+                                Icons.person_add_alt_rounded,
+                                color: cores('corTextoBotao'),
+                                size: tamanhoFonte.iconPequeno(context),
+                              )
+                            : CircleAvatar(
+                                maxRadius: 5,
+                                minRadius: 1,
+                                backgroundImage: FileImage(
+                                  File(fileImage.path),
+                                ),
+                              ),
+                      )
+                    : Stack(children: [
+                        CircleAvatar(
+                          radius: 80,
                           backgroundImage: NetworkImage(urlImage),
                         ),
-                ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: cores('corSimbolo'),
+                                size: tamanhoFonte.iconPequeno(context),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  apagarImagem == true;
+                                  urlImage = '';
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ]),
               ),
             ),
           ),
@@ -179,15 +208,16 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                           'Editar',
                           style: TextStyle(fontSize: 18),
                         ),
-                        onPressed: () {
-                          verificarDados(context, uid, txtNome.text, txtDtNascimento.text, txtEmail.text, txtCPF.text,
-                              txtCRFa.text, txtTelefone.text, txtSenha.text, txtSenhaCofirmar.text, urlImage);
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const TelaInicial(),
-                            ),
-                          );
+                        onPressed: () async {
+                          fileImage != null ? urlImage = (await uploadImageUsers(fileImage, 'users'))! : urlImage = '';
+
+                          if (apagarImagem == true) {
+                            await deletarImagem(urlImage);
+                            await apagarImagemUser(id);
+                          }
+
+                          verificarDados(context, uid, urlImage, txtNome.text, txtDtNascimento.text, txtEmail.text,
+                              txtCPF.text, txtCRFa.text, txtTelefone.text, txtSenha.text, txtSenhaCofirmar.text);
                         },
                       ),
                     ),

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../view/TelaPacientes.dart';
+import '../models/maps.dart';
 
 import '../connections/fireAuth.dart';
 import '../widgets/mensagem.dart';
 
 String nomeColecao = 'pacientes';
 
-recuperarPacientes() async {
+recuperarTodosPacientes() async {
   return await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario());
 }
 
@@ -53,52 +53,58 @@ Future<List<String>> fazerListaUIDPacientes() async {
 adicionarPaciente(
     context,
     uidFono,
-    dataInicio,
+    dataInicioPaciente,
     urlImage,
     nomePaciente,
-    dataNascimento,
-    telefone,
-    genero,
-    lougradouro,
-    numero,
-    bairro,
-    cidade,
-    estado,
-    cep,
-    tipoConsulta,
-    descricao,
-    generoResponsavel,
-    nomeResponsavel,
-    dataNascimentoResponsavel,
-    relacaoResponsavel,
-    escolaridadeResponsavel,
-    profissaoResponsavel) async {
+    dataNascimentoPaciente,
+    CPFPaciente,
+    RGPaciente,
+    generoPaciente,
+    lougradouroPaciente,
+    numeroPaciente,
+    bairroPaciente,
+    cidadePaciente,
+    estadoPaciente,
+    cepPaciente,
+    tipoConsultaPaciente,
+    descricaoPaciente,
+    qtdResponsavel,
+    listGeneroResponsavel,
+    listNomeResponsavel,
+    listIdadeResponsavel,
+    listTelefoneResponsavel,
+    listRelacaoResponsavel,
+    listEscolaridadeResponsavel,
+    listProfissaoResponsavel) async {
   CollectionReference pacientes = FirebaseFirestore.instance.collection(nomeColecao);
   String uidPaciente = '';
   Map<String, dynamic> data = {
     'uidFono': uidFono,
-    'dataInicioPaciente': dataInicio,
+    'dataInicioPaciente': dataInicioPaciente,
     'urlImagePaciente': urlImage,
     'nomePaciente': nomePaciente,
-    'dtNascimentoPaciente': dataNascimento,
-    'telefonePaciente': telefone,
-    'generoPaciente': genero,
-    'lougradouroPaciente': lougradouro,
-    'numeroPaciente': numero,
-    'bairroPaciente': bairro,
-    'cidadePaciente': cidade,
-    'estadoPaciente': estado,
-    'cepPaciente': cep,
-    'tipoConsultaPaciente': tipoConsulta,
-    'descricaoPaciente': descricao,
+    'dtNascimentoPaciente': dataNascimentoPaciente,
+    'CPFPaciente': CPFPaciente,
+    'RGPaciente': RGPaciente,
+    'generoPaciente': generoPaciente,
+    'lougradouroPaciente': lougradouroPaciente,
+    'numeroPaciente': numeroPaciente,
+    'bairroPaciente': bairroPaciente,
+    'cidadePaciente': cidadePaciente,
+    'estadoPaciente': estadoPaciente,
+    'cepPaciente': cepPaciente,
+    'tipoConsultaPaciente': tipoConsultaPaciente,
+    'descricaoPaciente': descricaoPaciente,
+    'qtdResponsavel': qtdResponsavel + 1
   };
-  for (int i = 0; i < generoResponsavel.length; i++) {
-    data['generoResponsavel$i'] = generoResponsavel[i].toString();
-    data['nomeResponsavel$i'] = nomeResponsavel[i].text;
-    data['dataNascimentoResponsavel$i'] = dataNascimentoResponsavel[i].text;
-    data['relacaoResponsavel$i'] = relacaoResponsavel[i];
-    data['escolaridadeResponsavel$i'] = escolaridadeResponsavel[i].text;
-    data['profissaoResponsavel$i'] = profissaoResponsavel[i].text;
+  for (int i = 0; i < listGeneroResponsavel.length; i++) {
+    data['generoResponsavel$i'] = listGeneroResponsavel[i].toString();
+    data['nomeResponsavel$i'] = listNomeResponsavel[i].text;
+    data['idadeResponsavel$i'] = listIdadeResponsavel[i].text;
+    data['telefoneResponsavel$i'] = listTelefoneResponsavel[i].text;
+    data['relacaoResponsavel$i'] = listRelacaoResponsavel[i];
+    data['escolaridadeResponsavel$i'] = listEscolaridadeResponsavel[i].text;
+    data['profissaoResponsavel$i'] = listProfissaoResponsavel[i].text;
   }
   DocumentReference docRef = await pacientes.add(data);
   await FirebaseFirestore.instance
@@ -110,12 +116,261 @@ adicionarPaciente(
   });
   await docRef.update({'uidPaciente': uidPaciente});
   sucesso(context, 'O paciente foi adicionado com sucesso.');
-  Navigator.pushReplacement(
+  Navigator.pop(context);
+}
+
+editarPaciente(
     context,
-    MaterialPageRoute(
-      builder: (context) => const TelaPacientes(),
-    ),
-  );
+    uidFono,
+    uidPaciente,
+    dataInicioPaciente,
+    urlImage,
+    nomePaciente,
+    dataNascimentoPaciente,
+    CPFPaciente,
+    RGPaciente,
+    generoPaciente,
+    lougradouroPaciente,
+    numeroPaciente,
+    bairroPaciente,
+    cidadePaciente,
+    estadoPaciente,
+    cepPaciente,
+    tipoConsultaPaciente,
+    descricaoPaciente,
+    qtdResponsavel,
+    listGeneroResponsavel,
+    listNomeResponsavel,
+    listIdadeResponsavel,
+    listTelefoneResponsavel,
+    listRelacaoResponsavel,
+    listEscolaridadeResponsavel,
+    listProfissaoResponsavel) async {
+  Map<String, dynamic> data = {
+    'uidFono': uidFono,
+    'dataInicioPaciente': dataInicioPaciente,
+    'urlImagePaciente': urlImage,
+    'nomePaciente': nomePaciente,
+    'dtNascimentoPaciente': dataNascimentoPaciente,
+    'CPFPaciente': CPFPaciente,
+    'RGPaciente': RGPaciente,
+    'generoPaciente': generoPaciente,
+    'lougradouroPaciente': lougradouroPaciente,
+    'numeroPaciente': numeroPaciente,
+    'bairroPaciente': bairroPaciente,
+    'cidadePaciente': cidadePaciente,
+    'estadoPaciente': estadoPaciente,
+    'cepPaciente': cepPaciente,
+    'tipoConsultaPaciente': tipoConsultaPaciente,
+    'descricaoPaciente': descricaoPaciente,
+    'qtdResponsavel': qtdResponsavel + 1
+  };
+  for (int i = 0; i < listGeneroResponsavel.length; i++) {
+    data['generoResponsavel$i'] = listGeneroResponsavel[i].toString();
+    data['nomeResponsavel$i'] = listNomeResponsavel[i].text;
+    data['idadeResponsavel$i'] = listIdadeResponsavel[i].text;
+    data['telefoneResponsavel$i'] = listTelefoneResponsavel[i].text;
+    data['relacaoResponsavel$i'] = listRelacaoResponsavel[i];
+    data['escolaridadeResponsavel$i'] = listEscolaridadeResponsavel[i].text;
+    data['profissaoResponsavel$i'] = listProfissaoResponsavel[i].text;
+  }
+  await FirebaseFirestore.instance.collection(nomeColecao).doc(uidPaciente).update(data);
+  sucesso(context, 'O paciente foi atualizado com sucesso.');
+  Navigator.pop(context);
+}
+
+apagarPaciente(context, id) async {
+  try {
+    await FirebaseFirestore.instance.collection(nomeColecao).doc(id).delete();
+    sucesso(context, 'Paciente apagado com sucesso!');
+    Navigator.pop(context);
+  } catch (e) {
+    erro(context, 'Erro ao remover a consulta');
+  }
+}
+
+recuperarPaciente(context, uid) async {
+  String uidPaciente = '';
+  String uidFono = '';
+  String dataInicioPaciente = '';
+  String urlImagePaciente = '';
+  String nomePaciente = '';
+  String dtNascimentoPaciente = '';
+  String CPFPaciente = '';
+  String RGPaciente = '';
+  Gender? generoPaciente;
+  String lougradouroPaciente = '';
+  String numeroPaciente = '';
+  String bairroPaciente = '';
+  String cidadePaciente = '';
+  String estadoPaciente = '';
+  String cepPaciente = '';
+  String tipoConsultaPaciente = '';
+  String descricaoPaciente = '';
+  int qtdResponsavel = 0;
+  List<Gender?> listGeneroResponsavel = [];
+  List<String> listNomeResponsavel = [];
+  List<String> listIdadeResponsavel = [];
+  List<String> listTelefoneResponsavel = [];
+  List<String> listRelacaoResponsavel = [];
+  List<String> listEscolaridadeResponsavel = [];
+  List<String> listProfissaoResponsavel = [];
+
+  Map<String, dynamic> paciente = {};
+
+  await FirebaseFirestore.instance.collection(nomeColecao).where('uidPaciente', isEqualTo: uid).get().then((q) {
+    if (q.docs.isNotEmpty) {
+      uidPaciente = q.docs[0].id;
+      uidFono = q.docs[0].data()['uidFono'];
+      dataInicioPaciente = q.docs[0].data()['dataInicioPaciente'];
+      urlImagePaciente = q.docs[0].data()['urlImagePaciente'];
+      nomePaciente = q.docs[0].data()['nomePaciente'];
+      dtNascimentoPaciente = q.docs[0].data()['dtNascimentoPaciente'];
+      CPFPaciente = q.docs[0].data()['CPFPaciente'];
+      RGPaciente = q.docs[0].data()['RGPaciente'];
+      generoPaciente = stringToGender(q.docs[0].data()['generoPaciente']);
+      lougradouroPaciente = q.docs[0].data()['lougradouroPaciente'];
+      numeroPaciente = q.docs[0].data()['numeroPaciente'];
+      bairroPaciente = q.docs[0].data()['bairroPaciente'];
+      cidadePaciente = q.docs[0].data()['cidadePaciente'];
+      estadoPaciente = q.docs[0].data()['estadoPaciente'];
+      cepPaciente = q.docs[0].data()['cepPaciente'];
+      tipoConsultaPaciente = q.docs[0].data()['tipoConsultaPaciente'];
+      descricaoPaciente = q.docs[0].data()['descricaoPaciente'];
+      qtdResponsavel = q.docs[0].data()['qtdResponsavel'];
+      for (int i = 0; i < qtdResponsavel; i++) {
+        listGeneroResponsavel.add(stringToGender(q.docs[0].data()['generoResponsavel$i']));
+        listNomeResponsavel.add(q.docs[0].data()['nomeResponsavel$i']);
+        listIdadeResponsavel.add(q.docs[0].data()['idadeResponsavel$i']);
+        listTelefoneResponsavel.add(q.docs[0].data()['telefoneResponsavel$i']);
+        listRelacaoResponsavel.add(q.docs[0].data()['relacaoResponsavel$i']);
+        listEscolaridadeResponsavel.add(q.docs[0].data()['escolaridadeResponsavel$i']);
+        listProfissaoResponsavel.add(q.docs[0].data()['profissaoResponsavel$i']);
+      }
+    }
+  });
+
+  paciente = {
+    'uidPaciente': uidPaciente,
+    'uidFono': uidFono,
+    'dataInicioPaciente': dataInicioPaciente,
+    'urlImagePaciente': urlImagePaciente,
+    'nomePaciente': nomePaciente,
+    'dtNascimentoPaciente': dtNascimentoPaciente,
+    'CPFPaciente': CPFPaciente,
+    'RGPaciente': RGPaciente,
+    'generoPaciente': generoPaciente,
+    'lougradouroPaciente': lougradouroPaciente,
+    'numeroPaciente': numeroPaciente,
+    'bairroPaciente': bairroPaciente,
+    'cidadePaciente': cidadePaciente,
+    'estadoPaciente': estadoPaciente,
+    'cepPaciente': cepPaciente,
+    'tipoConsultaPaciente': tipoConsultaPaciente,
+    'descricaoPaciente': descricaoPaciente,
+    'qtdResponsavel': qtdResponsavel,
+    'listGeneroResponsavel': listGeneroResponsavel,
+    'listNomeResponsavel': listNomeResponsavel,
+    'listIdadeResponsavel': listIdadeResponsavel,
+    'listTelefoneResponsavel': listTelefoneResponsavel,
+    'listRelacaoResponsavel': listRelacaoResponsavel,
+    'listEscolaridadeResponsavel': listEscolaridadeResponsavel,
+    'listProfissaoResponsavel': listProfissaoResponsavel,
+  };
+
+  return paciente;
+}
+
+recuperarPacientePorNome(context, nome) async {
+  String uidPaciente = '';
+  String uidFono = '';
+  String dataInicioPaciente = '';
+  String urlImagePaciente = '';
+  String nomePaciente = '';
+  String dtNascimentoPaciente = '';
+  String CPFPaciente = '';
+  String RGPaciente = '';
+  Gender? generoPaciente;
+  String lougradouroPaciente = '';
+  String numeroPaciente = '';
+  String bairroPaciente = '';
+  String cidadePaciente = '';
+  String estadoPaciente = '';
+  String cepPaciente = '';
+  String tipoConsultaPaciente = '';
+  String descricaoPaciente = '';
+  int qtdResponsavel = 0;
+  List<Gender?> listGeneroResponsavel = [];
+  List<String> listNomeResponsavel = [];
+  List<String> listIdadeResponsavel = [];
+  List<String> listTelefoneResponsavel = [];
+  List<String> listRelacaoResponsavel = [];
+  List<String> listEscolaridadeResponsavel = [];
+  List<String> listProfissaoResponsavel = [];
+
+  Map<String, dynamic> paciente = {};
+
+  await FirebaseFirestore.instance.collection(nomeColecao).where('nomePaciente', isEqualTo: nome).get().then((q) {
+    if (q.docs.isNotEmpty) {
+      uidPaciente = q.docs[0].id;
+      uidFono = q.docs[0].data()['uidFono'];
+      dataInicioPaciente = q.docs[0].data()['dataInicioPaciente'];
+      urlImagePaciente = q.docs[0].data()['urlImagePaciente'];
+      nomePaciente = q.docs[0].data()['nomePaciente'];
+      dtNascimentoPaciente = q.docs[0].data()['dtNascimentoPaciente'];
+      CPFPaciente = q.docs[0].data()['CPFPaciente'];
+      RGPaciente = q.docs[0].data()['RGPaciente'];
+      generoPaciente = stringToGender(q.docs[0].data()['generoPaciente']);
+      lougradouroPaciente = q.docs[0].data()['lougradouroPaciente'];
+      numeroPaciente = q.docs[0].data()['numeroPaciente'];
+      bairroPaciente = q.docs[0].data()['bairroPaciente'];
+      cidadePaciente = q.docs[0].data()['cidadePaciente'];
+      estadoPaciente = q.docs[0].data()['estadoPaciente'];
+      cepPaciente = q.docs[0].data()['cepPaciente'];
+      tipoConsultaPaciente = q.docs[0].data()['tipoConsultaPaciente'];
+      descricaoPaciente = q.docs[0].data()['descricaoPaciente'];
+      qtdResponsavel = q.docs[0].data()['qtdResponsavel'];
+      for (int i = 0; i < qtdResponsavel; i++) {
+        listGeneroResponsavel.add(stringToGender(q.docs[0].data()['generoResponsavel$i']));
+        listNomeResponsavel.add(q.docs[0].data()['nomeResponsavel$i']);
+        listIdadeResponsavel.add(q.docs[0].data()['idadeResponsavel$i']);
+        listTelefoneResponsavel.add(q.docs[0].data()['telefoneResponsavel$i']);
+        listRelacaoResponsavel.add(q.docs[0].data()['relacaoResponsavel$i']);
+        listEscolaridadeResponsavel.add(q.docs[0].data()['escolaridadeResponsavel$i']);
+        listProfissaoResponsavel.add(q.docs[0].data()['profissaoResponsavel$i']);
+      }
+    }
+  });
+
+  paciente = {
+    'uidPaciente': uidPaciente,
+    'uidFono': uidFono,
+    'dataInicioPaciente': dataInicioPaciente,
+    'urlImagePaciente': urlImagePaciente,
+    'nomePaciente': nomePaciente,
+    'dtNascimentoPaciente': dtNascimentoPaciente,
+    'CPFPaciente': CPFPaciente,
+    'RGPaciente': RGPaciente,
+    'generoPaciente': generoPaciente,
+    'lougradouroPaciente': lougradouroPaciente,
+    'numeroPaciente': numeroPaciente,
+    'bairroPaciente': bairroPaciente,
+    'cidadePaciente': cidadePaciente,
+    'estadoPaciente': estadoPaciente,
+    'cepPaciente': cepPaciente,
+    'tipoConsultaPaciente': tipoConsultaPaciente,
+    'descricaoPaciente': descricaoPaciente,
+    'qtdResponsavel': qtdResponsavel,
+    'listGeneroResponsavel': listGeneroResponsavel,
+    'listNomeResponsavel': listNomeResponsavel,
+    'listIdadeResponsavel': listIdadeResponsavel,
+    'listTelefoneResponsavel': listTelefoneResponsavel,
+    'listRelacaoResponsavel': listRelacaoResponsavel,
+    'listEscolaridadeResponsavel': listEscolaridadeResponsavel,
+    'listProfissaoResponsavel': listProfissaoResponsavel,
+  };
+
+  return paciente;
 }
 
 /*else {

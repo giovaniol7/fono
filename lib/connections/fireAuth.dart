@@ -1,11 +1,6 @@
-import 'dart:io';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firedart/firedart.dart' as fd;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/mensagem.dart';
 import 'sharedPreference.dart';
 import 'fireCloudUser.dart';
@@ -14,9 +9,9 @@ idUsuario() {
   return FirebaseAuth.instance.currentUser!.uid;
 }
 
-criarConta(context, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage) {
+criarConta(context, urlImage, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha) async {
   FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: senha).then((res) {
-    adicionarUsuario(res.user!.uid.toString(), genero, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage);
+    adicionarUsuario(res.user!.uid.toString(), urlImage, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha);
     sucesso(context, 'O usuário foi criado com sucesso!');
     Navigator.pop(context);
   }).catchError((e) {
@@ -89,7 +84,7 @@ autenticarConta(context, email, senha) async {
   }*/
 
 signOut(context) async {
-  if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+  //if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
     try {
       await FirebaseAuth.instance.signOut();
       deleteValor();
@@ -99,7 +94,7 @@ signOut(context) async {
       print(e.toString());
       return null;
     }
-  } else {
+  /*} else {
     //fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
     //fd.Firestore.initialize('programafono-7be09');
     try {
@@ -111,5 +106,5 @@ signOut(context) async {
       print(e.toString());
       return null;
     }
-  }
+  }*/
 }

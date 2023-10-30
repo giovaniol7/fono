@@ -1,11 +1,7 @@
-import 'dart:io';
 
 import '/connections/fireAuth.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firedart/firedart.dart' as fd;
 
 Future<Map<String, double>> calcularFinanceiro() async {
   double totalGanhos = 0;
@@ -116,8 +112,8 @@ Future<Map<String, double>> calcularFinanceiro() async {
 Future<double> calcularAReceber() async {
   double aReceber = 0;
 
-  try {
-    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+  //try {
+    //if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
       QuerySnapshot usersSnapshot = await FirebaseFirestore.instance
           .collection('contas')
           .where('uidFono', isEqualTo: idUsuario())
@@ -135,7 +131,7 @@ Future<double> calcularAReceber() async {
           aReceber += precoCompra;
         });
       }
-    } else {
+    /*} else {
       //await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
       //await fd.Firestore.initialize('programafono-7be09');
       var auth = fd.FirebaseAuth.instance;
@@ -167,14 +163,14 @@ Future<double> calcularAReceber() async {
     }
   } catch (e) {
     print('Erro ao calcular somas: $e');
-  }
+  }*/
   return aReceber;
 }
 
 Future<double> calcularAPagar () async {
   double aPagar = 0;
-  try {
-    if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+  //try {
+    //if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
       QuerySnapshot recebidosSnapshot = await FirebaseFirestore.instance
           .collection('contas')
           .where('uidFono', isEqualTo: idUsuario())
@@ -192,7 +188,7 @@ Future<double> calcularAPagar () async {
           aPagar += precoCompra;
         });
       }
-    }else{
+    /*}else{
       //await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
       //await fd.Firestore.initialize('programafono-7be09');
       var auth = fd.FirebaseAuth.instance;
@@ -225,6 +221,6 @@ Future<double> calcularAPagar () async {
     }
   } catch (e) {
     print('Erro ao calcular somas: $e');
-  }
+  }*/
   return aPagar;
 }

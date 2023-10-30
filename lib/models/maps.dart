@@ -2,6 +2,28 @@ import 'package:flutter/material.dart';
 
 import '../connections/fireCloudConsultas.dart';
 
+enum Gender { male, female }
+
+Gender? stringToGender(String genderString) {
+  if (genderString == 'Gender.male') {
+    return Gender.male;
+  } else if (genderString == 'Gender.female') {
+    return Gender.female;
+  }
+  return null;
+}
+
+String genderToString(Gender gender) {
+  switch (gender) {
+    case Gender.male:
+      return 'Masc.';
+    case Gender.female:
+      return 'Fem.';
+    default:
+      return '';
+  }
+}
+
 Map<int, String> nomeMeses = {
   1: 'Janeiro',
   2: 'Fevereiro',

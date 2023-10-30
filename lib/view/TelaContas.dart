@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:fono/connections/fireAuth.dart';
 import 'package:fono/connections/fireCloudContas.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -11,9 +8,7 @@ import 'package:fono/view/TelaAdicionarContas.dart';
 import '../controllers/calcularFinanceiro.dart';
 import '../controllers/converterData.dart';
 import '../controllers/estilos.dart';
-import 'package:firedart/firedart.dart' as fd;
 import 'package:fono/widgets/mensagem.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../controllers/formatarMesAno.dart';
 

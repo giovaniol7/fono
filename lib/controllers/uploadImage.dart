@@ -1,23 +1,39 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 
-Future<String?> uploadImage() async {
+pickedImage() async {
   final picker = ImagePicker();
   final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-  if (pickedFile != null) {
-    // Crie uma referência única para a imagem no Firebase Storage
-    final ref = FirebaseStorage.instance.ref().child('users/${DateTime.now().toString()}');
+  return pickedFile;
+}
 
-    // Faça o upload da imagem para o Firebase Storage
+Future<String?> uploadImageUsers(pickedFile, colecao) async {
+  if (pickedFile != null) {
+    final ref = FirebaseStorage.instance.ref().child('$colecao/${DateTime.now().toString()}');
+
     final uploadTask = ref.putFile(File(pickedFile.path));
     final snapshot = await uploadTask.whenComplete(() => null);
 
-    // Recupere a URL da imagem no Firebase Storage
     final url = await snapshot.ref.getDownloadURL();
 
     return url;
   }
+  return null;
+}
+
+Future<void> deletarImagem(String caminho) async {
+  var referencia = FirebaseStorage.instance.refFromURL(caminho);
+
+  await referencia.delete();
+}
+
+Future<void> apagarImagemUser(String idDoDocumento) async {
+  DocumentReference documentoRef = FirebaseFirestore.instance.collection('users').doc(idDoDocumento);
+  String urlImage = '';
+
+  await documentoRef.update({'urlImage': urlImage});
 }

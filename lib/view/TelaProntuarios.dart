@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fono/connections/fireAuth.dart';
-
-import 'package:fono/view/TelaAdicionarPaciente.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -10,21 +7,20 @@ import '../widgets/TextFieldSuggestions.dart';
 import '../controllers/estilos.dart';
 import '../widgets/cardPaciente.dart';
 
-class TelaPacientes extends StatefulWidget {
-  const TelaPacientes({super.key});
+class TelaProntuarios extends StatefulWidget {
+  const TelaProntuarios({super.key});
 
   @override
-  State<TelaPacientes> createState() => _TelaPacientesState();
+  State<TelaProntuarios> createState() => _TelaProntuariosState();
 }
 
-class _TelaPacientesState extends State<TelaPacientes> {
+class _TelaProntuariosState extends State<TelaProntuarios> {
   var pacientes;
   var nomePaciente;
   var tipoPaciente;
   String _paciente = '';
   List<String> listaPaciente = [];
   String _outroPaciente = "";
-  var user;
 
   carregarDados() async {
     List<String> lista = await fazerListaPacientes();
@@ -41,7 +37,6 @@ class _TelaPacientesState extends State<TelaPacientes> {
     carregarDados();
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -53,7 +48,7 @@ class _TelaPacientesState extends State<TelaPacientes> {
           },
         ),
         title: Text(
-          "Pacientes",
+          "Prontuário de Atendimento",
           style: TextStyle(color: cores('corTexto'), fontSize: 24),
         ),
         backgroundColor: cores('corTerciaria'),
@@ -82,8 +77,8 @@ class _TelaPacientesState extends State<TelaPacientes> {
                 child: StreamBuilder<QuerySnapshot>(
                     stream: pacientes != null
                         ? (_paciente.isEmpty
-                            ? pacientes.orderBy('nomePaciente').snapshots()
-                            : pacientes.where('nomePaciente', isEqualTo: _paciente).snapshots())
+                        ? pacientes.orderBy('nomePaciente').snapshots()
+                        : pacientes.where('nomePaciente', isEqualTo: _paciente).snapshots())
                         : null,
                     builder: (context, snapshot) {
                       switch (snapshot.connectionState) {
@@ -100,10 +95,10 @@ class _TelaPacientesState extends State<TelaPacientes> {
                           return ListView.separated(
                               padding: EdgeInsets.all(10),
                               scrollDirection: Axis.vertical,
-                              itemBuilder: (context, index) => listarPaciente(context, dados.docs[index], 'pacientes'),
+                              itemBuilder: (context, index) => listarPaciente(context, dados.docs[index], 'prontuario'),
                               separatorBuilder: (context, _) => SizedBox(
-                                    width: 1,
-                                  ),
+                                width: 1,
+                              ),
                               itemCount: dados.size);
                       }
                     }),
@@ -112,7 +107,7 @@ class _TelaPacientesState extends State<TelaPacientes> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      /*floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
         onPressed: () {
           String tipo = 'adicionar';
@@ -128,7 +123,7 @@ class _TelaPacientesState extends State<TelaPacientes> {
           size: 35,
         ),
         backgroundColor: cores('corBotao'),
-      ),
+      ),*/
     );
   }
 }

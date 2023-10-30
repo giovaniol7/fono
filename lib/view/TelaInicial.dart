@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fono/controllers/calcularFinanceiro.dart';
+import 'package:fono/view/TelaAdicionarProntuarios.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -103,23 +104,22 @@ class _TelaInicialState extends State<TelaInicial> {
                               ],
                             ),
                           )
-                        : Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: calendarHome(context, tamanhoWidgets, tamanhoFonte),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
-                                    child: contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas,
-                                        despesas, saldo, aReceber, aPagar, _obscureText),
-                                  ),
-                                ],
-                              ),
-                            ],
+                        : Container(
+                            padding: EdgeInsets.all(10),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: calendarHome(context, tamanhoWidgets, tamanhoFonte),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Expanded(
+                                  child: contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas,
+                                      despesas, saldo, aReceber, aPagar, _obscureText),
+                                ),
+                              ],
+                            ),
                           ),
                     Container(
                       margin: EdgeInsets.only(right: 10, top: 10),
@@ -216,6 +216,7 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                     } else {
                       DataSource dataSource = snapshot.data!;
                       return SfCalendar(
+                        minDate: DateTime.now(),
                         showTodayButton: true,
                         controller: _calendarController,
                         showWeekNumber: false,
@@ -224,6 +225,19 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                         dataSource: dataSource,
                         headerDateFormat: 'MMM yyyy',
                         todayHighlightColor: cores('corSimbolo'),
+                        onTap: (CalendarTapDetails details) {
+                          if (details.targetElement == CalendarElement.appointment) {
+                            Appointment tappedAppointment = details.appointments!.first;
+                            DateTime dataClicada = details.date!;
+                            String tipo = 'adicionar';
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TelaAdicionarProntuarios(tipo, tappedAppointment, dataClicada),
+                              ),
+                            );
+                          }
+                        },
                         headerStyle: CalendarHeaderStyle(
                             textStyle: TextStyle(color: cores('corTexto'), fontSize: 20),
                             textAlign: TextAlign.center,
@@ -234,9 +248,9 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                               height: 0,
                             ),
                             monthHeaderSettings: MonthHeaderSettings(
-                                monthFormat: 'MMM, yyyy',
-                                height: 40,
-                                textAlign: TextAlign.start,
+                                monthFormat: 'MMM yyyy',
+                                height: 45,
+                                textAlign: TextAlign.center,
                                 backgroundColor: cores('corDetalhe'),
                                 monthTextStyle:
                                     TextStyle(color: cores('corTexto'), fontSize: 15, fontWeight: FontWeight.w500)),
@@ -250,9 +264,9 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                                   color: cores('corTexto'),
                                 ),
                                 dateTextStyle: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 15,
                                   fontWeight: FontWeight.w500,
-                                  color: cores('corTexto'),
+                                  color: cores('corSimbolo'),
                                 )),
                             appointmentTextStyle:
                                 TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white)),

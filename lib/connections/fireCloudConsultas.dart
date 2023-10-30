@@ -1,12 +1,9 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firedart/firedart.dart' as fd;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../models/maps.dart';
@@ -33,9 +30,11 @@ retornarIDConsultas() async {
 }
 
 listarConsultas() async {
-  if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-    return FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario());
-  } else {
+  return FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario());
+}
+
+/*  //if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+} else {
     await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
     await fd.Firestore.initialize('programafono-7be09');
 
@@ -49,8 +48,7 @@ listarConsultas() async {
     String uidFono = user.id;
 
     return fd.Firestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: uidFono);
-  }
-}
+  }*/
 
 Future<Map<String, String>> buscarPorNomeConsultas(context, nome) async {
   String id = '';
@@ -71,7 +69,6 @@ Future<Map<String, String>> buscarPorNomeConsultas(context, nome) async {
 
   return consultas;
 }
-
 
 adicionarConsultas(context, nomePaciente, dataConsulta, horarioConsulta, duracaoConsulta, frequenciaConsulta,
     semanaConsulta, colorConsulta) async {
@@ -172,6 +169,51 @@ Future<Map<String, dynamic>> carregarAppointment(appointment) async {
   };
 
   return consulta;
+}
+
+Future<Appointment> appointmentsPorUIDPaciente(uidPaciente) async {
+  Appointment appointments = Appointment(startTime: DateTime.now(), endTime: DateTime.now());
+
+  try {
+    QuerySnapshot querySnapshot =
+    await FirebaseFirestore.instance.collection(nomeColecao).where('uidPaciente', isEqualTo: uidPaciente).get();
+
+    querySnapshot.docs.forEach((doc) {
+      var colorConsulta = doc['colorConsulta'];
+      var dataConsulta = doc['dataConsulta'];
+      var duracaoConsulta = doc['duracaoConsulta'];
+      var frequenciaConsulta = doc['frequenciaConsulta'];
+      var horarioConsulta = doc['horarioConsulta'];
+      var nomePaciente = doc['nomePaciente'];
+      var semanaConsulta = doc['semanaConsulta'];
+
+      DateFormat dateFormat = DateFormat('dd/MM/yyyy');
+      DateTime dateTime = dateFormat.parseStrict(dataConsulta);
+
+      List<String> timeConsulta = horarioConsulta.split(':');
+      int horasConsulta = int.parse(timeConsulta[0]);
+      int minutesConsulta = int.parse(timeConsulta[1]);
+
+      List<String> durConsulta = duracaoConsulta.split(':');
+      int horasDuracaoConsulta = int.parse(durConsulta[0]);
+      int minutesDuracaoConsulta = int.parse(durConsulta[1]);
+
+      final DateTime startTime = DateTime(dateTime.year, dateTime.month, dateTime.day, horasConsulta, minutesConsulta);
+      final DateTime endTime = startTime.add(Duration(hours: horasDuracaoConsulta, minutes: minutesDuracaoConsulta));
+
+      appointments = Appointment(
+        startTime: startTime,
+        endTime: endTime,
+        subject: nomePaciente,
+        color: Color(int.parse('0xFF$colorConsulta')),
+        recurrenceRule: 'FREQ=$frequenciaConsulta;BYDAY=$semanaConsulta',
+        isAllDay: false,
+      );
+    });
+  } catch (e) {
+    print('Erro ao buscar dados do Firestore: $e');
+  }
+  return appointments;
 }
 
 //Carregar Calendario

@@ -1,38 +1,28 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firedart/firedart.dart' as fd;
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/mensagem.dart';
 import 'fireAuth.dart';
 
 String nomeColecao = 'users';
 
-retornarIDUser() async {
-  if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-    FirebaseFirestore.instance.collection(nomeColecao).where('uid', isEqualTo: idUsuario()).get().then((q) {
-      if (q.docs.isNotEmpty) {
-        return q.docs[0].id;
-      }
-    });
-  } else {
-    fd.Firestore.instance.collection(nomeColecao).where('uid', isEqualTo: idUsuario()).get().then((us) {
-      if (us.isNotEmpty) {
-        us.forEach((doc) {
-          // return doc.id;
-        });
-      }
-    });
-  }
+Future<String> retornarIDUser() async {
+  String id = '';
+
+  await FirebaseFirestore.instance.collection(nomeColecao).where('uid', isEqualTo: idUsuario()).get().then((q) {
+    if (q.docs.isNotEmpty) {
+      id = q.docs[0].id;
+    }
+  });
+
+  return id;
 }
 
-criarUsuario(context, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage){
+criarUsuario(context, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage) {
   FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: senha).then((res) {
-    FirebaseFirestore.instance.collection('users').add({
+    FirebaseFirestore.instance.collection(nomeColecao).add({
       'uid': res.user!.uid.toString(),
       'genero': genero,
       'nome': nome,
@@ -59,39 +49,10 @@ criarUsuario(context, genero, nome, dtNascimento, email, cpf, crfa, telefone, se
   });
 }
 
-/*if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-  } else {
-      FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: senha).then((res) {
-        fd.Firestore.instance.collection('users').add({
-          'uid': res.user!.uid.toString(),
-          'nome': nome,
-          'dtNascimento': dtNascimento,
-          'email': email,
-          'cpf': cpf,
-          'crfa': crfa,
-          'telefone': telefone,
-          'urlImage': urlImage,
-        });
-        sucesso(context, 'O usuário foi criado com sucesso!');
-        Navigator.pop(context);
-      }).catchError((e) {
-        switch (e.code) {
-          case 'email-already-in-use':
-            erro(context, 'O email já foi cadastrado.');
-            break;
-          case 'invalid-email':
-            erro(context, 'O formato do email é inválido.');
-            break;
-          default:
-            erro(context, e.code.toString());
-        }
-      });
-    }
-   */
-
-adicionarUsuario(res, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage) {
+adicionarUsuario(res, urlImage, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha) {
   FirebaseFirestore.instance.collection(nomeColecao).add({
     'uid': res,
+    'urlImage': urlImage,
     'genero': genero,
     'nome': nome,
     'dtNascimento': dtNascimento,
@@ -99,25 +60,25 @@ adicionarUsuario(res, genero, nome, dtNascimento, email, cpf, crfa, telefone, se
     'cpf': cpf,
     'crfa': crfa,
     'telefone': telefone,
-    'urlImage': urlImage,
   });
 }
 
-editarUsuario(context, uid, nome, dtNascimento, email, cpf, crfa, telefone, senha, urlImage) async {
+editarUsuario(context, uid, urlImage, nome, dtNascimento, email, cpf, crfa, telefone, senha) async {
   if (senha.isNotEmpty) {
     FirebaseAuth.instance.currentUser!.updatePassword(senha);
   }
   Map<String, dynamic> data = {
     'uid': uid,
+    'urlImage': urlImage,
     'nome': nome,
     'dtNascimento': dtNascimento,
     'email': email,
     'cpf': cpf,
     'crfa': crfa,
     'telefone': telefone,
-    'urlImage': urlImage,
   };
-  await FirebaseFirestore.instance.collection('users').doc(retornarIDUser()).update(data);
+  String id = await retornarIDUser();
+  await FirebaseFirestore.instance.collection(nomeColecao).doc(id).update(data);
   sucesso(context, 'O usuário foi editado com sucesso!');
 }
 
@@ -134,7 +95,6 @@ Future<Map<String, String>> listarUsuario() async {
   String telefone = '';
   Map<String, String> usuario = {};
 
-  //if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
   await FirebaseFirestore.instance.collection(nomeColecao).where('uid', isEqualTo: idUsuario()).get().then((q) {
     if (q.docs.isNotEmpty) {
       id = q.docs[0].id;
@@ -162,33 +122,5 @@ Future<Map<String, String>> listarUsuario() async {
     'cpf': cpf,
     'crfa': crfa,
   };
-  /*} else {
-    await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
-    await fd.Firestore.initialize('programafono-7be09');
-
-    var auth = fd.FirebaseAuth.instance;
-    final emailSave = await SharedPreferences.getInstance();
-    var email = emailSave.getString('email');
-    final senhaSave = await SharedPreferences.getInstance();
-    var senha = senhaSave.getString('senha');
-    await auth.signIn(email!, senha!);
-    var user = await auth.getUser();
-    String uidFono = user.id;
-
-    fd.Firestore.instance.collection(nomeColecao).where('uid', isEqualTo: uidFono).get().then((us) {
-      if (us.isNotEmpty) {
-        us.forEach((doc) {
-          nome = doc['nome'];
-          urlImage = doc['urlImage'];
-          genero = doc['genero'];
-        });
-      }
-    });
-    usuario = {
-      'nome': nome,
-      'urlImage': urlImage,
-      'genero': genero,
-    };
-  }*/
   return usuario;
 }

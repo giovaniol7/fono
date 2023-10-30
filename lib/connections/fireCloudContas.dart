@@ -1,12 +1,9 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firedart/firedart.dart' as fd;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/mensagem.dart';
 import 'fireAuth.dart';
@@ -30,23 +27,7 @@ retornarIDContas() async {
 }
 
 listarContas() async {
-  if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
-    return FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario());
-  } else {
-    await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
-    await fd.Firestore.initialize('programafono-7be09');
-
-    var auth = fd.FirebaseAuth.instance;
-    final emailSave = await SharedPreferences.getInstance();
-    var email = emailSave.getString('email');
-    final senhaSave = await SharedPreferences.getInstance();
-    var senha = senhaSave.getString('senha');
-    await auth.signIn(email!, senha!);
-    var user = await auth.getUser();
-    String uidFono = user.id;
-
-    return fd.Firestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: uidFono);
-  }
+  return FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario());
 }
 
 editarContas(context, id, uidFono, uidPaciente, nomePaciente, dataConsulta, horarioConsulta, duracaoConsulta,
@@ -83,7 +64,7 @@ adicionarContas(
     descricaoConta,
     estadoPago,
     estadoRecebido) async {
-  if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
+  //if (kIsWeb || Platform.isAndroid || Platform.isIOS) {
     CollectionReference contas = FirebaseFirestore.instance.collection('contas');
     NumberFormat numberFormat = NumberFormat('#,##0.00', 'pt_BR');
     DateTime proximoMes;
@@ -153,7 +134,7 @@ adicionarContas(
 
     sucesso(context, 'Conta adicionada com sucesso.');
     Navigator.pop(context);
-  } else {
+  /*} else {
     await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
     fd.Firestore.initialize('programafono-7be09');
     var auth = fd.FirebaseAuth.instance;
@@ -239,7 +220,7 @@ adicionarContas(
 
     sucesso(context, 'Conta adicionada com sucesso.');
     Navigator.pop(context);
-  }
+  }*/
 }
 
 Stream<QuerySnapshot<Object?>> recuperarCredito() {

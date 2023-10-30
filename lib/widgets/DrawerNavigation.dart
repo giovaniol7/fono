@@ -3,6 +3,7 @@ import 'package:fono/view/TelaAgenda.dart';
 import 'package:fono/view/TelaContas.dart';
 import 'package:fono/view/TelaEditarPerfil.dart';
 import 'package:fono/view/TelaPacientes.dart';
+import 'package:fono/view/TelaProntuarios.dart';
 
 import '../connections/fireAuth.dart';
 import '../controllers/estilos.dart';
@@ -52,19 +53,14 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
       padding: EdgeInsets.symmetric(vertical: 35),
       child: Row(
         children: [
-          widget.urlImage.isEmpty
-              ? Icon(
-                  Icons.person,
-                  color: cores('corSimbolo'),
-                )
-              : CircleAvatar(
-                  radius: 30,
-                  backgroundImage: widget.urlImage.isNotEmpty
-                      ? NetworkImage(widget.urlImage)
-                      : (widget.genero == 'Gender.male'
-                      ? AssetImage('images/icons/profileBoy.png')
-                      : AssetImage("images/icons/profileGirl.png") as ImageProvider)
-                ),
+          CircleAvatar(
+            radius: 30,
+            backgroundImage: widget.urlImage.isNotEmpty
+                ? NetworkImage(widget.urlImage)
+                : (widget.genero == 'Gender.male'
+                    ? AssetImage('images/icons/profileBoy.png')
+                    : AssetImage('images/icons/profileGirl.png') as ImageProvider),
+          ),
           SizedBox(
             width: 20,
           ),
@@ -146,10 +142,15 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               color: cores(corSimbolo),
             ),
             title: Text(
-              'Relatório',
+              'Prontuários',
               style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TelaProntuarios(),
+                  ));
               /*Navigator.pushNamed(
                   context,
                   '/pacientes'

@@ -1,6 +1,6 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 
 import 'package:intl/intl.dart';
 import 'package:brasil_fields/brasil_fields.dart';
@@ -23,6 +23,7 @@ class TelaCadastro extends StatefulWidget {
 
 class _TelaCadastroState extends State<TelaCadastro> {
   var urlImage;
+  var fileImage;
   var txtNome = TextEditingController();
   var txtEmail = TextEditingController();
   var txtSenha = TextEditingController();
@@ -49,7 +50,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
 
   @override
   Widget build(BuildContext context) {
-    void verificarSenhas() {
+    void verificarSenhas() async {
       final DateFormat formatter = DateFormat('dd/MM/yyyy');
       final DateTime dataNascimento = formatter.parse(txtDtNascimento.text);
       final DateTime agora = DateTime.now();
@@ -69,8 +70,9 @@ class _TelaCadastroState extends State<TelaCadastro> {
               erro(context, 'Senhas não coincidem.');
             } else {
               if (txtSenha.text.length >= 6) {
-                criarConta(context, _selectedGeneroFono, txtNome.text, txtDtNascimento.text, txtEmail.text, txtCPF.text,
-                    txtCRFa.text, txtTelefone.text, txtSenha.text, urlImage);
+                urlImage!.isEmpty ? urlImage = await uploadImageUsers(fileImage, 'users') : urlImage = '';
+                criarConta(context, urlImage, _selectedGeneroFono, txtNome.text, txtDtNascimento.text, txtEmail.text,
+                    txtCPF.text, txtCRFa.text, txtTelefone.text, txtSenha.text);
               } else {
                 erro(context, 'Senha deve possuir mais de 6 caracteres.');
               }
@@ -127,12 +129,12 @@ class _TelaCadastroState extends State<TelaCadastro> {
                         ),
                         child: InkWell(
                           onTap: () async {
-                            urlImage = await uploadImage();
+                            fileImage = await pickedImage();
                             setState(() {
-                              urlImage = urlImage!;
+                              fileImage = fileImage!;
                             });
                           },
-                          child: urlImage == null
+                          child: fileImage == null
                               ? Icon(
                                   Icons.person_add_alt_rounded,
                                   color: cores('corTextoBotao'),
@@ -141,7 +143,9 @@ class _TelaCadastroState extends State<TelaCadastro> {
                               : CircleAvatar(
                                   maxRadius: 5,
                                   minRadius: 1,
-                                  backgroundImage: NetworkImage(urlImage),
+                                  backgroundImage: FileImage(
+                                    File(fileImage),
+                                  ),
                                 ),
                         ),
                       ),
@@ -151,7 +155,9 @@ class _TelaCadastroState extends State<TelaCadastro> {
               ),
             ],
           ),
-          const SizedBox(height: 10,),
+          const SizedBox(
+            height: 10,
+          ),
           Container(
             padding: EdgeInsets.all(10),
             child: Center(
