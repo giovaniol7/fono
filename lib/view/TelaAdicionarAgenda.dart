@@ -87,6 +87,8 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
 
   @override
   Widget build(BuildContext context) {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+
     return Scaffold(
         appBar: AppBar(
           actions: [
@@ -361,81 +363,74 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                 ),
                 const SizedBox(height: 20),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      width: 150,
-                      child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                              foregroundColor: cores('corTextoBotao'),
-                              minimumSize: const Size(200, 45),
-                              backgroundColor: cores('corBotao'),
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(32),
-                              )),
-                          child: Text(
-                            widget.tipo == 'adicionar' ? 'Adicionar' : 'Atualizar',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          onPressed: () async {
-                            String colorHex = selecioneCorConsulta.value.toRadixString(16).padLeft(8, '0');
-                            if (widget.tipo == 'adicionar' &&
-                                nomeConsulta.text.isNotEmpty &&
-                                dataConsulta.text.isNotEmpty &&
-                                horarioConsulta.text.isNotEmpty &&
-                                duracaoConsulta.text.isNotEmpty) {
-                              adicionarConsultas(
-                                context,
-                                nomeConsulta.text,
-                                dataConsulta.text,
-                                horarioConsulta.text,
-                                duracaoConsulta.text,
-                                selecioneFrequenciaConsulta,
-                                selecioneSemanaConsulta,
-                                colorHex,
-                              );
-                            } else if (widget.tipo == 'editar' &&
-                                nomeConsulta.text.isNotEmpty &&
-                                dataConsulta.text.isNotEmpty &&
-                                horarioConsulta.text.isNotEmpty &&
-                                duracaoConsulta.text.isNotEmpty) {
-                              editarConsultas(
-                                context,
-                                id,
-                                idUsuario(),
-                                uidPaciente,
-                                nomeConsulta.text,
-                                dataConsulta.text,
-                                horarioConsulta.text,
-                                duracaoConsulta.text,
-                                selecioneFrequenciaConsulta,
-                                selecioneSemanaConsulta,
-                                colorHex,
-                              );
-                            }
-                          }),
-                    ),
-                    const Padding(padding: EdgeInsets.all(20)),
-                    SizedBox(
-                      width: 150,
-                      child: OutlinedButton(
+                    OutlinedButton(
                         style: OutlinedButton.styleFrom(
                             foregroundColor: cores('corTextoBotao'),
-                            minimumSize: const Size(200, 45),
                             backgroundColor: cores('corBotao'),
                             elevation: 5,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
                             )),
-                        child: const Text(
-                          'Cancelar',
-                          style: TextStyle(fontSize: 16),
+                        child: Text(
+                          widget.tipo == 'adicionar' ? 'Adicionar' : 'Atualizar',
+                          style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                         ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                        onPressed: () async {
+                          String colorHex = selecioneCorConsulta.value.toRadixString(16).padLeft(8, '0');
+                          if (widget.tipo == 'adicionar' &&
+                              nomeConsulta.text.isNotEmpty &&
+                              dataConsulta.text.isNotEmpty &&
+                              horarioConsulta.text.isNotEmpty &&
+                              duracaoConsulta.text.isNotEmpty) {
+                            adicionarConsultas(
+                              context,
+                              nomeConsulta.text,
+                              dataConsulta.text,
+                              horarioConsulta.text,
+                              duracaoConsulta.text,
+                              selecioneFrequenciaConsulta,
+                              selecioneSemanaConsulta,
+                              colorHex,
+                            );
+                          } else if (widget.tipo == 'editar' &&
+                              nomeConsulta.text.isNotEmpty &&
+                              dataConsulta.text.isNotEmpty &&
+                              horarioConsulta.text.isNotEmpty &&
+                              duracaoConsulta.text.isNotEmpty) {
+                            editarConsultas(
+                              context,
+                              id,
+                              idUsuario(),
+                              uidPaciente,
+                              nomeConsulta.text,
+                              dataConsulta.text,
+                              horarioConsulta.text,
+                              duracaoConsulta.text,
+                              selecioneFrequenciaConsulta,
+                              selecioneSemanaConsulta,
+                              colorHex,
+                            );
+                          }
+                        }),
+                    SizedBox(width: 10),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                          foregroundColor: cores('corTextoBotao'),
+                          backgroundColor: cores('corBotao'),
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32),
+                          )),
+                      child: Text(
+                        'Cancelar',
+                        style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                       ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                     ),
                   ],
                 ),

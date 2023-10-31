@@ -69,6 +69,32 @@ final List<String> estados = [
   "TO"
 ];
 
+final List<String> escolaridade = [
+  'Berçário',
+  'Maternal I',
+  'Maternal II',
+  'Jardim I',
+  'Jardim II',
+  'Ensino Fundamental I',
+  'Ensino Fundamental II',
+  'Ensino Médio'
+];
+
+final List<String> escolaridadeResp = [
+  "Ensino Fundamental - Incompleto",
+  "Ensino Fundamental - Completo",
+  "Ensino Médio - Incompleto",
+  "Ensino Médio - Completo",
+  "Ensino Superior - Incompleto",
+  "Ensino Superior - Completo",
+  "Pós-graduação - Incompleto",
+  "Pós-graduação - Completo",
+  "Pós-graduação - Incompleto",
+  "Pós-graduação - Completo",
+  "Pós-graduação - Incompleto",
+  "Pós-graduação - Completo"
+];
+
 final List<Color> colors = [
   Colors.red,
   Colors.green,

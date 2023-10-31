@@ -55,16 +55,15 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
       String nome = widget.appointments.subject;
       var paciente = await recuperarPacientePorNome(context, nome);
       String uidPaciente = paciente['uidPaciente'];
-      DateTime dataAtual = DateTime.now();
-      DateTime dataSeteDiasAtras = dataAtual.subtract(Duration(days: 7));
+      DateTime dataSeteDiasAtras = widget.dataClicada.subtract(Duration(days: 7));
       String dataFormatada = DateFormat('dd/MM/yyyy').format(dataSeteDiasAtras);
       prontuarios = await recuperarProntuarioData(context, uidPaciente, dataFormatada);
-
     } else if (widget.tipo == 'editar') {
       String nome = widget.appointments.subject;
       var paciente = await recuperarPacientePorNome(context, nome);
       String uidPaciente = paciente['uidPaciente'];
-      prontuarios = await recuperarProntuarioData(context, uidPaciente, DateFormat('dd/MM/yyyy').format(widget.dataClicada));
+      prontuarios =
+          await recuperarProntuarioData(context, uidPaciente, DateFormat('dd/MM/yyyy').format(widget.dataClicada));
     }
 
     setState(() {
@@ -108,6 +107,8 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
   }
 
   Widget build(BuildContext context) {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -238,76 +239,69 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
                     maxPalavras: 500, maxLinhas: 5, tamanho: 20.0),
                 const SizedBox(height: 40),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      width: 150,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                            foregroundColor: cores('corTextoBotao'),
-                            minimumSize: const Size(200, 45),
-                            backgroundColor: cores('corBotao'),
-                            elevation: 5,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            )),
-                        child: Text(
-                          widget.tipo == 'editar' ? 'Atualizar' : "Adicionar",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        onPressed: () async {
-                          if (txtNome.text.isNotEmpty &&
-                              txtData.text.isNotEmpty &&
-                              txtTime.text.isNotEmpty &&
-                              txtObjetivosProntuarios.text.isNotEmpty &&
-                              txtMateriaisProntuarios.text.isNotEmpty &&
-                              txtResultadosProntuarios.text.isNotEmpty) {
-                            String uidPaciente = await buscarIdPaciente(context, txtNome.text);
-                            widget.tipo == 'adicionar'
-                                ? adicionarProntuario(
-                                    context,
-                                    idUsuario(),
-                                    uidPaciente,
-                                    txtNome.text,
-                                    txtData.text,
-                                    txtTime.text,
-                                    txtObjetivosProntuarios.text,
-                                    txtMateriaisProntuarios.text,
-                                    txtResultadosProntuarios.text)
-                                : editarProntuario(
-                                    context,
-                                    idUsuario(),
-                                    uidPaciente,
-                                    txtNome.text,
-                                    txtData.text,
-                                    txtTime.text,
-                                    txtObjetivosProntuarios.text,
-                                    txtMateriaisProntuarios.text,
-                                    txtResultadosProntuarios.text);
-                          }
-                        },
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                          foregroundColor: cores('corTextoBotao'),
+                          backgroundColor: cores('corBotao'),
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32),
+                          )),
+                      child: Text(
+                        widget.tipo == 'editar' ? 'Atualizar' : "Adicionar",
+                        style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                       ),
+                      onPressed: () async {
+                        if (txtNome.text.isNotEmpty &&
+                            txtData.text.isNotEmpty &&
+                            txtTime.text.isNotEmpty &&
+                            txtObjetivosProntuarios.text.isNotEmpty &&
+                            txtMateriaisProntuarios.text.isNotEmpty &&
+                            txtResultadosProntuarios.text.isNotEmpty) {
+                          String uidPaciente = await buscarIdPaciente(context, txtNome.text);
+                          widget.tipo == 'adicionar'
+                              ? adicionarProntuario(
+                                  context,
+                                  idUsuario(),
+                                  uidPaciente,
+                                  txtNome.text,
+                                  txtData.text,
+                                  txtTime.text,
+                                  txtObjetivosProntuarios.text,
+                                  txtMateriaisProntuarios.text,
+                                  txtResultadosProntuarios.text)
+                              : editarProntuario(
+                                  context,
+                                  idUsuario(),
+                                  uidPaciente,
+                                  txtNome.text,
+                                  txtData.text,
+                                  txtTime.text,
+                                  txtObjetivosProntuarios.text,
+                                  txtMateriaisProntuarios.text,
+                                  txtResultadosProntuarios.text);
+                        }
+                      },
                     ),
-                    Padding(padding: EdgeInsets.all(20)),
-                    SizedBox(
-                      width: 150,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                            foregroundColor: cores('corSecundaria'),
-                            minimumSize: const Size(200, 45),
-                            backgroundColor: cores('corTexto'),
-                            elevation: 5,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            )),
-                        child: const Text(
-                          'Cancelar',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                    SizedBox(width: 10),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                          foregroundColor: cores('corSecundaria'),
+                          backgroundColor: cores('corTexto'),
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32),
+                          )),
+                      child: Text(
+                        'Cancelar',
+                        style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                       ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                     ),
                   ],
                 ),

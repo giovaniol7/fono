@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../controllers/uploadDoc.dart';
 import '../models/maps.dart';
 
 import '../connections/fireAuth.dart';
@@ -60,6 +61,10 @@ adicionarPaciente(
     CPFPaciente,
     RGPaciente,
     generoPaciente,
+    escolaridadePaciente,
+    periodoEscolaPaciente,
+    professoraPaciente,
+    telefoneProfessoraPaciente,
     lougradouroPaciente,
     numeroPaciente,
     bairroPaciente,
@@ -75,8 +80,10 @@ adicionarPaciente(
     listTelefoneResponsavel,
     listRelacaoResponsavel,
     listEscolaridadeResponsavel,
-    listProfissaoResponsavel) async {
+    listProfissaoResponsavel,
+    fileDoc) async {
   CollectionReference pacientes = FirebaseFirestore.instance.collection(nomeColecao);
+  String? urlDocPaciente = fileDoc != null ? await uploadDocToFirebase(fileDoc) : '';
   String uidPaciente = '';
   Map<String, dynamic> data = {
     'uidFono': uidFono,
@@ -87,6 +94,10 @@ adicionarPaciente(
     'CPFPaciente': CPFPaciente,
     'RGPaciente': RGPaciente,
     'generoPaciente': generoPaciente,
+    'escolaridadePaciente': escolaridadePaciente,
+    'periodoEscolaPaciente': periodoEscolaPaciente,
+    'professoraPaciente': professoraPaciente,
+    'telefoneProfessoraPaciente': telefoneProfessoraPaciente,
     'lougradouroPaciente': lougradouroPaciente,
     'numeroPaciente': numeroPaciente,
     'bairroPaciente': bairroPaciente,
@@ -95,7 +106,8 @@ adicionarPaciente(
     'cepPaciente': cepPaciente,
     'tipoConsultaPaciente': tipoConsultaPaciente,
     'descricaoPaciente': descricaoPaciente,
-    'qtdResponsavel': qtdResponsavel + 1
+    'qtdResponsavel': qtdResponsavel + 1,
+    'urlDocPaciente': urlDocPaciente
   };
   for (int i = 0; i < listGeneroResponsavel.length; i++) {
     data['generoResponsavel$i'] = listGeneroResponsavel[i].toString();
@@ -130,6 +142,10 @@ editarPaciente(
     CPFPaciente,
     RGPaciente,
     generoPaciente,
+    escolaridadePaciente,
+    periodoEscolaPaciente,
+    professoraPaciente,
+    telefoneProfessoraPaciente,
     lougradouroPaciente,
     numeroPaciente,
     bairroPaciente,
@@ -145,7 +161,9 @@ editarPaciente(
     listTelefoneResponsavel,
     listRelacaoResponsavel,
     listEscolaridadeResponsavel,
-    listProfissaoResponsavel) async {
+    listProfissaoResponsavel,
+    fileDoc) async {
+  String? urlDocPaciente = fileDoc != null ? await uploadDocToFirebase(fileDoc) : '';
   Map<String, dynamic> data = {
     'uidFono': uidFono,
     'dataInicioPaciente': dataInicioPaciente,
@@ -155,6 +173,10 @@ editarPaciente(
     'CPFPaciente': CPFPaciente,
     'RGPaciente': RGPaciente,
     'generoPaciente': generoPaciente,
+    'escolaridadePaciente': escolaridadePaciente,
+    'periodoEscolaPaciente': periodoEscolaPaciente,
+    'professoraPaciente': professoraPaciente,
+    'telefoneProfessoraPaciente': telefoneProfessoraPaciente,
     'lougradouroPaciente': lougradouroPaciente,
     'numeroPaciente': numeroPaciente,
     'bairroPaciente': bairroPaciente,
@@ -163,7 +185,8 @@ editarPaciente(
     'cepPaciente': cepPaciente,
     'tipoConsultaPaciente': tipoConsultaPaciente,
     'descricaoPaciente': descricaoPaciente,
-    'qtdResponsavel': qtdResponsavel + 1
+    'qtdResponsavel': qtdResponsavel + 1,
+    'urlDocPaciente': urlDocPaciente
   };
   for (int i = 0; i < listGeneroResponsavel.length; i++) {
     data['generoResponsavel$i'] = listGeneroResponsavel[i].toString();
@@ -199,6 +222,10 @@ recuperarPaciente(context, uid) async {
   String CPFPaciente = '';
   String RGPaciente = '';
   Gender? generoPaciente;
+  String escolaridadePaciente = '';
+  String periodoEscolaPaciente = '';
+  String professoraPaciente = '';
+  String telefoneProfessoraPaciente = '';
   String lougradouroPaciente = '';
   String numeroPaciente = '';
   String bairroPaciente = '';
@@ -208,6 +235,7 @@ recuperarPaciente(context, uid) async {
   String tipoConsultaPaciente = '';
   String descricaoPaciente = '';
   int qtdResponsavel = 0;
+  String urlDocPaciente = '';
   List<Gender?> listGeneroResponsavel = [];
   List<String> listNomeResponsavel = [];
   List<String> listIdadeResponsavel = [];
@@ -229,6 +257,10 @@ recuperarPaciente(context, uid) async {
       CPFPaciente = q.docs[0].data()['CPFPaciente'];
       RGPaciente = q.docs[0].data()['RGPaciente'];
       generoPaciente = stringToGender(q.docs[0].data()['generoPaciente']);
+      escolaridadePaciente = q.docs[0].data()['escolaridadePaciente'];
+      periodoEscolaPaciente = q.docs[0].data()['periodoEscolaPaciente'];
+      professoraPaciente = q.docs[0].data()['professoraPaciente'];
+      telefoneProfessoraPaciente = q.docs[0].data()['telefoneProfessoraPaciente'];
       lougradouroPaciente = q.docs[0].data()['lougradouroPaciente'];
       numeroPaciente = q.docs[0].data()['numeroPaciente'];
       bairroPaciente = q.docs[0].data()['bairroPaciente'];
@@ -238,6 +270,7 @@ recuperarPaciente(context, uid) async {
       tipoConsultaPaciente = q.docs[0].data()['tipoConsultaPaciente'];
       descricaoPaciente = q.docs[0].data()['descricaoPaciente'];
       qtdResponsavel = q.docs[0].data()['qtdResponsavel'];
+      urlDocPaciente = q.docs[0].data()['urlDocPaciente'];
       for (int i = 0; i < qtdResponsavel; i++) {
         listGeneroResponsavel.add(stringToGender(q.docs[0].data()['generoResponsavel$i']));
         listNomeResponsavel.add(q.docs[0].data()['nomeResponsavel$i']);
@@ -260,6 +293,10 @@ recuperarPaciente(context, uid) async {
     'CPFPaciente': CPFPaciente,
     'RGPaciente': RGPaciente,
     'generoPaciente': generoPaciente,
+    'escolaridadePaciente': escolaridadePaciente,
+    'periodoEscolaPaciente': periodoEscolaPaciente,
+    'professoraPaciente': professoraPaciente,
+    'telefoneProfessoraPaciente': telefoneProfessoraPaciente,
     'lougradouroPaciente': lougradouroPaciente,
     'numeroPaciente': numeroPaciente,
     'bairroPaciente': bairroPaciente,
@@ -269,6 +306,7 @@ recuperarPaciente(context, uid) async {
     'tipoConsultaPaciente': tipoConsultaPaciente,
     'descricaoPaciente': descricaoPaciente,
     'qtdResponsavel': qtdResponsavel,
+    'urlDocPaciente': urlDocPaciente,
     'listGeneroResponsavel': listGeneroResponsavel,
     'listNomeResponsavel': listNomeResponsavel,
     'listIdadeResponsavel': listIdadeResponsavel,
@@ -291,6 +329,10 @@ recuperarPacientePorNome(context, nome) async {
   String CPFPaciente = '';
   String RGPaciente = '';
   Gender? generoPaciente;
+  String escolaridadePaciente = '';
+  String periodoEscolaPaciente = '';
+  String professoraPaciente = '';
+  String telefoneProfessoraPaciente = '';
   String lougradouroPaciente = '';
   String numeroPaciente = '';
   String bairroPaciente = '';
@@ -300,6 +342,7 @@ recuperarPacientePorNome(context, nome) async {
   String tipoConsultaPaciente = '';
   String descricaoPaciente = '';
   int qtdResponsavel = 0;
+  String urlDocPaciente = '';
   List<Gender?> listGeneroResponsavel = [];
   List<String> listNomeResponsavel = [];
   List<String> listIdadeResponsavel = [];
@@ -321,6 +364,10 @@ recuperarPacientePorNome(context, nome) async {
       CPFPaciente = q.docs[0].data()['CPFPaciente'];
       RGPaciente = q.docs[0].data()['RGPaciente'];
       generoPaciente = stringToGender(q.docs[0].data()['generoPaciente']);
+      escolaridadePaciente = q.docs[0].data()['escolaridadePaciente'];
+      periodoEscolaPaciente = q.docs[0].data()['periodoEscolaPaciente'];
+      professoraPaciente = q.docs[0].data()['professoraPaciente'];
+      telefoneProfessoraPaciente = q.docs[0].data()['telefoneProfessoraPaciente'];
       lougradouroPaciente = q.docs[0].data()['lougradouroPaciente'];
       numeroPaciente = q.docs[0].data()['numeroPaciente'];
       bairroPaciente = q.docs[0].data()['bairroPaciente'];
@@ -330,6 +377,7 @@ recuperarPacientePorNome(context, nome) async {
       tipoConsultaPaciente = q.docs[0].data()['tipoConsultaPaciente'];
       descricaoPaciente = q.docs[0].data()['descricaoPaciente'];
       qtdResponsavel = q.docs[0].data()['qtdResponsavel'];
+      urlDocPaciente = q.docs[0].data()['urlDocPaciente'];
       for (int i = 0; i < qtdResponsavel; i++) {
         listGeneroResponsavel.add(stringToGender(q.docs[0].data()['generoResponsavel$i']));
         listNomeResponsavel.add(q.docs[0].data()['nomeResponsavel$i']);
@@ -352,6 +400,10 @@ recuperarPacientePorNome(context, nome) async {
     'CPFPaciente': CPFPaciente,
     'RGPaciente': RGPaciente,
     'generoPaciente': generoPaciente,
+    'escolaridadePaciente': escolaridadePaciente,
+    'periodoEscolaPaciente': periodoEscolaPaciente,
+    'professoraPaciente': professoraPaciente,
+    'telefoneProfessoraPaciente': telefoneProfessoraPaciente,
     'lougradouroPaciente': lougradouroPaciente,
     'numeroPaciente': numeroPaciente,
     'bairroPaciente': bairroPaciente,
@@ -361,6 +413,7 @@ recuperarPacientePorNome(context, nome) async {
     'tipoConsultaPaciente': tipoConsultaPaciente,
     'descricaoPaciente': descricaoPaciente,
     'qtdResponsavel': qtdResponsavel,
+    'urlDocPaciente': urlDocPaciente,
     'listGeneroResponsavel': listGeneroResponsavel,
     'listNomeResponsavel': listNomeResponsavel,
     'listIdadeResponsavel': listIdadeResponsavel,

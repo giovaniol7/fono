@@ -2,13 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fono/connections/fireAuth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:intl/intl.dart';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:search_cep/search_cep.dart';
+import 'package:path/path.dart' as ph;
 
 import '../connections/fireCloudPacientes.dart';
+import '../controllers/uploadDoc.dart';
 import '../controllers/uploadImage.dart';
 import '../models/maps.dart';
 import '../widgets/campoTexto.dart';
@@ -28,6 +31,8 @@ class TelaAdicionarPaciente extends StatefulWidget {
 class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   var paciente;
   var fileImage;
+  File? fileDoc;
+  String nomeArquivo = '';
   var apagarImagem;
   var uidPaciente = '';
   var uidFono = '';
@@ -43,7 +48,11 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   var txtCidadePaciente = TextEditingController();
   var txtCEPPaciente = TextEditingController();
   var txtDescricaoPaciente = TextEditingController();
+  var txtProfessoraPaciente = TextEditingController();
+  var txtTelefoneProfessoraPaciente = TextEditingController();
+  String selecioneEscolaridadePaciente = 'Berçário';
   String selecioneTipoConsultaPaciente = 'Convênio';
+  String selecionePeriodoEscolaPaciente = 'Manhã';
   String selecioneEstadoPaciente = 'AC';
   Gender? _selectedGeneroPaciente;
 
@@ -79,6 +88,10 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         txtCPFPaciente.text = paciente['CPFPaciente'];
         txtRGPaciente.text = paciente['RGPaciente'];
         _selectedGeneroPaciente = paciente['generoPaciente'];
+        selecioneEscolaridadePaciente = paciente['escolaridadePaciente'];
+        selecionePeriodoEscolaPaciente = paciente['periodoEscolaPaciente'];
+        txtProfessoraPaciente.text = paciente['professoraPaciente'];
+        txtTelefoneProfessoraPaciente.text = paciente['telefoneProfessoraPaciente'];
         txtLogradouroPaciente.text = paciente['lougradouroPaciente'];
         txtNumeroPaciente.text = paciente['numeroPaciente'];
         txtBairroPaciente.text = paciente['bairroPaciente'];
@@ -88,6 +101,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         selecioneTipoConsultaPaciente = paciente['tipoConsultaPaciente'];
         txtDescricaoPaciente.text = paciente['descricaoPaciente'];
         qtdResponsavel = paciente['qtdResponsavel'];
+        nomeArquivo = paciente['urlDocPaciente'] == '' ? '' : urlToString(paciente['urlDocPaciente']);
         ListGeneroResponsavelPaciente = paciente['listGeneroResponsavel'];
         ListNomeResponsavelPaciente =
             (paciente['listNomeResponsavel'] as List<String>).map((nome) => TextEditingController(text: nome)).toList();
@@ -150,544 +164,731 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
       body: Container(
           child: ListView(
         children: [
-          Column(
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.2,
-                decoration: BoxDecoration(
-                    color: cores('corSombra'),
-                    boxShadow: [
-                      BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5),
-                    ],
-                    borderRadius:
-                        const BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Center(
-                      child: Container(
-                        width: 80.0,
-                        height: 80.0,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: cores('corBotao'),
-                        ),
-                        child: urlImagePaciente == ''
-                            ? InkWell(
-                                onTap: () async {
-                                  fileImage = await pickedImage();
+          containerCabecalho(),
+          containerDados(),
+        ],
+      )),
+    );
+  }
+
+  containerCabecalho() {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+
+    return Column(
+      children: [
+        Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 0.2,
+          decoration: BoxDecoration(
+              color: cores('corSombra'),
+              boxShadow: [
+                BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5),
+              ],
+              borderRadius: const BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Center(
+                child: Container(
+                  width: 80.0,
+                  height: 80.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: cores('corBotao'),
+                  ),
+                  child: urlImagePaciente == ''
+                      ? InkWell(
+                          onTap: () async {
+                            fileImage = await pickedImage();
+                            setState(() {
+                              fileImage = fileImage!;
+                            });
+                          },
+                          child: fileImage == null
+                              ? Icon(
+                                  Icons.person_add_alt_rounded,
+                                  color: cores('corTextoBotao'),
+                                  size: tamanhoFonte.iconPequeno(context),
+                                )
+                              : CircleAvatar(
+                                  maxRadius: 5,
+                                  minRadius: 1,
+                                  backgroundImage: FileImage(
+                                    File(fileImage.path),
+                                  ),
+                                ),
+                        )
+                      : Stack(children: [
+                          CircleAvatar(
+                            radius: 80,
+                            backgroundImage: NetworkImage(urlImagePaciente),
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.delete,
+                                  color: cores('corSimbolo'),
+                                  size: tamanhoFonte.iconPequeno(context),
+                                ),
+                                onPressed: () {
                                   setState(() {
-                                    fileImage = fileImage!;
+                                    apagarImagem == true;
+                                    urlImagePaciente = '';
                                   });
                                 },
-                                child: fileImage == null
-                                    ? Icon(
-                                        Icons.person_add_alt_rounded,
-                                        color: cores('corTextoBotao'),
-                                        size: tamanhoFonte.iconPequeno(context),
-                                      )
-                                    : CircleAvatar(
-                                        maxRadius: 5,
-                                        minRadius: 1,
-                                        backgroundImage: FileImage(
-                                          File(fileImage.path),
-                                        ),
-                                      ),
-                              )
-                            : Stack(children: [
-                                CircleAvatar(
-                                  radius: 80,
-                                  backgroundImage: NetworkImage(urlImagePaciente),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.5),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Center(
-                                    child: IconButton(
-                                      icon: Icon(
-                                        Icons.delete,
-                                        color: cores('corSimbolo'),
-                                        size: tamanhoFonte.iconPequeno(context),
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          apagarImagem == true;
-                                          urlImagePaciente = '';
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ]),
+                              ),
+                            ),
+                          ),
+                        ]),
+                ),
+              ),
+              const Padding(padding: EdgeInsets.only(top: 10)),
+              Text(
+                'Data: $dataInicioPaciente',
+                style: TextStyle(
+                    fontSize: tamanhoFonte.letraPequena(context),
+                    color: cores('corTexto'),
+                    fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  containerDados() {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          campoTexto('Nome', txtNomePaciente, Icons.label),
+          const SizedBox(height: 20),
+          campoTexto('Data de Nascimento', txtDataNascimentoPaciente, Icons.calendar_month_outlined,
+              formato: DataInputFormatter(), numeros: true),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child:
+                    campoTexto('CPF', txtCPFPaciente, Icons.credit_card, formato: CpfInputFormatter(), numeros: true),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: campoTexto('RG', txtRGPaciente, Icons.credit_card,
+                    formato: MaskTextInputFormatter(
+                      mask: '##.###.###-#',
+                      filter: {"#": RegExp(r'[0-9]')},
+                    ),
+                    numeros: true),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Sexo:',
+            style: TextStyle(
+                fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: RadioListTile<Gender>(
+                  title: Text(
+                    'Masculino',
+                    style: TextStyle(color: cores('corTexto')),
+                  ),
+                  value: Gender.male,
+                  groupValue: _selectedGeneroPaciente,
+                  activeColor: cores('corSimbolo'),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedGeneroPaciente = value;
+                    });
+                  },
+                ),
+              ),
+              Expanded(
+                child: RadioListTile<Gender>(
+                  title: Text(
+                    'Feminino',
+                    style: TextStyle(color: cores('corTexto')),
+                  ),
+                  value: Gender.female,
+                  groupValue: _selectedGeneroPaciente,
+                  activeColor: cores('corSimbolo'),
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedGeneroPaciente = value;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    Text(
+                      'Escolaridade: ',
+                      style: TextStyle(
+                          fontSize: tamanhoFonte.letraPequena(context),
+                          color: cores('corTexto'),
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.only(left: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(color: cores('corBorda')),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
+                            // changes position of shadow
+                          ]),
+                      child: DropdownButton(
+                        hint: Text(
+                          'Escolaridade: ',
+                          style: TextStyle(color: cores('corTexto')),
+                        ),
+                        icon: Icon(
+                          Icons.arrow_drop_down,
+                          color: cores('corTexto'),
+                        ),
+                        iconSize: 30,
+                        iconEnabledColor: cores('corTexto'),
+                        style: TextStyle(
+                          color: cores('corTexto'),
+                          fontWeight: FontWeight.w400,
+                          fontSize: tamanhoFonte.letraPequena(context),
+                        ),
+                        underline: Container(
+                          height: 0,
+                        ),
+                        isExpanded: true,
+                        value: selecioneEscolaridadePaciente,
+                        onChanged: (newValue) {
+                          setState(() {
+                            selecioneEscolaridadePaciente = newValue!;
+                          });
+                        },
+                        items: escolaridade.map((state) {
+                          return DropdownMenuItem(
+                            value: state,
+                            child: Text(state),
+                          );
+                        }).toList(),
                       ),
                     ),
-                    const Padding(padding: EdgeInsets.only(top: 10)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  children: [
                     Text(
-                      'Data: $dataInicioPaciente',
-                      style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
+                      'Selecione o Período:',
+                      style: TextStyle(
+                          fontSize: tamanhoFonte.letraPequena(context),
+                          color: cores('corTexto'),
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.only(left: 10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(color: cores('corBorda')),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
+                            // changes position of shadow
+                          ]),
+                      child: DropdownButton<String>(
+                        icon: const Icon(Icons.arrow_drop_down),
+                        iconSize: 30,
+                        iconEnabledColor: cores('corTexto'),
+                        style: TextStyle(
+                          color: cores('corTexto'),
+                          fontWeight: FontWeight.w400,
+                          fontSize: tamanhoFonte.letraPequena(context),
+                        ),
+                        underline: Container(
+                          height: 0,
+                        ),
+                        isExpanded: true,
+                        hint: const Text('Selecione uma Opção'),
+                        value: selecionePeriodoEscolaPaciente,
+                        items: [
+                          DropdownMenuItem(
+                            value: 'Manhã',
+                            child: Text(
+                              'Manhã',
+                              style: TextStyle(color: cores('corTexto')),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Tarde',
+                            child: Text(
+                              'Tarde',
+                              style: TextStyle(color: cores('corTexto')),
+                            ),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Integral',
+                            child: Text(
+                              'Integral',
+                              style: TextStyle(color: cores('corTexto')),
+                            ),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            selecionePeriodoEscolaPaciente = value!;
+                          });
+                        },
+                      ),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                campoTexto('Nome', txtNomePaciente, Icons.label),
-                const SizedBox(height: 20),
-                campoTexto('Data de Nascimento', txtDataNascimentoPaciente, Icons.calendar_month_outlined,
-                    formato: DataInputFormatter(), numeros: true),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: campoTexto('CPF', txtCPFPaciente, Icons.credit_card,
-                          formato: CpfInputFormatter(), numeros: true),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: campoTexto('RG', txtRGPaciente, Icons.credit_card,
-                          formato: MaskTextInputFormatter(
-                            mask: '##.###.###-#',
-                            filter: {"#": RegExp(r'[0-9]')},
-                          ),
-                          numeros: true),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Sexo:',
-                  style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: RadioListTile<Gender>(
-                        title: Text(
-                          'Masculino',
-                          style: TextStyle(color: cores('corTexto')),
-                        ),
-                        value: Gender.male,
-                        groupValue: _selectedGeneroPaciente,
-                        activeColor: cores('corSimbolo'),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedGeneroPaciente = value;
-                          });
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: RadioListTile<Gender>(
-                        title: Text(
-                          'Feminino',
-                          style: TextStyle(color: cores('corTexto')),
-                        ),
-                        value: Gender.female,
-                        groupValue: _selectedGeneroPaciente,
-                        activeColor: cores('corSimbolo'),
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedGeneroPaciente = value;
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: campoTexto('CEP', txtCEPPaciente, Icons.mail, formato: CepInputFormatter(), numeros: true,
-                          onchaged: (value) async {
-                        var cepSemFormatacao = value.replaceAll(RegExp(r'[^0-9]'), '');
-                        var viaCepSearchCep = ViaCepSearchCep();
-                        var result = await viaCepSearchCep.searchInfoByCep(cep: cepSemFormatacao);
-                        result.fold(
-                          (error) {
-                            print('Ocorreu um erro ao buscar as informações do CEP: $error');
-                          },
-                          (viaCepInfo) {
-                            setState(() {
-                              String? localidade = viaCepInfo.localidade;
-                              String? estado = viaCepInfo.uf;
-                              txtCidadePaciente.text = localidade!;
-                              selecioneEstadoPaciente = estado!;
-                            });
-                          },
-                        );
-                      }),
-                    ),
-                    const Padding(padding: EdgeInsets.only(right: 10)),
-                    Expanded(
-                        child: Column(
-                      children: [
-                        Text(
-                          'Selecione um Estado:',
-                          style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
-                        ),
-                        Container(
-                          height: 40,
-                          padding: const EdgeInsets.only(left: 10),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8.0),
-                              border: Border.all(color: cores('corBorda')),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 7)
-                                // changes position of shadow
-                              ]),
-                          child: DropdownButton(
-                            hint: Text(
-                              'Selecione um Estado',
-                              style: TextStyle(color: cores('corTexto')),
-                            ),
-                            icon: Icon(
-                              Icons.arrow_drop_down,
-                              color: cores('corTexto'),
-                            ),
-                            iconSize: 30,
-                            iconEnabledColor: cores('corTexto'),
-                            style: TextStyle(
-                              color: cores('corTexto'),
-                              fontWeight: FontWeight.w400,
-                              fontSize: 18,
-                            ),
-                            underline: Container(
-                              height: 0,
-                            ),
-                            isExpanded: true,
-                            value: selecioneEstadoPaciente,
-                            onChanged: (newValue) {
-                              setState(() {
-                                selecioneEstadoPaciente = newValue!;
-                              });
-                            },
-                            items: estados.map((state) {
-                              return DropdownMenuItem(
-                                value: state,
-                                child: Text(state),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ))
-                  ],
-                ),
-                const SizedBox(height: 20),
-                campoTexto('Logradouro', txtLogradouroPaciente, Icons.location_on),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: campoTexto('Número', txtNumeroPaciente, Icons.home, numeros: true),
-                    ),
-                    const Padding(padding: EdgeInsets.only(right: 10)),
-                    Expanded(
-                      child: campoTexto('Bairro', txtBairroPaciente, Icons.maps_home_work),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 20),
-                campoTexto(
-                  'Cidade',
-                  txtCidadePaciente,
-                  Icons.location_city,
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Selecione o tipo de Consulta:',
-                  style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
-                ),
-                Container(
-                  padding: const EdgeInsets.only(left: 10),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(color: cores('corBorda')),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
-                        // changes position of shadow
-                      ]),
-                  child: DropdownButton<String>(
-                    icon: const Icon(Icons.arrow_drop_down),
-                    iconSize: 30,
-                    iconEnabledColor: cores('corTexto'),
-                    style: TextStyle(
-                      color: cores('corTexto'),
-                      fontWeight: FontWeight.w400,
-                      fontSize: 15,
-                    ),
-                    underline: Container(
-                      height: 0,
-                    ),
-                    isExpanded: true,
-                    hint: const Text('Selecione uma Opção'),
-                    value: selecioneTipoConsultaPaciente,
-                    items: [
-                      DropdownMenuItem(
-                        value: 'Convênio',
-                        child: Text(
-                          'Convênio',
-                          style: TextStyle(color: cores('corTexto')),
-                        ),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Particular',
-                        child: Text(
-                          'Particular',
-                          style: TextStyle(color: cores('corTexto')),
-                        ),
-                      ),
-                    ],
-                    onChanged: (value) {
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(child: campoTexto('Professora', txtProfessoraPaciente, FontAwesomeIcons.personChalkboard)),
+              const SizedBox(width: 10),
+              Expanded(
+                  child: campoTexto('Telefone Professora', txtTelefoneProfessoraPaciente, Icons.phone,
+                      formato: TelefoneInputFormatter(), numeros: true)),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: campoTexto('CEP', txtCEPPaciente, Icons.mail, formato: CepInputFormatter(), numeros: true,
+                    onchaged: (value) async {
+                  var cepSemFormatacao = value.replaceAll(RegExp(r'[^0-9]'), '');
+                  var viaCepSearchCep = ViaCepSearchCep();
+                  var result = await viaCepSearchCep.searchInfoByCep(cep: cepSemFormatacao);
+                  result.fold(
+                    (error) {
+                      print('Ocorreu um erro ao buscar as informações do CEP: $error');
+                    },
+                    (viaCepInfo) {
                       setState(() {
-                        selecioneTipoConsultaPaciente = value!;
+                        String? localidade = viaCepInfo.localidade;
+                        String? estado = viaCepInfo.uf;
+                        txtCidadePaciente.text = localidade!;
+                        selecioneEstadoPaciente = estado!;
                       });
                     },
+                  );
+                }),
+              ),
+              const Padding(padding: EdgeInsets.only(right: 10)),
+              Expanded(
+                  child: Column(
+                children: [
+                  Text(
+                    'Selecione um Estado:',
+                    style: TextStyle(
+                        fontSize: tamanhoFonte.letraPequena(context),
+                        color: cores('corTexto'),
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Container(
+                    height: 40,
+                    padding: const EdgeInsets.only(left: 10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.0),
+                        border: Border.all(color: cores('corBorda')),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 7)
+                          // changes position of shadow
+                        ]),
+                    child: DropdownButton(
+                      hint: Text(
+                        'Selecione um Estado',
+                        style: TextStyle(color: cores('corTexto')),
+                      ),
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: cores('corTexto'),
+                      ),
+                      iconSize: 30,
+                      iconEnabledColor: cores('corTexto'),
+                      style: TextStyle(
+                        color: cores('corTexto'),
+                        fontWeight: FontWeight.w400,
+                        fontSize: tamanhoFonte.letraPequena(context),
+                      ),
+                      underline: Container(
+                        height: 0,
+                      ),
+                      isExpanded: true,
+                      value: selecioneEstadoPaciente,
+                      onChanged: (newValue) {
+                        setState(() {
+                          selecioneEstadoPaciente = newValue!;
+                        });
+                      },
+                      items: estados.map((state) {
+                        return DropdownMenuItem(
+                          value: state,
+                          child: Text(state),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ))
+            ],
+          ),
+          const SizedBox(height: 20),
+          campoTexto('Logradouro', txtLogradouroPaciente, Icons.location_on),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(child: campoTexto('Número', txtNumeroPaciente, Icons.home, numeros: true)),
+              const Padding(padding: EdgeInsets.only(right: 10)),
+              Expanded(child: campoTexto('Bairro', txtBairroPaciente, Icons.maps_home_work))
+            ],
+          ),
+          const SizedBox(height: 20),
+          campoTexto('Cidade', txtCidadePaciente, Icons.location_city),
+          const SizedBox(height: 20),
+          Text(
+            'Selecione o tipo de Consulta:',
+            style: TextStyle(
+                fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold),
+          ),
+          Container(
+            padding: const EdgeInsets.only(left: 10),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(color: cores('corBorda')),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
+                  // changes position of shadow
+                ]),
+            child: DropdownButton<String>(
+              icon: const Icon(Icons.arrow_drop_down),
+              iconSize: 30,
+              iconEnabledColor: cores('corTexto'),
+              style: TextStyle(
+                color: cores('corTexto'),
+                fontWeight: FontWeight.w400,
+                fontSize: tamanhoFonte.letraPequena(context),
+              ),
+              underline: Container(
+                height: 0,
+              ),
+              isExpanded: true,
+              hint: const Text('Selecione uma Opção'),
+              value: selecioneTipoConsultaPaciente,
+              items: [
+                DropdownMenuItem(
+                  value: 'Convênio',
+                  child: Text(
+                    'Convênio',
+                    style: TextStyle(color: cores('corTexto')),
                   ),
                 ),
-                const SizedBox(height: 20),
-                campoTexto('Descrição', txtDescricaoPaciente, Icons.description,
-                    maxPalavras: 200, maxLinhas: 5, tamanho: 20.0),
-                Divider(
-                  thickness: 2,
-                  height: 50,
-                  color: cores('corTexto'),
+                DropdownMenuItem(
+                  value: 'Particular',
+                  child: Text(
+                    'Particular',
+                    style: TextStyle(color: cores('corTexto')),
+                  ),
                 ),
-                Text(
-                  'Dados dos Responsáveis:',
-                  style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  selecioneTipoConsultaPaciente = value!;
+                });
+              },
+            ),
+          ),
+          const SizedBox(height: 20),
+          campoTexto('Descrição', txtDescricaoPaciente, Icons.description,
+              maxPalavras: 200, maxLinhas: 5, tamanho: 20.0),
+          Divider(
+            thickness: 2,
+            height: 50,
+            color: cores('corTexto'),
+          ),
+          Text(
+            'Dados dos Responsáveis:',
+            style: TextStyle(
+                fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold),
+          ),
+          //------------------------------------------------------------------------------
+          columnResponsavel(),
+          const SizedBox(height: 20),
+          indexResponsavel < 1
+              ? SizedBox(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                        foregroundColor: cores('corTextoBotao'),
+                        minimumSize: const Size(45, 45),
+                        backgroundColor: cores('corBotao'),
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32),
+                        )),
+                    child: const Icon(Icons.add),
+                    onPressed: () {
+                      if (ListGeneroResponsavelPaciente[indexResponsavel] != null &&
+                          ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                          ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                          ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                          ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                          ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty) {
+                        widget.tipo == 'adicionar'
+                            ? setState(() {
+                                ListGeneroResponsavelPaciente.add(null);
+                                ListNomeResponsavelPaciente.add(TextEditingController());
+                                ListIdadeResponsavelPaciente.add(TextEditingController());
+                                ListTelefoneResponsavelPaciente.add(TextEditingController());
+                                ListRelacaoResponsavelPaciente.add('Mãe');
+                                ListEscolaridadeResponsavelPaciente.add(TextEditingController());
+                                ListProfissaoResponsavelPaciente.add(TextEditingController());
+                                indexResponsavel++;
+                              })
+                            : setState(() {
+                                indexResponsavel + 1 < qtdResponsavel ? indexResponsavel++ : null;
+                              });
+                      } else {
+                        erro(context, 'Preencha os campos obrigatórios!');
+                      }
+                    },
+                  ),
+                )
+              : SizedBox(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                        foregroundColor: cores('corTextoBotao'),
+                        minimumSize: const Size(45, 45),
+                        backgroundColor: Colors.grey,
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32),
+                        )),
+                    child: const Icon(Icons.add),
+                    onPressed: () {},
+                  ),
                 ),
-                //------------------------------------------------------------------------------
-                columnResponsavel(),
-                const SizedBox(height: 20),
-                indexResponsavel < 1
-                    ? SizedBox(
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                              foregroundColor: cores('corTextoBotao'),
-                              minimumSize: const Size(45, 45),
-                              backgroundColor: cores('corBotao'),
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(32),
-                              )),
-                          child: const Icon(Icons.add),
-                          onPressed: () {
-                            if (ListGeneroResponsavelPaciente[indexResponsavel] != null &&
+          Divider(
+            thickness: 2,
+            height: 50,
+            color: cores('corTexto'),
+          ),
+          Center(
+            child: ElevatedButton(
+              style: ButtonStyle(
+                shadowColor: MaterialStatePropertyAll(cores('corSombra')),
+                backgroundColor: MaterialStatePropertyAll(cores('corDetalhe')),
+              ),
+              onPressed: () async {
+                fileDoc = await pickDocument();
+                setState(() {
+                  nomeArquivo = ph.basename(fileDoc!.path);
+                });
+              },
+              child: Text(
+                nomeArquivo.isEmpty ? 'Anexar Documento' : nomeArquivo,
+                style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+              ),
+            ),
+          ),
+          Divider(
+            thickness: 2,
+            height: 50,
+            color: cores('corTexto'),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                      foregroundColor: cores('corTextoBotao'),
+                      backgroundColor: cores('corBotao'),
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32),
+                      )),
+                  child: Text(
+                    widget.tipo == 'editar' ? 'Atualizar' : 'Criar',
+                    style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
+                  ),
+                  onPressed: () async {
+                    fileImage != null
+                        ? urlImagePaciente = (await uploadImageUsers(fileImage, 'pacientes'))!
+                        : urlImagePaciente = '';
+
+                    if (apagarImagem == true) {
+                      await deletarImagem(urlImagePaciente);
+                      await apagarImagemUser(uidPaciente);
+                    }
+
+                    widget.tipo == 'editar'
+                        ? (txtNomePaciente.text.isNotEmpty &&
+                                txtDataNascimentoPaciente.text.isNotEmpty &&
+                                txtCPFPaciente.text.isNotEmpty &&
+                                txtRGPaciente.text.isNotEmpty &&
+                                _selectedGeneroPaciente != null &&
+                                selecioneEscolaridadePaciente.isNotEmpty &&
+                                selecionePeriodoEscolaPaciente.isNotEmpty &&
+                                txtProfessoraPaciente.text.isNotEmpty &&
+                                txtTelefoneProfessoraPaciente.text.isNotEmpty &&
+                                txtLogradouroPaciente.text.isNotEmpty &&
+                                txtNumeroPaciente.text.isNotEmpty &&
+                                txtBairroPaciente.text.isNotEmpty &&
+                                txtCidadePaciente.text.isNotEmpty &&
+                                selecioneEstadoPaciente.isNotEmpty &&
+                                txtCEPPaciente.text.isNotEmpty &&
+                                selecioneTipoConsultaPaciente.isNotEmpty &&
+                                txtDescricaoPaciente.text.isNotEmpty &&
+                                ListGeneroResponsavelPaciente[indexResponsavel] != null &&
                                 ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
                                 ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
                                 ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
                                 ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty) {
-                              widget.tipo == 'adicionar'
-                                  ? setState(() {
-                                      ListGeneroResponsavelPaciente.add(null);
-                                      ListNomeResponsavelPaciente.add(TextEditingController());
-                                      ListIdadeResponsavelPaciente.add(TextEditingController());
-                                      ListTelefoneResponsavelPaciente.add(TextEditingController());
-                                      ListRelacaoResponsavelPaciente.add('Mãe');
-                                      ListEscolaridadeResponsavelPaciente.add(TextEditingController());
-                                      ListProfissaoResponsavelPaciente.add(TextEditingController());
-                                      indexResponsavel++;
-                                    })
-                                  : setState(() {
-                                      indexResponsavel + 1 < qtdResponsavel ? indexResponsavel++ : null;
-                                    });
-                            } else {
-                              erro(context, 'Preencha os campos obrigatórios!');
-                            }
-                          },
-                        ),
-                      )
-                    : SizedBox(
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                              foregroundColor: cores('corTextoBotao'),
-                              minimumSize: const Size(45, 45),
-                              backgroundColor: Colors.grey,
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(32),
-                              )),
-                          child: const Icon(Icons.add),
-                          onPressed: () {},
-                        ),
-                      ),
-                //------------------------------------------------------------------------------
-                Divider(
-                  thickness: 2,
-                  height: 50,
-                  color: cores('corTexto'),
+                                ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty)
+                            ? editarPaciente(
+                                context,
+                                idUsuario(),
+                                widget.uid,
+                                dataInicioPaciente,
+                                urlImagePaciente,
+                                txtNomePaciente.text,
+                                txtDataNascimentoPaciente.text,
+                                txtCPFPaciente.text,
+                                txtRGPaciente.text,
+                                _selectedGeneroPaciente.toString(),
+                                selecioneEscolaridadePaciente,
+                                selecionePeriodoEscolaPaciente,
+                                txtProfessoraPaciente.text,
+                                txtTelefoneProfessoraPaciente.text,
+                                txtLogradouroPaciente.text,
+                                txtNumeroPaciente.text,
+                                txtBairroPaciente.text,
+                                txtCidadePaciente.text,
+                                selecioneEstadoPaciente,
+                                txtCEPPaciente.text,
+                                selecioneTipoConsultaPaciente,
+                                txtDescricaoPaciente.text,
+                                indexResponsavel,
+                                ListGeneroResponsavelPaciente,
+                                ListNomeResponsavelPaciente,
+                                ListIdadeResponsavelPaciente,
+                                ListTelefoneResponsavelPaciente,
+                                ListRelacaoResponsavelPaciente,
+                                ListEscolaridadeResponsavelPaciente,
+                                ListProfissaoResponsavelPaciente,
+                                fileDoc,
+                              )
+                            : erro(context, 'Preencha os campos obrigatórios!')
+                        : (txtNomePaciente.text.isNotEmpty &&
+                                txtDataNascimentoPaciente.text.isNotEmpty &&
+                                txtCPFPaciente.text.isNotEmpty &&
+                                txtRGPaciente.text.isNotEmpty &&
+                                _selectedGeneroPaciente != null &&
+                                selecioneEscolaridadePaciente.isNotEmpty &&
+                                selecionePeriodoEscolaPaciente.isNotEmpty &&
+                                txtProfessoraPaciente.text.isNotEmpty &&
+                                txtTelefoneProfessoraPaciente.text.isNotEmpty &&
+                                txtLogradouroPaciente.text.isNotEmpty &&
+                                txtNumeroPaciente.text.isNotEmpty &&
+                                txtBairroPaciente.text.isNotEmpty &&
+                                txtCidadePaciente.text.isNotEmpty &&
+                                selecioneEstadoPaciente.isNotEmpty &&
+                                txtCEPPaciente.text.isNotEmpty &&
+                                selecioneTipoConsultaPaciente.isNotEmpty &&
+                                txtDescricaoPaciente.text.isNotEmpty &&
+                                ListGeneroResponsavelPaciente[indexResponsavel] != null &&
+                                ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                                ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                                ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                                ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                                ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty)
+                            ? adicionarPaciente(
+                                context,
+                                idUsuario(),
+                                dataInicioPaciente,
+                                urlImagePaciente,
+                                txtNomePaciente.text,
+                                txtDataNascimentoPaciente.text,
+                                txtCPFPaciente.text,
+                                txtRGPaciente.text,
+                                _selectedGeneroPaciente.toString(),
+                                selecioneEscolaridadePaciente,
+                                selecionePeriodoEscolaPaciente,
+                                txtProfessoraPaciente.text,
+                                txtTelefoneProfessoraPaciente.text,
+                                txtLogradouroPaciente.text,
+                                txtNumeroPaciente.text,
+                                txtBairroPaciente.text,
+                                txtCidadePaciente.text,
+                                selecioneEstadoPaciente,
+                                txtCEPPaciente.text,
+                                selecioneTipoConsultaPaciente,
+                                txtDescricaoPaciente.text,
+                                indexResponsavel,
+                                ListGeneroResponsavelPaciente,
+                                ListNomeResponsavelPaciente,
+                                ListIdadeResponsavelPaciente,
+                                ListTelefoneResponsavelPaciente,
+                                ListRelacaoResponsavelPaciente,
+                                ListEscolaridadeResponsavelPaciente,
+                                ListProfissaoResponsavelPaciente,
+                                fileDoc)
+                            : erro(context, 'Preencha os campos obrigatórios!');
+                  }),
+              SizedBox(width: 10),
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                    foregroundColor: cores('corTextoBotao'),
+                    backgroundColor: cores('corBotao'),
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                    )),
+                child: Text(
+                  'Cancelar',
+                  style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 150,
-                      child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                              foregroundColor: cores('corTextoBotao'),
-                              minimumSize: const Size(200, 45),
-                              backgroundColor: cores('corBotao'),
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(32),
-                              )),
-                          child: Text(
-                            widget.tipo == 'editar' ? 'Atualizar' : 'Criar',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          onPressed: () async {
-                            fileImage != null
-                                ? urlImagePaciente = (await uploadImageUsers(fileImage, 'pacientes'))!
-                                : urlImagePaciente = '';
-
-                            if (apagarImagem == true) {
-                              await deletarImagem(urlImagePaciente);
-                              await apagarImagemUser(uidPaciente);
-                            }
-
-                            widget.tipo == 'editar'
-                                ? (txtNomePaciente.text.isNotEmpty &&
-                                        txtDataNascimentoPaciente.text.isNotEmpty &&
-                                        txtCPFPaciente.text.isNotEmpty &&
-                                        txtRGPaciente.text.isNotEmpty &&
-                                        _selectedGeneroPaciente != null &&
-                                        txtLogradouroPaciente.text.isNotEmpty &&
-                                        txtNumeroPaciente.text.isNotEmpty &&
-                                        txtBairroPaciente.text.isNotEmpty &&
-                                        txtCidadePaciente.text.isNotEmpty &&
-                                        selecioneEstadoPaciente.isNotEmpty &&
-                                        txtCEPPaciente.text.isNotEmpty &&
-                                        selecioneTipoConsultaPaciente.isNotEmpty &&
-                                        txtDescricaoPaciente.text.isNotEmpty &&
-                                        ListGeneroResponsavelPaciente[indexResponsavel] != null &&
-                                        ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                        ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                        ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                        ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                        ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty)
-                                    ? editarPaciente(
-                                        context,
-                                        idUsuario(),
-                                        widget.uid,
-                                        dataInicioPaciente,
-                                        urlImagePaciente,
-                                        txtNomePaciente.text,
-                                        txtDataNascimentoPaciente.text,
-                                        txtCPFPaciente.text,
-                                        txtRGPaciente.text,
-                                        _selectedGeneroPaciente.toString(),
-                                        txtLogradouroPaciente.text,
-                                        txtNumeroPaciente.text,
-                                        txtBairroPaciente.text,
-                                        txtCidadePaciente.text,
-                                        selecioneEstadoPaciente,
-                                        txtCEPPaciente.text,
-                                        selecioneTipoConsultaPaciente,
-                                        txtDescricaoPaciente.text,
-                                        indexResponsavel,
-                                        ListGeneroResponsavelPaciente,
-                                        ListNomeResponsavelPaciente,
-                                        ListIdadeResponsavelPaciente,
-                                        ListTelefoneResponsavelPaciente,
-                                        ListRelacaoResponsavelPaciente,
-                                        ListEscolaridadeResponsavelPaciente,
-                                        ListProfissaoResponsavelPaciente,
-                                      )
-                                    : erro(context, 'Preencha os campos obrigatórios!')
-                                : (txtNomePaciente.text.isNotEmpty &&
-                                        txtDataNascimentoPaciente.text.isNotEmpty &&
-                                        txtCPFPaciente.text.isNotEmpty &&
-                                        txtRGPaciente.text.isNotEmpty &&
-                                        _selectedGeneroPaciente != null &&
-                                        txtLogradouroPaciente.text.isNotEmpty &&
-                                        txtNumeroPaciente.text.isNotEmpty &&
-                                        txtBairroPaciente.text.isNotEmpty &&
-                                        txtCidadePaciente.text.isNotEmpty &&
-                                        selecioneEstadoPaciente.isNotEmpty &&
-                                        txtCEPPaciente.text.isNotEmpty &&
-                                        selecioneTipoConsultaPaciente.isNotEmpty &&
-                                        txtDescricaoPaciente.text.isNotEmpty &&
-                                        ListGeneroResponsavelPaciente[indexResponsavel] != null &&
-                                        ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                        ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                        ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                        ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                        ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty)
-                                    ? adicionarPaciente(
-                                        context,
-                                        idUsuario(),
-                                        dataInicioPaciente,
-                                        urlImagePaciente,
-                                        txtNomePaciente.text,
-                                        txtDataNascimentoPaciente.text,
-                                        txtCPFPaciente.text,
-                                        txtRGPaciente.text,
-                                        _selectedGeneroPaciente.toString(),
-                                        txtLogradouroPaciente.text,
-                                        txtNumeroPaciente.text,
-                                        txtBairroPaciente.text,
-                                        txtCidadePaciente.text,
-                                        selecioneEstadoPaciente,
-                                        txtCEPPaciente.text,
-                                        selecioneTipoConsultaPaciente,
-                                        txtDescricaoPaciente.text,
-                                        indexResponsavel,
-                                        ListGeneroResponsavelPaciente,
-                                        ListNomeResponsavelPaciente,
-                                        ListIdadeResponsavelPaciente,
-                                        ListTelefoneResponsavelPaciente,
-                                        ListRelacaoResponsavelPaciente,
-                                        ListEscolaridadeResponsavelPaciente,
-                                        ListProfissaoResponsavelPaciente,
-                                      )
-                                    : erro(context, 'Preencha os campos obrigatórios!');
-                          }),
-                    ),
-                    const Padding(padding: EdgeInsets.all(20)),
-                    SizedBox(
-                      width: 150,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                            foregroundColor: cores('corTextoBotao'),
-                            minimumSize: const Size(200, 45),
-                            backgroundColor: cores('corBotao'),
-                            elevation: 5,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            )),
-                        child: const Text(
-                          'Cancelar',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 60),
-              ],
-            ),
-          )
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 60),
         ],
-      )),
+      ),
     );
   }
 
   Widget columnResponsavel() {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+
     return Column(
       children: [
         Divider(
@@ -698,7 +899,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         Text(
           'Sexo:',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: tamanhoFonte.letraPequena(context),
             color: cores('corTexto'),
             fontWeight: FontWeight.bold,
           ),
@@ -762,7 +963,8 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         const SizedBox(height: 20),
         Text(
           'Qual a relação do Responsável com Paciente?',
-          style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold),
         ),
         Container(
           padding: const EdgeInsets.only(left: 10),
@@ -785,7 +987,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
             style: TextStyle(
               color: cores('corTexto'),
               fontWeight: FontWeight.w400,
-              fontSize: 15,
+              fontSize: tamanhoFonte.letraPequena(context),
             ),
             underline: Container(
               height: 0,

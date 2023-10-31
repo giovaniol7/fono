@@ -191,56 +191,49 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                     senha: _obscureText2),
                 const SizedBox(height: 40),
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      width: 150,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                            foregroundColor: cores('corTextoBotao'),
-                            minimumSize: const Size(200, 45),
-                            backgroundColor: cores('corBotao'),
-                            elevation: 5,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            )),
-                        child: const Text(
-                          'Editar',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        onPressed: () async {
-                          fileImage != null ? urlImage = (await uploadImageUsers(fileImage, 'users'))! : urlImage = '';
-
-                          if (apagarImagem == true) {
-                            await deletarImagem(urlImage);
-                            await apagarImagemUser(id);
-                          }
-
-                          verificarDados(context, uid, urlImage, txtNome.text, txtDtNascimento.text, txtEmail.text,
-                              txtCPF.text, txtCRFa.text, txtTelefone.text, txtSenha.text, txtSenhaCofirmar.text);
-                        },
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                          foregroundColor: cores('corTextoBotao'),
+                          backgroundColor: cores('corBotao'),
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32),
+                          )),
+                      child: Text(
+                        'Editar',
+                        style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                       ),
+                      onPressed: () async {
+                        fileImage != null ? urlImage = (await uploadImageUsers(fileImage, 'users'))! : urlImage = '';
+
+                        if (apagarImagem == true) {
+                          await deletarImagem(urlImage);
+                          await apagarImagemUser(id);
+                        }
+
+                        verificarDados(context, uid, urlImage, txtNome.text, txtDtNascimento.text, txtEmail.text,
+                            txtCPF.text, txtCRFa.text, txtTelefone.text, txtSenha.text, txtSenhaCofirmar.text);
+                      },
                     ),
-                    Padding(padding: EdgeInsets.all(20)),
-                    SizedBox(
-                      width: 150,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                            foregroundColor: cores('corSecundaria'),
-                            minimumSize: const Size(200, 45),
-                            backgroundColor: cores('corTexto'),
-                            elevation: 5,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(32),
-                            )),
-                        child: const Text(
-                          'Cancelar',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                    SizedBox(width: 10),
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                          foregroundColor: cores('corSecundaria'),
+                          backgroundColor: cores('corTexto'),
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(32),
+                          )),
+                      child: Text(
+                        'Cancelar',
+                        style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                       ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                     ),
                   ],
                 ),

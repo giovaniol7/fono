@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../connections/fireCloudProntuarios.dart';
+import '../controllers/criarPDF.dart';
 import '../controllers/estilos.dart';
+import 'TelaPDF.dart';
 
 class TelaDadosProntuarios extends StatefulWidget {
   final String uidPaciente;
@@ -61,6 +63,18 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
             Navigator.pop(context);
           },
         ),
+        title: Text(
+          "$dataProntuario",
+          style: TextStyle(color: cores('corTexto')),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.picture_as_pdf),
+            onPressed: () async {
+              await savePdf();
+            },
+          ),
+        ],
       ),
       body: ListView(
         children: [
@@ -141,6 +155,11 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                       ),
                     ],
                   )),
+              Divider(
+                thickness: 2,
+                height: 1,
+                color: cores('corTexto'),
+              ),
               Container(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -164,6 +183,11 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                       ),
                     ],
                   )),
+              Divider(
+                thickness: 2,
+                height: 1,
+                color: cores('corTexto'),
+              ),
               Container(
                   padding: EdgeInsets.all(20),
                   child: Column(
@@ -187,6 +211,11 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                       ),
                     ],
                   )),
+              Divider(
+                thickness: 2,
+                height: 1,
+                color: cores('corTexto'),
+              ),
               Container(
                   padding: EdgeInsets.all(20),
                   child: Column(

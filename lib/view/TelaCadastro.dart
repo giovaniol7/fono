@@ -50,6 +50,8 @@ class _TelaCadastroState extends State<TelaCadastro> {
 
   @override
   Widget build(BuildContext context) {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+
     void verificarSenhas() async {
       final DateFormat formatter = DateFormat('dd/MM/yyyy');
       final DateTime dataNascimento = formatter.parse(txtDtNascimento.text);
@@ -255,49 +257,42 @@ class _TelaCadastroState extends State<TelaCadastro> {
                       senha: _obscureText2),
                   const SizedBox(height: 40),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(
-                        width: 150,
-                        child: OutlinedButton(
+                      OutlinedButton(
                           style: OutlinedButton.styleFrom(
                               foregroundColor: cores('corTextoBotao'),
-                              minimumSize: const Size(200, 45),
                               backgroundColor: cores('corBotao'),
                               elevation: 5,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
                               )),
-                          child: const Text(
+                          child: Text(
                             'Criar',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                           ),
                           onPressed: () {
                             verificarSenhas();
                           },
                         ),
-                      ),
-                      Padding(padding: EdgeInsets.all(20)),
-                      SizedBox(
-                        width: 150,
-                        child: OutlinedButton(
+                      SizedBox(width: 10),
+                      OutlinedButton(
                           style: OutlinedButton.styleFrom(
                               foregroundColor: cores('corTextoBotao'),
-                              minimumSize: const Size(200, 45),
                               backgroundColor: cores('corBotao'),
                               elevation: 5,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
                               )),
-                          child: const Text(
+                          child: Text(
                             'Cancelar',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                           ),
                           onPressed: () {
                             Navigator.pop(context);
                           },
                         ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 60),

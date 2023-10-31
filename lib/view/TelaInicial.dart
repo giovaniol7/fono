@@ -73,7 +73,6 @@ class _TelaInicialState extends State<TelaInicial> {
     carregarDados();
   }
 
-  @override
   Widget build(BuildContext context) {
     TamanhoWidgets tamanhoWidgets = TamanhoWidgets();
     TamanhoFonte tamanhoFonte = TamanhoFonte();

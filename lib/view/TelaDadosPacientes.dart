@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fono/controllers/uploadDoc.dart';
 
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,6 +20,7 @@ class TelaDadosPacientes extends StatefulWidget {
 
 class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
   var paciente;
+  late String nomeArquivo = '';
   late String uidPaciente = '';
   late String uidFono = '';
   late String dataInicioPaciente = '';
@@ -38,6 +40,10 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
   late String cepPaciente = '';
   late String tipoConsultaPaciente = '';
   late String descricaoPaciente = '';
+  late String professoraPaciente = '';
+  late String telefoneProfessoraPaciente = '';
+  late String escolaridadePaciente = '';
+  late String periodoEscolaPaciente = '';
 
   late List<Gender?> ListGeneroResponsavelPaciente = [];
   late List<String> ListNomeResponsavelPaciente = [];
@@ -72,6 +78,10 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
       RGPaciente = paciente['RGPaciente'];
       idadePaciente = calcularIdadeMeses(dtNascimentoPaciente);
       generoPaciente = genderToString(paciente['generoPaciente']);
+      escolaridadePaciente = paciente['escolaridadePaciente'];
+      periodoEscolaPaciente = paciente['periodoEscolaPaciente'];
+      professoraPaciente = paciente['professoraPaciente'];
+      telefoneProfessoraPaciente = paciente['telefoneProfessoraPaciente'];
       lougradouroPaciente = paciente['lougradouroPaciente'];
       numeroPaciente = paciente['numeroPaciente'];
       bairroPaciente = paciente['bairroPaciente'];
@@ -81,6 +91,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
       tipoConsultaPaciente = paciente['tipoConsultaPaciente'];
       descricaoPaciente = paciente['descricaoPaciente'];
       qtdResponsavel = paciente['qtdResponsavel'];
+      nomeArquivo = paciente['urlDocPaciente'] == '' ? '' : urlToString(paciente['urlDocPaciente']);
       ListGeneroResponsavelPaciente = paciente['listGeneroResponsavel'];
       ListNomeResponsavelPaciente = paciente['listNomeResponsavel'];
       ListIdadeResponsavelPaciente = paciente['listIdadeResponsavel'];
@@ -163,18 +174,19 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
       ),
       child: Column(
         children: <Widget>[
-          Text(
-            'Data de Início: $dataInicioPaciente',
-            style: TextStyle(
-                fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+          Center(
+            child: Text(
+              'Data de Início: $dataInicioPaciente',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+            ),
           ),
-          SizedBox(
-            height: 10,
-          ),
+          SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Text(
                     'Idade',
@@ -205,6 +217,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
               ),
               Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Text(
                     'Data Nasc.',
@@ -221,66 +234,39 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               ),
             ],
           ),
-          SizedBox(
-            height: 20,
-          ),
-          Center(
-            child: Expanded(
-              child: Text(
-                nomePaciente.toString(),
-                softWrap: true,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: TextStyle(
-                    color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context), fontWeight: FontWeight.bold),
-              ),
+          SizedBox(height: 20),
+          Container(
+            alignment: Alignment.center,
+            child: Text(
+              nomePaciente.toString(),
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: TextStyle(
+                  color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context), fontWeight: FontWeight.bold),
             ),
           ),
-          SizedBox(
-            height: 20,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  children: <Widget>[
-                    Text(
-                      ListGeneroResponsavelPaciente.isEmpty ? '' : ListRelacaoResponsavelPaciente[index],
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: tamanhoFonte.letraPequena(context),
-                        color: cores('corTexto'),
-                      ),
-                    ),
-                    Text(
-                      ListNomeResponsavelPaciente.isEmpty ? '' : ListNomeResponsavelPaciente[index],
-                      softWrap: true,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () async {
-                    final Uri url = Uri.parse("whatsapp://send?phone=+55$ListTelefoneResponsavelPaciente[index]");
-                    if (!await launchUrl(url)) throw 'Could not launch $url';
-                  },
+          SizedBox(height: 20),
+          Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Expanded(
                   child: Column(
                     children: <Widget>[
-                      Icon(
-                        Icons.phone,
-                        color: cores('corSimbolo'),
-                        size: tamanhoFonte.outroTamanho(context, 0.07),
+                      Text(
+                        ListGeneroResponsavelPaciente.isEmpty ? '' : ListRelacaoResponsavelPaciente[index],
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: tamanhoFonte.letraPequena(context),
+                          color: cores('corTexto'),
+                        ),
                       ),
                       Text(
-                        ListTelefoneResponsavelPaciente.isEmpty ? '' : ListTelefoneResponsavelPaciente[index],
+                        ListNomeResponsavelPaciente.isEmpty ? '' : ListNomeResponsavelPaciente[index],
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -289,8 +275,32 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                     ],
                   ),
                 ),
-              ),
-            ],
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () async {
+                      final Uri url = Uri.parse("whatsapp://send?phone=+55$ListTelefoneResponsavelPaciente[index]");
+                      if (!await launchUrl(url)) throw 'Could not launch $url';
+                    },
+                    child: Column(
+                      children: <Widget>[
+                        Icon(
+                          Icons.phone,
+                          color: cores('corSimbolo'),
+                          size: tamanhoFonte.outroTamanho(context, 0.07),
+                        ),
+                        Text(
+                          ListTelefoneResponsavelPaciente.isEmpty ? '' : ListTelefoneResponsavelPaciente[index],
+                          softWrap: true,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -314,9 +324,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                     fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context)),
               ),
             ),
-            SizedBox(
-              height: 5,
-            ),
+            SizedBox(height: 5),
             Row(
               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -333,28 +341,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 5,
-            ),
-            Row(
-              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text(
-                  'Escolaridade: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
-                ),
-                Text(
-                  generoPaciente,
-                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 5,
-            ),
+            SizedBox(height: 5),
             Row(
               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -368,6 +355,80 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 Text(
                   tipoConsultaPaciente,
                   style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+              ],
+            ),
+            SizedBox(height: 5),
+            Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text(
+                  'Escolaridade: ',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: cores('corTexto'),
+                      fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+                Text(
+                  escolaridadePaciente,
+                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+              ],
+            ),
+            SizedBox(height: 5),
+            Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text(
+                  'Período: ',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: cores('corTexto'),
+                      fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+                Text(
+                  periodoEscolaPaciente,
+                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+              ],
+            ),
+            SizedBox(height: 5),
+            Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text(
+                  'Professor(a): ',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: cores('corTexto'),
+                      fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+                Text(
+                  professoraPaciente,
+                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+              ],
+            ),
+            SizedBox(height: 5),
+            Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text(
+                  'Telefone Prof(a): ',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: cores('corTexto'),
+                      fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+                InkWell(
+                  onTap: () async {
+                    final Uri url = Uri.parse("whatsapp://send?phone=+55$ListTelefoneResponsavelPaciente[index]");
+                    if (!await launchUrl(url)) throw 'Could not launch $url';
+                  },
+                  child: Text(
+                    telefoneProfessoraPaciente,
+                    style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  ),
                 ),
               ],
             ),
@@ -392,9 +453,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                     fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context)),
               ),
             ),
-            SizedBox(
-              height: 5,
-            ),
+            SizedBox(height: 5),
             Text(
               descricaoPaciente,
               style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
@@ -420,9 +479,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                     fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context)),
               ),
             ),
-            SizedBox(
-              height: 5,
-            ),
+            SizedBox(height: 5),
             ...gerarResponsaveis(),
           ],
         ));
@@ -457,9 +514,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 5,
-            ),
+            SizedBox(height: 5),
             Row(
               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -479,9 +534,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 5,
-            ),
+            SizedBox(height: 5),
             Row(
               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -501,9 +554,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 5,
-            ),
+            SizedBox(height: 5),
             Row(
               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -525,9 +576,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 5,
-            ),
+            SizedBox(height: 5),
             Row(
               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -549,9 +598,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 5,
-            ),
+            SizedBox(height: 5),
             Row(
               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
@@ -573,9 +620,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 20,
-            ),
+            SizedBox(height: 20),
           ],
         ),
       );
@@ -601,9 +646,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                     fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context)),
               ),
             ),
-            SizedBox(
-              height: 5,
-            ),
+            SizedBox(height: 5),
             Text(
               "$lougradouroPaciente, $numeroPaciente - $bairroPaciente, $cidadePaciente - $estadoPaciente, $cepPaciente",
               style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
@@ -629,12 +672,23 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                     fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context)),
               ),
             ),
-            SizedBox(
-              height: 5,
-            ),
-            Text(
-              descricaoPaciente,
-              style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+            SizedBox(height: 5),
+            Center(
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  shadowColor: MaterialStatePropertyAll(cores('corSombra')),
+                  backgroundColor: MaterialStatePropertyAll(cores('corDetalhe')),
+                ),
+                onPressed: () async {
+                  if (nomeArquivo.isNotEmpty) {
+                    await downloadDoc(context, nomeArquivo);
+                  }
+                },
+                child: Text(
+                  nomeArquivo.isEmpty ? 'Anexar Documento' : nomeArquivo,
+                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+              ),
             ),
           ],
         ));

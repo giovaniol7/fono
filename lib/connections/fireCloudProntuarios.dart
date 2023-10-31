@@ -6,10 +6,10 @@ import '../widgets/mensagem.dart';
 
 String nomeColecao = 'prontuarios';
 
-Future<String?> buscarIdProntuario(context, nome) async {
+Future<String?> buscarIdProntuario(context, nome, dataProntuario) async {
   var id = '';
 
-  await FirebaseFirestore.instance.collection(nomeColecao).where('nomePaciente', isEqualTo: nome).get().then((q) {
+  await FirebaseFirestore.instance.collection(nomeColecao).where('nomePaciente', isEqualTo: nome).where('dataProntuario', isEqualTo: dataProntuario).get().then((q) {
     if (q.docs.isNotEmpty) {
       id = q.docs[0].id;
     }
@@ -48,7 +48,7 @@ editarProntuario(context, uidFono, uidPaciente, nomePaciente, dataProntuario, ho
     'materiaisProntuario': materiaisProntuario,
     'resultadosProntuario': resultadosProntuario,
   };
-  String? idProntuario = await buscarIdProntuario(context, nomePaciente);
+  String? idProntuario = await buscarIdProntuario(context, nomePaciente, dataProntuario);
   await FirebaseFirestore.instance.collection(nomeColecao).doc(idProntuario).update(data);
   sucesso(context, 'O prontuário foi atualizado com sucesso.');
   Navigator.pop(context);

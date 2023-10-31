@@ -1,12 +1,11 @@
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../../widgets/mensagem.dart';
 import 'sharedPreference.dart';
 import 'fireCloudUser.dart';
+import '../widgets/mensagem.dart';
 
 idUsuario() {
-  return FirebaseAuth.instance.currentUser!.uid;
+  return FirebaseAuth.instance.currentUser?.uid;
 }
 
 criarConta(context, urlImage, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha) async {

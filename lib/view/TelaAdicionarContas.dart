@@ -71,6 +71,7 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
 
   @override
   Widget build(BuildContext context) {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: cores('corFundo'),
@@ -319,74 +320,67 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                       maxPalavras: 200, maxLinhas: 5, tamanho: 20.0),
                   const SizedBox(height: 40),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(
-                        width: 150,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                              foregroundColor: cores('corTextoBotao'),
-                              minimumSize: const Size(200, 45),
-                              backgroundColor: cores('corBotao'),
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(32),
-                              )),
-                          child: const Text(
-                            'Adicionar',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          onPressed: () {
-                            if (selecioneTipoTransacao.isNotEmpty &&
-                                estadoTipo.isNotEmpty &&
-                                txtNome.text.isNotEmpty &&
-                                txtPreco.text.isNotEmpty &&
-                                selecioneFormaPagamento.isNotEmpty &&
-                                selecioneQntdParcelas.isNotEmpty &&
-                                txtData.text.isNotEmpty &&
-                                horaCompra.isNotEmpty) {
-                              adicionarContas(
-                                  context,
-                                  listUID,
-                                  listPacientes,
-                                  idUsuario(),
-                                  selecioneTipoTransacao,
-                                  estadoTipo,
-                                  txtNome.text,
-                                  txtPreco.text,
-                                  selecioneFormaPagamento,
-                                  selecioneQntdParcelas,
-                                  txtData.text,
-                                  horaCompra,
-                                  txtDescricaoConta.text,
-                                  estadoPago,
-                                  estadoRecebido);
-                            } else {
-                              erro(context, 'Preencha os campos obrigatórios!');
-                            }
-                          },
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: cores('corTextoBotao'),
+                            backgroundColor: cores('corBotao'),
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            )),
+                        child: Text(
+                          'Adicionar',
+                          style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                         ),
+                        onPressed: () {
+                          if (selecioneTipoTransacao.isNotEmpty &&
+                              estadoTipo.isNotEmpty &&
+                              txtNome.text.isNotEmpty &&
+                              txtPreco.text.isNotEmpty &&
+                              selecioneFormaPagamento.isNotEmpty &&
+                              selecioneQntdParcelas.isNotEmpty &&
+                              txtData.text.isNotEmpty &&
+                              horaCompra.isNotEmpty) {
+                            adicionarContas(
+                                context,
+                                listUID,
+                                listPacientes,
+                                idUsuario(),
+                                selecioneTipoTransacao,
+                                estadoTipo,
+                                txtNome.text,
+                                txtPreco.text,
+                                selecioneFormaPagamento,
+                                selecioneQntdParcelas,
+                                txtData.text,
+                                horaCompra,
+                                txtDescricaoConta.text,
+                                estadoPago,
+                                estadoRecebido);
+                          } else {
+                            erro(context, 'Preencha os campos obrigatórios!');
+                          }
+                        },
                       ),
-                      Padding(padding: EdgeInsets.all(20)),
-                      SizedBox(
-                        width: 150,
-                        child: OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                              foregroundColor: cores('corTextoBotao'),
-                              minimumSize: const Size(200, 45),
-                              backgroundColor: cores('corBotao'),
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(32),
-                              )),
-                          child: const Text(
-                            'Cancelar',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
+                      SizedBox(width: 10),
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: cores('corTextoBotao'),
+                            backgroundColor: cores('corBotao'),
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            )),
+                        child: Text(
+                          'Cancelar',
+                          style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                         ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
                       ),
                     ],
                   ),
