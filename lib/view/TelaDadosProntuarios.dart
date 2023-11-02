@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../connections/fireCloudProntuarios.dart';
 import '../controllers/criarPDF.dart';
 import '../controllers/estilos.dart';
-import 'TelaPDF.dart';
 
 class TelaDadosProntuarios extends StatefulWidget {
   final String uidPaciente;
@@ -71,7 +71,14 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
           IconButton(
             icon: Icon(Icons.picture_as_pdf),
             onPressed: () async {
-              await savePdf();
+              List<String> dateParts = dataProntuario.split('/');
+              int day = int.parse(dateParts[0]);
+              int month = int.parse(dateParts[1]);
+              int year = int.parse(dateParts[2]);
+              DateTime dateTime = DateTime(year, month, day);
+              String novaDataString = DateFormat('dd.MM.yyyy').format(dateTime);
+              await createPDF('${nomeProntuario}_${novaDataString}', nomeProntuario, dataProntuario, horarioProntuario,
+                  objetivosProntuario, materiaisProntuario, resultadosProntuario);
             },
           ),
         ],

@@ -109,7 +109,7 @@ class _TelaAgendaState extends State<TelaAgenda> {
                       details.appointments!.isNotEmpty &&
                       _controller.view != CalendarView.month) {
                     Appointment tappedAppointment = details.appointments!.first;
-                    await Navigator.push(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => TelaAdicionarAgenda(

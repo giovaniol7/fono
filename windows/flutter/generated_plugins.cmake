@@ -9,8 +9,8 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_core
   firebase_storage
   flutter_localization
-  printing
   screen_retriever
+  syncfusion_pdfviewer_windows
   url_launcher_windows
   window_manager
 )

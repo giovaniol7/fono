@@ -21,6 +21,7 @@ class TelaDadosPacientes extends StatefulWidget {
 class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
   var paciente;
   late String nomeArquivo = '';
+  late String urlDocPaciente = '';
   late String uidPaciente = '';
   late String uidFono = '';
   late String dataInicioPaciente = '';
@@ -92,6 +93,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
       descricaoPaciente = paciente['descricaoPaciente'];
       qtdResponsavel = paciente['qtdResponsavel'];
       nomeArquivo = paciente['urlDocPaciente'] == '' ? '' : urlToString(paciente['urlDocPaciente']);
+      urlDocPaciente = paciente['urlDocPaciente'];
       ListGeneroResponsavelPaciente = paciente['listGeneroResponsavel'];
       ListNomeResponsavelPaciente = paciente['listNomeResponsavel'];
       ListIdadeResponsavelPaciente = paciente['listIdadeResponsavel'];
@@ -681,7 +683,8 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
                 onPressed: () async {
                   if (nomeArquivo.isNotEmpty) {
-                    await downloadDoc(context, nomeArquivo);
+                    //await downloadDoc(context, nomeArquivo);
+                    await launchUrl(Uri.parse(urlDocPaciente));
                   }
                 },
                 child: Text(

@@ -56,8 +56,9 @@ dependencies:
   window_manager: ^0.3.7
   pdf: ^3.10.4
   path_provider: ^2.1.1
-  printing: ^5.11.0
   file_picker: ^6.0.0
+  open_file: ^3.3.2
+  syncfusion_flutter_pdfviewer: ^23.1.43
 
 dev_dependencies:
   flutter_test:
