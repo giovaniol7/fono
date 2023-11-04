@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fono/controllers/calcularFinanceiro.dart';
-import 'package:fono/view/TelaAdicionarProntuarios.dart';
+import 'package:fonocare/controllers/calcularFinanceiro.dart';
+import 'package:fonocare/view/TelaAdicionarProntuarios.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 

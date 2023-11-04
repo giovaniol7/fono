@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fono/view/TelaAdicionarPaciente.dart';
-import 'package:fono/view/TelaDadosPacientes.dart';
+import 'package:fonocare/view/TelaAdicionarPaciente.dart';
+import 'package:fonocare/view/TelaDadosPacientes.dart';
 import '../controllers/estilos.dart';
 import '../view/TelaProntuariosPaciente.dart';
 

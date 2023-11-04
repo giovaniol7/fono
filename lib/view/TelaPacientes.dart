@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fono/connections/fireAuth.dart';
+import 'package:fonocare/connections/fireAuth.dart';
 
-import 'package:fono/view/TelaAdicionarPaciente.dart';
+import 'package:fonocare/view/TelaAdicionarPaciente.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -29,7 +29,6 @@ class _TelaPacientesState extends State<TelaPacientes> {
   carregarDados() async {
     List<String> lista = await fazerListaPacientes();
     pacientes = await recuperarTodosPacientes();
-
     setState(() {
       listaPaciente = lista;
     });
@@ -47,7 +46,10 @@ class _TelaPacientesState extends State<TelaPacientes> {
       appBar: AppBar(
         iconTheme: IconThemeData(color: cores('corSimbolo')),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, size: 30,),
+          icon: Icon(
+            Icons.arrow_back,
+            size: 30,
+          ),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -59,12 +61,13 @@ class _TelaPacientesState extends State<TelaPacientes> {
         backgroundColor: cores('corTerciaria'),
       ),
       body: SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
         child: Container(
           child: Column(
             children: [
               Padding(padding: EdgeInsets.only(top: 20)),
               TextFieldSuggestions(
-                  margem: EdgeInsets.only(top: 5, left: 24, bottom: 20, right: 24),
+                  margem: EdgeInsets.only(top: 5, left: 20, bottom: 5, right: 20),
                   list: listaPaciente,
                   labelText: _outroPaciente,
                   textSuggetionsColor: cores('corTexto'),
@@ -78,7 +81,7 @@ class _TelaPacientesState extends State<TelaPacientes> {
                   onTap: () {},
                   height: 200),
               Container(
-                height: MediaQuery.of(context).size.height,
+                height: MediaQuery.of(context).size.height * 0.75,
                 child: StreamBuilder<QuerySnapshot>(
                     stream: pacientes != null
                         ? (_paciente.isEmpty
@@ -101,9 +104,7 @@ class _TelaPacientesState extends State<TelaPacientes> {
                               padding: EdgeInsets.all(10),
                               scrollDirection: Axis.vertical,
                               itemBuilder: (context, index) => listarPaciente(context, dados.docs[index], 'pacientes'),
-                              separatorBuilder: (context, _) => SizedBox(
-                                    width: 1,
-                                  ),
+                              separatorBuilder: (context, _) => const SizedBox(height: 5),
                               itemCount: dados.size);
                       }
                     }),

@@ -69,11 +69,11 @@ void main() async {
     token = tokenSave.getString('token');
 
     runApp(MaterialApp(
-      localizationsDelegates: [
+      localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      supportedLocales: [
+      supportedLocales: const [
         Locale('en'),
         Locale('pt'),
         Locale('es'),

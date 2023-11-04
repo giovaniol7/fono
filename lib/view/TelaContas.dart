@@ -1,14 +1,14 @@
-import 'package:fono/connections/fireCloudContas.dart';
+import 'package:fonocare/connections/fireCloudContas.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fono/view/TelaAdicionarContas.dart';
+import 'package:fonocare/view/TelaAdicionarContas.dart';
 import '../controllers/calcularFinanceiro.dart';
 import '../controllers/converterData.dart';
 import '../controllers/estilos.dart';
-import 'package:fono/widgets/mensagem.dart';
+import 'package:fonocare/widgets/mensagem.dart';
 
 import '../controllers/formatarMesAno.dart';
 

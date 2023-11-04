@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fono/controllers/estilos.dart';
+import 'package:fonocare/controllers/estilos.dart';
 
 class TextFieldSuggestions extends StatefulWidget {
   final List<String> list;
@@ -74,7 +74,7 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
           return Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(color: cores('corPrimaria')),
+              border: Border.all(color: cores('corBorda')),
               color: cores('branco'),
               boxShadow: [
                 BoxShadow(
@@ -98,7 +98,7 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
               decoration: InputDecoration(
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: cores('corPrimaria'),
+                    color: cores('corBorda'),
                     width: 2.0,
                   ),
                 ),
@@ -147,7 +147,7 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
                   bottomLeft: Radius.circular(15),
                   bottomRight: Radius.circular(15),
                 ),
-                color: cores('branco'),
+                color: cores('corCaixaPadrao'),
                 child: SizedBox(
                   height: options.length == 1
                       ? 85
@@ -195,10 +195,23 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
     List<String> words = text.toLowerCase().split(' ');
     List<String> capitalizedWords = [];
 
-    if (text.isNotEmpty) {
-      for (String word in words) {
-        String capitalizedWord = word[0].toUpperCase() + word.substring(1);
-        capitalizedWords.add(capitalizedWord);
+    for (String word in words) {
+      if (word.isNotEmpty) {
+        if (word == "da" ||
+            word == "de" ||
+            word == "di" ||
+            word == "do" ||
+            word == "du" ||
+            word == "das" ||
+            word == "des" ||
+            word == "dis" ||
+            word == "dos" ||
+            word == "dus") {
+          capitalizedWords.add(word);
+        } else {
+          String capitalizedWord = word[0].toUpperCase() + word.substring(1);
+          capitalizedWords.add(capitalizedWord);
+        }
       }
     }
 

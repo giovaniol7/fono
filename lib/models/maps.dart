@@ -4,6 +4,15 @@ import '../connections/fireCloudConsultas.dart';
 
 enum Gender { male, female }
 
+String limparTelefone(String telefone) {
+  RegExp regex = RegExp(r'\d+');
+  Iterable<Match> matches = regex.allMatches(telefone);
+
+  String resultado = matches.map((match) => match.group(0)!).join();
+
+  return resultado;
+}
+
 Gender? stringToGender(String genderString) {
   if (genderString == 'Gender.male') {
     return Gender.male;

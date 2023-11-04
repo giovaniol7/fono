@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fono/view/TelaAdicionarAgenda.dart';
+import 'package:fonocare/view/TelaAdicionarAgenda.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../connections/fireCloudConsultas.dart';
@@ -17,8 +17,6 @@ class TelaAgenda extends StatefulWidget {
 class _TelaAgendaState extends State<TelaAgenda> {
   CalendarController _controller = CalendarController();
   late Future<List<Appointment>> _futureAppointments;
-  List<Appointment> appointments = [];
-  var consultas;
 
   Future<void> atualizarDados() async {
     setState(() {
@@ -34,7 +32,6 @@ class _TelaAgendaState extends State<TelaAgenda> {
 
   @override
   Widget build(BuildContext context) {
-    TamanhoWidgets tamanhoWidgets = TamanhoWidgets();
     TamanhoFonte tamanhoFonte = TamanhoFonte();
 
     return Scaffold(
@@ -91,9 +88,17 @@ class _TelaAgendaState extends State<TelaAgenda> {
                     backgroundColor: cores('corFundo')),
                 headerDateFormat: 'MMMM y',
                 todayHighlightColor: cores('corTexto'),
-                view: CalendarView.week,
+                timeSlotViewSettings: TimeSlotViewSettings(
+                  nonWorkingDays: <int>[DateTime.saturday, DateTime.sunday],
+                  timeInterval: Duration(minutes: 30),
+                  startHour: 07,
+                  endHour: 20,
+                  timeFormat: 'HH:mm',
+                ),
+                view: CalendarView.workWeek,
                 allowedViews: [
                   CalendarView.day,
+                  CalendarView.workWeek,
                   CalendarView.week,
                   CalendarView.month,
                 ],
@@ -104,7 +109,7 @@ class _TelaAgendaState extends State<TelaAgenda> {
                     shape: BoxShape.rectangle),
                 controller: _controller,
                 firstDayOfWeek: 7,
-                onTap: (CalendarTapDetails details) async {
+                onTap: (CalendarTapDetails details) {
                   if (details.appointments != null &&
                       details.appointments!.isNotEmpty &&
                       _controller.view != CalendarView.month) {
@@ -118,22 +123,8 @@ class _TelaAgendaState extends State<TelaAgenda> {
                         ),
                       ),
                     );
-                  } /*else if (details.targetElement == CalendarElement.agenda) {
-                    Appointment tappedAppointment = details.appointments!.first;
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            TelaEditarAgenda(
-                              idUsuario(),
-                              tappedAppointment,
-                            ),
-                      ),
-                    );
-                    setState(() {
-                      _futureAppointments = getAppointmentsFromFirestore();
-                    });
-                  }*/
+                  }
+                  atualizarDados();
                 },
                 dataSource: MeetingDataSource(_futureAppointments),
                 monthViewSettings: MonthViewSettings(showAgenda: true),
@@ -143,7 +134,7 @@ class _TelaAgendaState extends State<TelaAgenda> {
       ),
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
-        onPressed: () async {
+        onPressed: () {
           Appointment tappedAppointment = Appointment(
             startTime: DateTime.now(),
             endTime: DateTime.now(),

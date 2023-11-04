@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fono/view/TelaAgenda.dart';
-import 'package:fono/view/TelaContas.dart';
-import 'package:fono/view/TelaEditarPerfil.dart';
-import 'package:fono/view/TelaPacientes.dart';
-import 'package:fono/view/TelaProntuarios.dart';
+import 'package:fonocare/view/TelaAgenda.dart';
+import 'package:fonocare/view/TelaContas.dart';
+import 'package:fonocare/view/TelaEditarPerfil.dart';
+import 'package:fonocare/view/TelaPacientes.dart';
+import 'package:fonocare/view/TelaProntuarios.dart';
 
 import '../connections/fireAuth.dart';
 import '../controllers/estilos.dart';
@@ -20,8 +20,6 @@ class DrawerNavigation extends StatefulWidget {
 }
 
 class _DrawerNavigationState extends State<DrawerNavigation> {
-  double tamanhoLetra = 18;
-
   String corTexto = 'corTexto';
   String corSimbolo = 'corSimbolo';
   String corLinha = 'verde';
@@ -47,10 +45,13 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
   }
 
   menuHeader() {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+    double tamanhoLetra = tamanhoFonte.letraPequena(context);
+
     return Container(
       alignment: Alignment.center,
       color: cores('corFundo'),
-      padding: EdgeInsets.symmetric(vertical: 35),
+      padding: EdgeInsets.symmetric(vertical: 20),
       child: Row(
         children: [
           CircleAvatar(
@@ -64,26 +65,28 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
           SizedBox(
             width: 20,
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Text(
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
                   widget.nomeUsuario.toString(),
                   style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
                 ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                widget.genero == 'Gender.male' ? 'Fonoaudiólogo' : 'Fonoaudióloga',
-                style: TextStyle(
-                  color: cores(corTexto),
-                  fontSize: 16,
+                SizedBox(
+                  height: 10,
                 ),
-              ),
-            ],
+                Text(
+                  widget.genero == 'Gender.male' ? 'Fonoaudiólogo' : 'Fonoaudióloga',
+                  style: TextStyle(
+                    color: cores(corTexto),
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -91,6 +94,9 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
   }
 
   menuItens() {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+    double tamanhoLetra = tamanhoFonte.letraPequena(context);
+
     return Container(
       padding: EdgeInsets.all(10),
       child: Wrap(

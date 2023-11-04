@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fono/controllers/uploadDoc.dart';
+import 'package:fonocare/controllers/uploadDoc.dart';
 
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -24,15 +24,19 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
   late String urlDocPaciente = '';
   late String uidPaciente = '';
   late String uidFono = '';
-  late String dataInicioPaciente = '';
+  late String dataAnamnesePaciente = '';
   late String urlImagePaciente = '';
   late String nomePaciente = '';
   late String dtNascimentoPaciente = '';
   late String CPFPaciente = '';
   late String RGPaciente = '';
   late String idadePaciente = '';
-  late String telefonePaciente = '';
   late String generoPaciente = '';
+  late String escolaPaciente = '';
+  late String escolaridadePaciente = '';
+  late String periodoEscolaPaciente = '';
+  late String professoraPaciente = '';
+  late String telefoneProfessoraPaciente = '';
   late String lougradouroPaciente = '';
   late String numeroPaciente = '';
   late String bairroPaciente = '';
@@ -41,10 +45,6 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
   late String cepPaciente = '';
   late String tipoConsultaPaciente = '';
   late String descricaoPaciente = '';
-  late String professoraPaciente = '';
-  late String telefoneProfessoraPaciente = '';
-  late String escolaridadePaciente = '';
-  late String periodoEscolaPaciente = '';
 
   late List<Gender?> ListGeneroResponsavelPaciente = [];
   late List<String> ListNomeResponsavelPaciente = [];
@@ -67,11 +67,11 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
     paciente = await recuperarPaciente(context, widget.uidPaciente);
 
     setState(() {
-      dataInicioPaciente = DateFormat('dd/MM/yyyy').format(dataAtual);
+      dataAnamnesePaciente = DateFormat('dd/MM/yyyy').format(dataAtual);
 
       uidPaciente = paciente['uidPaciente'];
       uidFono = paciente['uidFono'];
-      dataInicioPaciente = paciente['dataInicioPaciente'];
+      dataAnamnesePaciente = paciente['dataAnamnesePaciente'];
       urlImagePaciente = paciente['urlImagePaciente'];
       nomePaciente = paciente['nomePaciente'];
       dtNascimentoPaciente = paciente['dtNascimentoPaciente'];
@@ -79,6 +79,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
       RGPaciente = paciente['RGPaciente'];
       idadePaciente = calcularIdadeMeses(dtNascimentoPaciente);
       generoPaciente = genderToString(paciente['generoPaciente']);
+      escolaPaciente = paciente['escolaPaciente'];
       escolaridadePaciente = paciente['escolaridadePaciente'];
       periodoEscolaPaciente = paciente['periodoEscolaPaciente'];
       professoraPaciente = paciente['professoraPaciente'];
@@ -178,7 +179,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
         children: <Widget>[
           Center(
             child: Text(
-              'Data de Início: $dataInicioPaciente',
+              'Data de Anamnese: $dataAnamnesePaciente',
               style: TextStyle(
                   fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
             ),
@@ -280,7 +281,8 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 Expanded(
                   child: GestureDetector(
                     onTap: () async {
-                      final Uri url = Uri.parse("whatsapp://send?phone=+55$ListTelefoneResponsavelPaciente[index]");
+                      String telRespLimp = limparTelefone(ListTelefoneResponsavelPaciente[index]);
+                      final Uri url = Uri.parse("https://wa.me/+55$telRespLimp");
                       if (!await launchUrl(url)) throw 'Could not launch $url';
                     },
                     child: Column(
@@ -365,6 +367,25 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 Text(
+                  'Escola: ',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: cores('corTexto'),
+                      fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+                Expanded(
+                  child: Text(
+                    escolaPaciente,
+                    style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 5),
+            Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text(
                   'Escolaridade: ',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -424,7 +445,8 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
                 InkWell(
                   onTap: () async {
-                    final Uri url = Uri.parse("whatsapp://send?phone=+55$ListTelefoneResponsavelPaciente[index]");
+                    String telProfLimp = limparTelefone(telefoneProfessoraPaciente);
+                    final Uri url = Uri.parse("https://wa.me/+55$telProfLimp");
                     if (!await launchUrl(url)) throw 'Could not launch $url';
                   },
                   child: Text(
@@ -495,6 +517,28 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
       responsaveisWidgets.add(
         Column(
           children: [
+            Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text(
+                  'Grau Responsável: ',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: cores('corTexto'),
+                      fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+                Expanded(
+                  child: Text(
+                    ListRelacaoResponsavelPaciente.isEmpty ? '' : ListRelacaoResponsavelPaciente[index],
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 5),
             Row(
               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[

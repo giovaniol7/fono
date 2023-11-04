@@ -18,7 +18,7 @@ Future<String> buscarIdPaciente(context, nome) async {
 
   await FirebaseFirestore.instance.collection(nomeColecao).where('nomePaciente', isEqualTo: nome).get().then((q) {
     if (q.docs.isNotEmpty) {
-      id = q.docs[0].id;
+      id = q.docs[0].data()['uidPaciente'];
     }
   });
 
@@ -54,13 +54,14 @@ Future<List<String>> fazerListaUIDPacientes() async {
 adicionarPaciente(
     context,
     uidFono,
-    dataInicioPaciente,
-    urlImage,
+    urlImagePaciente,
+    dataAnamnesePaciente,
     nomePaciente,
     dataNascimentoPaciente,
     CPFPaciente,
     RGPaciente,
     generoPaciente,
+    escolaPaciente,
     escolaridadePaciente,
     periodoEscolaPaciente,
     professoraPaciente,
@@ -87,13 +88,14 @@ adicionarPaciente(
   String uidPaciente = '';
   Map<String, dynamic> data = {
     'uidFono': uidFono,
-    'dataInicioPaciente': dataInicioPaciente,
-    'urlImagePaciente': urlImage,
+    'urlImagePaciente': urlImagePaciente,
+    'dataAnamnesePaciente': dataAnamnesePaciente,
     'nomePaciente': nomePaciente,
     'dtNascimentoPaciente': dataNascimentoPaciente,
     'CPFPaciente': CPFPaciente,
     'RGPaciente': RGPaciente,
     'generoPaciente': generoPaciente,
+    'escolaPaciente': escolaPaciente,
     'escolaridadePaciente': escolaridadePaciente,
     'periodoEscolaPaciente': periodoEscolaPaciente,
     'professoraPaciente': professoraPaciente,
@@ -135,13 +137,14 @@ editarPaciente(
     context,
     uidFono,
     uidPaciente,
-    dataInicioPaciente,
-    urlImage,
+    urlImagePaciente,
+    dataAnamnesePaciente,
     nomePaciente,
     dataNascimentoPaciente,
     CPFPaciente,
     RGPaciente,
     generoPaciente,
+    escolaPaciente,
     escolaridadePaciente,
     periodoEscolaPaciente,
     professoraPaciente,
@@ -166,13 +169,14 @@ editarPaciente(
   String? urlDocPaciente = fileDoc != null ? await uploadDocToFirebase(fileDoc) : '';
   Map<String, dynamic> data = {
     'uidFono': uidFono,
-    'dataInicioPaciente': dataInicioPaciente,
-    'urlImagePaciente': urlImage,
+    'urlImagePaciente': urlImagePaciente,
+    'dataAnamnesePaciente': dataAnamnesePaciente,
     'nomePaciente': nomePaciente,
     'dtNascimentoPaciente': dataNascimentoPaciente,
     'CPFPaciente': CPFPaciente,
     'RGPaciente': RGPaciente,
     'generoPaciente': generoPaciente,
+    'escolaPaciente': escolaPaciente,
     'escolaridadePaciente': escolaridadePaciente,
     'periodoEscolaPaciente': periodoEscolaPaciente,
     'professoraPaciente': professoraPaciente,
@@ -185,7 +189,7 @@ editarPaciente(
     'cepPaciente': cepPaciente,
     'tipoConsultaPaciente': tipoConsultaPaciente,
     'descricaoPaciente': descricaoPaciente,
-    'qtdResponsavel': qtdResponsavel + 1,
+    'qtdResponsavel': qtdResponsavel,
     'urlDocPaciente': urlDocPaciente
   };
   for (int i = 0; i < listGeneroResponsavel.length; i++) {
@@ -215,13 +219,14 @@ apagarPaciente(context, id) async {
 recuperarPaciente(context, uid) async {
   String uidPaciente = '';
   String uidFono = '';
-  String dataInicioPaciente = '';
   String urlImagePaciente = '';
+  String dataAnamnesePaciente = '';
   String nomePaciente = '';
   String dtNascimentoPaciente = '';
   String CPFPaciente = '';
   String RGPaciente = '';
   Gender? generoPaciente;
+  String escolaPaciente = '';
   String escolaridadePaciente = '';
   String periodoEscolaPaciente = '';
   String professoraPaciente = '';
@@ -250,13 +255,14 @@ recuperarPaciente(context, uid) async {
     if (q.docs.isNotEmpty) {
       uidPaciente = q.docs[0].id;
       uidFono = q.docs[0].data()['uidFono'];
-      dataInicioPaciente = q.docs[0].data()['dataInicioPaciente'];
       urlImagePaciente = q.docs[0].data()['urlImagePaciente'];
+      dataAnamnesePaciente = q.docs[0].data()['dataAnamnesePaciente'];
       nomePaciente = q.docs[0].data()['nomePaciente'];
       dtNascimentoPaciente = q.docs[0].data()['dtNascimentoPaciente'];
       CPFPaciente = q.docs[0].data()['CPFPaciente'];
       RGPaciente = q.docs[0].data()['RGPaciente'];
       generoPaciente = stringToGender(q.docs[0].data()['generoPaciente']);
+      escolaPaciente = q.docs[0].data()['escolaPaciente'];
       escolaridadePaciente = q.docs[0].data()['escolaridadePaciente'];
       periodoEscolaPaciente = q.docs[0].data()['periodoEscolaPaciente'];
       professoraPaciente = q.docs[0].data()['professoraPaciente'];
@@ -286,13 +292,14 @@ recuperarPaciente(context, uid) async {
   paciente = {
     'uidPaciente': uidPaciente,
     'uidFono': uidFono,
-    'dataInicioPaciente': dataInicioPaciente,
+    'dataAnamnesePaciente': dataAnamnesePaciente,
     'urlImagePaciente': urlImagePaciente,
     'nomePaciente': nomePaciente,
     'dtNascimentoPaciente': dtNascimentoPaciente,
     'CPFPaciente': CPFPaciente,
     'RGPaciente': RGPaciente,
     'generoPaciente': generoPaciente,
+    'escolaPaciente': escolaPaciente,
     'escolaridadePaciente': escolaridadePaciente,
     'periodoEscolaPaciente': periodoEscolaPaciente,
     'professoraPaciente': professoraPaciente,
@@ -322,13 +329,14 @@ recuperarPaciente(context, uid) async {
 recuperarPacientePorNome(context, nome) async {
   String uidPaciente = '';
   String uidFono = '';
-  String dataInicioPaciente = '';
   String urlImagePaciente = '';
+  String dataAnamnesePaciente = '';
   String nomePaciente = '';
   String dtNascimentoPaciente = '';
   String CPFPaciente = '';
   String RGPaciente = '';
   Gender? generoPaciente;
+  String escolaPaciente = '';
   String escolaridadePaciente = '';
   String periodoEscolaPaciente = '';
   String professoraPaciente = '';
@@ -357,13 +365,14 @@ recuperarPacientePorNome(context, nome) async {
     if (q.docs.isNotEmpty) {
       uidPaciente = q.docs[0].id;
       uidFono = q.docs[0].data()['uidFono'];
-      dataInicioPaciente = q.docs[0].data()['dataInicioPaciente'];
       urlImagePaciente = q.docs[0].data()['urlImagePaciente'];
+      dataAnamnesePaciente = q.docs[0].data()['dataAnamnesePaciente'];
       nomePaciente = q.docs[0].data()['nomePaciente'];
       dtNascimentoPaciente = q.docs[0].data()['dtNascimentoPaciente'];
       CPFPaciente = q.docs[0].data()['CPFPaciente'];
       RGPaciente = q.docs[0].data()['RGPaciente'];
       generoPaciente = stringToGender(q.docs[0].data()['generoPaciente']);
+      escolaPaciente = q.docs[0].data()['escolaPaciente'];
       escolaridadePaciente = q.docs[0].data()['escolaridadePaciente'];
       periodoEscolaPaciente = q.docs[0].data()['periodoEscolaPaciente'];
       professoraPaciente = q.docs[0].data()['professoraPaciente'];
@@ -393,13 +402,14 @@ recuperarPacientePorNome(context, nome) async {
   paciente = {
     'uidPaciente': uidPaciente,
     'uidFono': uidFono,
-    'dataInicioPaciente': dataInicioPaciente,
     'urlImagePaciente': urlImagePaciente,
+    'dataAnamnesePaciente': dataAnamnesePaciente,
     'nomePaciente': nomePaciente,
     'dtNascimentoPaciente': dtNascimentoPaciente,
     'CPFPaciente': CPFPaciente,
     'RGPaciente': RGPaciente,
     'generoPaciente': generoPaciente,
+    'escolaPaciente': escolaPaciente,
     'escolaridadePaciente': escolaridadePaciente,
     'periodoEscolaPaciente': periodoEscolaPaciente,
     'professoraPaciente': professoraPaciente,

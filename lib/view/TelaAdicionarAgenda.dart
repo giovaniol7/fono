@@ -36,6 +36,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
   String _paciente = '';
   List<String> listaPaciente = [];
   var nome;
+  var horario;
   var id;
   var uidPaciente;
   var appointment;
@@ -49,7 +50,9 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
     List<String> lista = await fazerListaPacientes();
     widget.tipo == 'editar' ? appointment = await carregarAppointment(widget.appointment) : null;
     nome = widget.appointment.subject;
-    consulta = await buscarPorNomeConsultas(context, nome);
+    horario = widget.appointment.startTime;
+    consulta = await buscarPorNomeHoraConsultas(context, nome, horario);
+    //String uidPac = await buscarIdPaciente(context, nome);
 
     setState(() {
       listaPaciente = lista;

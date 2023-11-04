@@ -1,10 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:fono/connections/fireAuth.dart';
+import 'package:fonocare/connections/fireAuth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import 'package:intl/intl.dart';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:search_cep/search_cep.dart';
@@ -36,20 +35,21 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   var apagarImagem;
   var uidPaciente = '';
   var uidFono = '';
-  var dataInicioPaciente = '';
+  var txtDataAnamnesePaciente = TextEditingController();
   var urlImagePaciente = '';
   var txtNomePaciente = TextEditingController();
   var txtDataNascimentoPaciente = TextEditingController();
   var txtCPFPaciente = TextEditingController();
   var txtRGPaciente = TextEditingController();
+  var txtEscolaPaciente = TextEditingController();
+  var txtProfessoraPaciente = TextEditingController();
+  var txtTelefoneProfessoraPaciente = TextEditingController();
   var txtLogradouroPaciente = TextEditingController();
   var txtNumeroPaciente = TextEditingController();
   var txtBairroPaciente = TextEditingController();
   var txtCidadePaciente = TextEditingController();
   var txtCEPPaciente = TextEditingController();
   var txtDescricaoPaciente = TextEditingController();
-  var txtProfessoraPaciente = TextEditingController();
-  var txtTelefoneProfessoraPaciente = TextEditingController();
   String selecioneEscolaridadePaciente = 'Berçário';
   String selecioneTipoConsultaPaciente = 'Convênio';
   String selecionePeriodoEscolaPaciente = 'Manhã';
@@ -66,8 +66,6 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   int indexResponsavel = 0;
   int qtdResponsavel = 0;
 
-  DateTime dataAtual = DateTime.now();
-
   Future<void> atualizarDados() async {
     await carregarDados();
   }
@@ -76,18 +74,17 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
     widget.tipo == 'editar' ? paciente = await recuperarPaciente(context, widget.uid) : null;
 
     setState(() {
-      dataInicioPaciente = DateFormat('dd/MM/yyyy').format(dataAtual);
-
       if (widget.tipo == 'editar') {
         uidPaciente = paciente['uidPaciente'];
         uidFono = paciente['uidFono'];
-        dataInicioPaciente = paciente['dataInicioPaciente'];
+        txtDataAnamnesePaciente.text = paciente['dataAnamnesePaciente'];
         urlImagePaciente = paciente['urlImagePaciente'];
         txtNomePaciente.text = paciente['nomePaciente'];
         txtDataNascimentoPaciente.text = paciente['dtNascimentoPaciente'];
         txtCPFPaciente.text = paciente['CPFPaciente'];
         txtRGPaciente.text = paciente['RGPaciente'];
         _selectedGeneroPaciente = paciente['generoPaciente'];
+        txtEscolaPaciente.text = paciente['escolaPaciente'];
         selecioneEscolaridadePaciente = paciente['escolaridadePaciente'];
         selecionePeriodoEscolaPaciente = paciente['periodoEscolaPaciente'];
         txtProfessoraPaciente.text = paciente['professoraPaciente'];
@@ -247,14 +244,6 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                         ]),
                 ),
               ),
-              const Padding(padding: EdgeInsets.only(top: 10)),
-              Text(
-                'Data: $dataInicioPaciente',
-                style: TextStyle(
-                    fontSize: tamanhoFonte.letraPequena(context),
-                    color: cores('corTexto'),
-                    fontWeight: FontWeight.bold),
-              ),
             ],
           ),
         ),
@@ -269,308 +258,8 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          campoTexto('Nome', txtNomePaciente, Icons.label),
-          const SizedBox(height: 20),
-          campoTexto('Data de Nascimento', txtDataNascimentoPaciente, Icons.calendar_month_outlined,
-              formato: DataInputFormatter(), numeros: true),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child:
-                    campoTexto('CPF', txtCPFPaciente, Icons.credit_card, formato: CpfInputFormatter(), numeros: true),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: campoTexto('RG', txtRGPaciente, Icons.credit_card,
-                    formato: MaskTextInputFormatter(
-                      mask: '##.###.###-#',
-                      filter: {"#": RegExp(r'[0-9]')},
-                    ),
-                    numeros: true),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'Sexo:',
-            style: TextStyle(
-                fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: RadioListTile<Gender>(
-                  title: Text(
-                    'Masculino',
-                    style: TextStyle(color: cores('corTexto')),
-                  ),
-                  value: Gender.male,
-                  groupValue: _selectedGeneroPaciente,
-                  activeColor: cores('corSimbolo'),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedGeneroPaciente = value;
-                    });
-                  },
-                ),
-              ),
-              Expanded(
-                child: RadioListTile<Gender>(
-                  title: Text(
-                    'Feminino',
-                    style: TextStyle(color: cores('corTexto')),
-                  ),
-                  value: Gender.female,
-                  groupValue: _selectedGeneroPaciente,
-                  activeColor: cores('corSimbolo'),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedGeneroPaciente = value;
-                    });
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  children: [
-                    Text(
-                      'Escolaridade: ',
-                      style: TextStyle(
-                          fontSize: tamanhoFonte.letraPequena(context),
-                          color: cores('corTexto'),
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.only(left: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(color: cores('corBorda')),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
-                            // changes position of shadow
-                          ]),
-                      child: DropdownButton(
-                        hint: Text(
-                          'Escolaridade: ',
-                          style: TextStyle(color: cores('corTexto')),
-                        ),
-                        icon: Icon(
-                          Icons.arrow_drop_down,
-                          color: cores('corTexto'),
-                        ),
-                        iconSize: 30,
-                        iconEnabledColor: cores('corTexto'),
-                        style: TextStyle(
-                          color: cores('corTexto'),
-                          fontWeight: FontWeight.w400,
-                          fontSize: tamanhoFonte.letraPequena(context),
-                        ),
-                        underline: Container(
-                          height: 0,
-                        ),
-                        isExpanded: true,
-                        value: selecioneEscolaridadePaciente,
-                        onChanged: (newValue) {
-                          setState(() {
-                            selecioneEscolaridadePaciente = newValue!;
-                          });
-                        },
-                        items: escolaridade.map((state) {
-                          return DropdownMenuItem(
-                            value: state,
-                            child: Text(state),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  children: [
-                    Text(
-                      'Selecione o Período:',
-                      style: TextStyle(
-                          fontSize: tamanhoFonte.letraPequena(context),
-                          color: cores('corTexto'),
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.only(left: 10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.0),
-                          border: Border.all(color: cores('corBorda')),
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
-                            // changes position of shadow
-                          ]),
-                      child: DropdownButton<String>(
-                        icon: const Icon(Icons.arrow_drop_down),
-                        iconSize: 30,
-                        iconEnabledColor: cores('corTexto'),
-                        style: TextStyle(
-                          color: cores('corTexto'),
-                          fontWeight: FontWeight.w400,
-                          fontSize: tamanhoFonte.letraPequena(context),
-                        ),
-                        underline: Container(
-                          height: 0,
-                        ),
-                        isExpanded: true,
-                        hint: const Text('Selecione uma Opção'),
-                        value: selecionePeriodoEscolaPaciente,
-                        items: [
-                          DropdownMenuItem(
-                            value: 'Manhã',
-                            child: Text(
-                              'Manhã',
-                              style: TextStyle(color: cores('corTexto')),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'Tarde',
-                            child: Text(
-                              'Tarde',
-                              style: TextStyle(color: cores('corTexto')),
-                            ),
-                          ),
-                          DropdownMenuItem(
-                            value: 'Integral',
-                            child: Text(
-                              'Integral',
-                              style: TextStyle(color: cores('corTexto')),
-                            ),
-                          ),
-                        ],
-                        onChanged: (value) {
-                          setState(() {
-                            selecionePeriodoEscolaPaciente = value!;
-                          });
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(child: campoTexto('Professora', txtProfessoraPaciente, FontAwesomeIcons.personChalkboard)),
-              const SizedBox(width: 10),
-              Expanded(
-                  child: campoTexto('Telefone Professora', txtTelefoneProfessoraPaciente, Icons.phone,
-                      formato: TelefoneInputFormatter(), numeros: true)),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: campoTexto('CEP', txtCEPPaciente, Icons.mail, formato: CepInputFormatter(), numeros: true,
-                    onchaged: (value) async {
-                  var cepSemFormatacao = value.replaceAll(RegExp(r'[^0-9]'), '');
-                  var viaCepSearchCep = ViaCepSearchCep();
-                  var result = await viaCepSearchCep.searchInfoByCep(cep: cepSemFormatacao);
-                  result.fold(
-                    (error) {
-                      print('Ocorreu um erro ao buscar as informações do CEP: $error');
-                    },
-                    (viaCepInfo) {
-                      setState(() {
-                        String? localidade = viaCepInfo.localidade;
-                        String? estado = viaCepInfo.uf;
-                        txtCidadePaciente.text = localidade!;
-                        selecioneEstadoPaciente = estado!;
-                      });
-                    },
-                  );
-                }),
-              ),
-              const Padding(padding: EdgeInsets.only(right: 10)),
-              Expanded(
-                  child: Column(
-                children: [
-                  Text(
-                    'Selecione um Estado:',
-                    style: TextStyle(
-                        fontSize: tamanhoFonte.letraPequena(context),
-                        color: cores('corTexto'),
-                        fontWeight: FontWeight.bold),
-                  ),
-                  Container(
-                    height: 40,
-                    padding: const EdgeInsets.only(left: 10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(color: cores('corBorda')),
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 7)
-                          // changes position of shadow
-                        ]),
-                    child: DropdownButton(
-                      hint: Text(
-                        'Selecione um Estado',
-                        style: TextStyle(color: cores('corTexto')),
-                      ),
-                      icon: Icon(
-                        Icons.arrow_drop_down,
-                        color: cores('corTexto'),
-                      ),
-                      iconSize: 30,
-                      iconEnabledColor: cores('corTexto'),
-                      style: TextStyle(
-                        color: cores('corTexto'),
-                        fontWeight: FontWeight.w400,
-                        fontSize: tamanhoFonte.letraPequena(context),
-                      ),
-                      underline: Container(
-                        height: 0,
-                      ),
-                      isExpanded: true,
-                      value: selecioneEstadoPaciente,
-                      onChanged: (newValue) {
-                        setState(() {
-                          selecioneEstadoPaciente = newValue!;
-                        });
-                      },
-                      items: estados.map((state) {
-                        return DropdownMenuItem(
-                          value: state,
-                          child: Text(state),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ))
-            ],
-          ),
-          const SizedBox(height: 20),
-          campoTexto('Logradouro', txtLogradouroPaciente, Icons.location_on),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(child: campoTexto('Número', txtNumeroPaciente, Icons.home, numeros: true)),
-              const Padding(padding: EdgeInsets.only(right: 10)),
-              Expanded(child: campoTexto('Bairro', txtBairroPaciente, Icons.maps_home_work))
-            ],
-          ),
-          const SizedBox(height: 20),
-          campoTexto('Cidade', txtCidadePaciente, Icons.location_city),
-          const SizedBox(height: 20),
+          containerDadosPaciente(),
+          containerDadosEndereco(),
           Text(
             'Selecione o tipo de Consulta:',
             style: TextStyle(
@@ -625,264 +314,614 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
             ),
           ),
           const SizedBox(height: 20),
-          campoTexto('Descrição', txtDescricaoPaciente, Icons.description,
+          campoTexto('Descrição/Queixa', txtDescricaoPaciente, Icons.description,
               maxPalavras: 200, maxLinhas: 5, tamanho: 20.0),
-          Divider(
-            thickness: 2,
-            height: 50,
-            color: cores('corTexto'),
-          ),
-          Text(
-            'Dados dos Responsáveis:',
-            style: TextStyle(
-                fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold),
-          ),
-          //------------------------------------------------------------------------------
-          columnResponsavel(),
-          const SizedBox(height: 20),
-          indexResponsavel < 1
-              ? SizedBox(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                        foregroundColor: cores('corTextoBotao'),
-                        minimumSize: const Size(45, 45),
-                        backgroundColor: cores('corBotao'),
-                        elevation: 5,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(32),
-                        )),
-                    child: const Icon(Icons.add),
-                    onPressed: () {
-                      if (ListGeneroResponsavelPaciente[indexResponsavel] != null &&
-                          ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                          ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                          ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                          ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                          ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty) {
-                        widget.tipo == 'adicionar'
-                            ? setState(() {
-                                ListGeneroResponsavelPaciente.add(null);
-                                ListNomeResponsavelPaciente.add(TextEditingController());
-                                ListIdadeResponsavelPaciente.add(TextEditingController());
-                                ListTelefoneResponsavelPaciente.add(TextEditingController());
-                                ListRelacaoResponsavelPaciente.add('Mãe');
-                                ListEscolaridadeResponsavelPaciente.add(TextEditingController());
-                                ListProfissaoResponsavelPaciente.add(TextEditingController());
-                                indexResponsavel++;
-                              })
-                            : setState(() {
-                                indexResponsavel + 1 < qtdResponsavel ? indexResponsavel++ : null;
-                              });
-                      } else {
-                        erro(context, 'Preencha os campos obrigatórios!');
-                      }
-                    },
+          containerResponsavel(),
+          containerAnexo(),
+          rowBotao(),
+          const SizedBox(height: 60),
+        ],
+      ),
+    );
+  }
+
+  containerDadosPaciente() {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+
+    return Column(
+      children: [
+        campoTexto('Data Anamnese', txtDataAnamnesePaciente, Icons.calendar_today,
+            formato: DataInputFormatter(), numeros: true),
+        const SizedBox(height: 20),
+        campoTexto('Nome', txtNomePaciente, Icons.label),
+        const SizedBox(height: 20),
+        campoTexto('Data de Nascimento', txtDataNascimentoPaciente, Icons.calendar_month_outlined,
+            formato: DataInputFormatter(), numeros: true),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(
+              child: campoTexto('CPF', txtCPFPaciente, Icons.credit_card, formato: CpfInputFormatter(), numeros: true),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: campoTexto('RG', txtRGPaciente, Icons.credit_card,
+                  formato: MaskTextInputFormatter(
+                    mask: '##.###.###-#',
+                    filter: {"#": RegExp(r'[0-9]')},
                   ),
-                )
-              : SizedBox(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                        foregroundColor: cores('corTextoBotao'),
-                        minimumSize: const Size(45, 45),
-                        backgroundColor: Colors.grey,
-                        elevation: 5,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(32),
-                        )),
-                    child: const Icon(Icons.add),
-                    onPressed: () {},
-                  ),
+                  numeros: true),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Text(
+          'Sexo:',
+          style: TextStyle(
+              fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: RadioListTile<Gender>(
+                title: Text(
+                  'Masculino',
+                  style: TextStyle(color: cores('corTexto')),
                 ),
-          Divider(
-            thickness: 2,
-            height: 50,
-            color: cores('corTexto'),
-          ),
-          Center(
-            child: ElevatedButton(
-              style: ButtonStyle(
-                shadowColor: MaterialStatePropertyAll(cores('corSombra')),
-                backgroundColor: MaterialStatePropertyAll(cores('corDetalhe')),
-              ),
-              onPressed: () async {
-                fileDoc = await pickDocument();
-                setState(() {
-                  nomeArquivo = ph.basename(fileDoc!.path);
-                });
-              },
-              child: Text(
-                nomeArquivo.isEmpty ? 'Anexar Documento' : nomeArquivo,
-                style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                value: Gender.male,
+                groupValue: _selectedGeneroPaciente,
+                activeColor: cores('corSimbolo'),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedGeneroPaciente = value;
+                  });
+                },
               ),
             ),
-          ),
-          Divider(
-            thickness: 2,
-            height: 50,
-            color: cores('corTexto'),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              OutlinedButton(
+            Expanded(
+              child: RadioListTile<Gender>(
+                title: Text(
+                  'Feminino',
+                  style: TextStyle(color: cores('corTexto')),
+                ),
+                value: Gender.female,
+                groupValue: _selectedGeneroPaciente,
+                activeColor: cores('corSimbolo'),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedGeneroPaciente = value;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        campoTexto('Escola', txtEscolaPaciente, Icons.school),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  Text(
+                    'Escolaridade: ',
+                    style: TextStyle(
+                        fontSize: tamanhoFonte.letraPequena(context),
+                        color: cores('corTexto'),
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.0),
+                        border: Border.all(color: cores('corBorda')),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
+                          // changes position of shadow
+                        ]),
+                    child: DropdownButton(
+                      hint: Text(
+                        'Escolaridade: ',
+                        style: TextStyle(color: cores('corTexto')),
+                      ),
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: cores('corTexto'),
+                      ),
+                      iconSize: 30,
+                      iconEnabledColor: cores('corTexto'),
+                      style: TextStyle(
+                        color: cores('corTexto'),
+                        fontWeight: FontWeight.w400,
+                        fontSize: tamanhoFonte.letraPequena(context),
+                      ),
+                      underline: Container(
+                        height: 0,
+                      ),
+                      isExpanded: true,
+                      value: selecioneEscolaridadePaciente,
+                      onChanged: (newValue) {
+                        setState(() {
+                          selecioneEscolaridadePaciente = newValue!;
+                        });
+                      },
+                      items: escolaridade.map((state) {
+                        return DropdownMenuItem(
+                          value: state,
+                          child: Text(state),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                children: [
+                  Text(
+                    'Selecione o Período:',
+                    style: TextStyle(
+                        fontSize: tamanhoFonte.letraPequena(context),
+                        color: cores('corTexto'),
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8.0),
+                        border: Border.all(color: cores('corBorda')),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
+                          // changes position of shadow
+                        ]),
+                    child: DropdownButton<String>(
+                      icon: const Icon(Icons.arrow_drop_down),
+                      iconSize: 30,
+                      iconEnabledColor: cores('corTexto'),
+                      style: TextStyle(
+                        color: cores('corTexto'),
+                        fontWeight: FontWeight.w400,
+                        fontSize: tamanhoFonte.letraPequena(context),
+                      ),
+                      underline: Container(
+                        height: 0,
+                      ),
+                      isExpanded: true,
+                      hint: const Text('Selecione uma Opção'),
+                      value: selecionePeriodoEscolaPaciente,
+                      items: [
+                        DropdownMenuItem(
+                          value: 'Manhã',
+                          child: Text(
+                            'Manhã',
+                            style: TextStyle(color: cores('corTexto')),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Tarde',
+                          child: Text(
+                            'Tarde',
+                            style: TextStyle(color: cores('corTexto')),
+                          ),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Integral',
+                          child: Text(
+                            'Integral',
+                            style: TextStyle(color: cores('corTexto')),
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          selecionePeriodoEscolaPaciente = value!;
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(child: campoTexto('Professora', txtProfessoraPaciente, FontAwesomeIcons.personChalkboard)),
+            const SizedBox(width: 10),
+            Expanded(
+                child: campoTexto('Telefone Professora', txtTelefoneProfessoraPaciente, Icons.phone,
+                    formato: TelefoneInputFormatter(), numeros: true)),
+          ],
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  containerDadosEndereco() {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: campoTexto('CEP', txtCEPPaciente, Icons.mail, formato: CepInputFormatter(), numeros: true,
+                  onchaged: (value) async {
+                var cepSemFormatacao = value.replaceAll(RegExp(r'[^0-9]'), '');
+                var viaCepSearchCep = ViaCepSearchCep();
+                var result = await viaCepSearchCep.searchInfoByCep(cep: cepSemFormatacao);
+                result.fold(
+                  (error) {
+                    print('Ocorreu um erro ao buscar as informações do CEP: $error');
+                  },
+                  (viaCepInfo) {
+                    setState(() {
+                      String? localidade = viaCepInfo.localidade;
+                      String? estado = viaCepInfo.uf;
+                      txtCidadePaciente.text = localidade!;
+                      selecioneEstadoPaciente = estado!;
+                    });
+                  },
+                );
+              }),
+            ),
+            const Padding(padding: EdgeInsets.only(right: 10)),
+            Expanded(
+                child: Column(
+              children: [
+                Text(
+                  'Selecione um Estado:',
+                  style: TextStyle(
+                      fontSize: tamanhoFonte.letraPequena(context),
+                      color: cores('corTexto'),
+                      fontWeight: FontWeight.bold),
+                ),
+                Container(
+                  height: 40,
+                  padding: const EdgeInsets.only(left: 10),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.0),
+                      border: Border.all(color: cores('corBorda')),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 7)
+                        // changes position of shadow
+                      ]),
+                  child: DropdownButton(
+                    hint: Text(
+                      'Selecione um Estado',
+                      style: TextStyle(color: cores('corTexto')),
+                    ),
+                    icon: Icon(
+                      Icons.arrow_drop_down,
+                      color: cores('corTexto'),
+                    ),
+                    iconSize: 30,
+                    iconEnabledColor: cores('corTexto'),
+                    style: TextStyle(
+                      color: cores('corTexto'),
+                      fontWeight: FontWeight.w400,
+                      fontSize: tamanhoFonte.letraPequena(context),
+                    ),
+                    underline: Container(
+                      height: 0,
+                    ),
+                    isExpanded: true,
+                    value: selecioneEstadoPaciente,
+                    onChanged: (newValue) {
+                      setState(() {
+                        selecioneEstadoPaciente = newValue!;
+                      });
+                    },
+                    items: estados.map((state) {
+                      return DropdownMenuItem(
+                        value: state,
+                        child: Text(state),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ))
+          ],
+        ),
+        const SizedBox(height: 20),
+        campoTexto('Logradouro', txtLogradouroPaciente, Icons.location_on),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(child: campoTexto('Número', txtNumeroPaciente, Icons.home, numeros: true)),
+            const Padding(padding: EdgeInsets.only(right: 10)),
+            Expanded(child: campoTexto('Bairro', txtBairroPaciente, Icons.maps_home_work))
+          ],
+        ),
+        const SizedBox(height: 20),
+        campoTexto('Cidade', txtCidadePaciente, Icons.location_city),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  containerResponsavel() {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+
+    return Column(
+      children: [
+        Divider(
+          thickness: 2,
+          height: 50,
+          color: cores('corTexto'),
+        ),
+        Text(
+          'Dados dos Responsáveis:',
+          style: TextStyle(
+              fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold),
+        ),
+        //------------------------------------------------------------------------------
+        columnResponsavel(),
+        const SizedBox(height: 20),
+        indexResponsavel < 1
+            ? SizedBox(
+                child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
                       foregroundColor: cores('corTextoBotao'),
+                      minimumSize: const Size(45, 45),
                       backgroundColor: cores('corBotao'),
                       elevation: 5,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(32),
                       )),
-                  child: Text(
-                    widget.tipo == 'editar' ? 'Atualizar' : 'Criar',
-                    style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-                  ),
-                  onPressed: () async {
-                    fileImage != null
-                        ? urlImagePaciente = (await uploadImageUsers(fileImage, 'pacientes'))!
-                        : urlImagePaciente = '';
-
-                    if (apagarImagem == true) {
-                      await deletarImagem(urlImagePaciente);
-                      await apagarImagemUser(uidPaciente);
+                  child: const Icon(Icons.add),
+                  onPressed: () {
+                    if (ListGeneroResponsavelPaciente[indexResponsavel] != null &&
+                        ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                        ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                        ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                        ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                        ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty) {
+                      widget.tipo == 'adicionar'
+                          ? setState(() {
+                              ListGeneroResponsavelPaciente.add(null);
+                              ListNomeResponsavelPaciente.add(TextEditingController());
+                              ListIdadeResponsavelPaciente.add(TextEditingController());
+                              ListTelefoneResponsavelPaciente.add(TextEditingController());
+                              ListRelacaoResponsavelPaciente.add('Mãe');
+                              ListEscolaridadeResponsavelPaciente.add(TextEditingController());
+                              ListProfissaoResponsavelPaciente.add(TextEditingController());
+                              indexResponsavel++;
+                            })
+                          : setState(() {
+                              indexResponsavel + 1 < qtdResponsavel ? indexResponsavel++ : null;
+                            });
+                    } else {
+                      erro(context, 'Preencha os campos obrigatórios!');
                     }
-
-                    widget.tipo == 'editar'
-                        ? (txtNomePaciente.text.isNotEmpty &&
-                                txtDataNascimentoPaciente.text.isNotEmpty &&
-                                txtCPFPaciente.text.isNotEmpty &&
-                                txtRGPaciente.text.isNotEmpty &&
-                                _selectedGeneroPaciente != null &&
-                                selecioneEscolaridadePaciente.isNotEmpty &&
-                                selecionePeriodoEscolaPaciente.isNotEmpty &&
-                                txtProfessoraPaciente.text.isNotEmpty &&
-                                txtTelefoneProfessoraPaciente.text.isNotEmpty &&
-                                txtLogradouroPaciente.text.isNotEmpty &&
-                                txtNumeroPaciente.text.isNotEmpty &&
-                                txtBairroPaciente.text.isNotEmpty &&
-                                txtCidadePaciente.text.isNotEmpty &&
-                                selecioneEstadoPaciente.isNotEmpty &&
-                                txtCEPPaciente.text.isNotEmpty &&
-                                selecioneTipoConsultaPaciente.isNotEmpty &&
-                                txtDescricaoPaciente.text.isNotEmpty &&
-                                ListGeneroResponsavelPaciente[indexResponsavel] != null &&
-                                ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty)
-                            ? editarPaciente(
-                                context,
-                                idUsuario(),
-                                widget.uid,
-                                dataInicioPaciente,
-                                urlImagePaciente,
-                                txtNomePaciente.text,
-                                txtDataNascimentoPaciente.text,
-                                txtCPFPaciente.text,
-                                txtRGPaciente.text,
-                                _selectedGeneroPaciente.toString(),
-                                selecioneEscolaridadePaciente,
-                                selecionePeriodoEscolaPaciente,
-                                txtProfessoraPaciente.text,
-                                txtTelefoneProfessoraPaciente.text,
-                                txtLogradouroPaciente.text,
-                                txtNumeroPaciente.text,
-                                txtBairroPaciente.text,
-                                txtCidadePaciente.text,
-                                selecioneEstadoPaciente,
-                                txtCEPPaciente.text,
-                                selecioneTipoConsultaPaciente,
-                                txtDescricaoPaciente.text,
-                                indexResponsavel,
-                                ListGeneroResponsavelPaciente,
-                                ListNomeResponsavelPaciente,
-                                ListIdadeResponsavelPaciente,
-                                ListTelefoneResponsavelPaciente,
-                                ListRelacaoResponsavelPaciente,
-                                ListEscolaridadeResponsavelPaciente,
-                                ListProfissaoResponsavelPaciente,
-                                fileDoc,
-                              )
-                            : erro(context, 'Preencha os campos obrigatórios!')
-                        : (txtNomePaciente.text.isNotEmpty &&
-                                txtDataNascimentoPaciente.text.isNotEmpty &&
-                                txtCPFPaciente.text.isNotEmpty &&
-                                txtRGPaciente.text.isNotEmpty &&
-                                _selectedGeneroPaciente != null &&
-                                selecioneEscolaridadePaciente.isNotEmpty &&
-                                selecionePeriodoEscolaPaciente.isNotEmpty &&
-                                txtProfessoraPaciente.text.isNotEmpty &&
-                                txtTelefoneProfessoraPaciente.text.isNotEmpty &&
-                                txtLogradouroPaciente.text.isNotEmpty &&
-                                txtNumeroPaciente.text.isNotEmpty &&
-                                txtBairroPaciente.text.isNotEmpty &&
-                                txtCidadePaciente.text.isNotEmpty &&
-                                selecioneEstadoPaciente.isNotEmpty &&
-                                txtCEPPaciente.text.isNotEmpty &&
-                                selecioneTipoConsultaPaciente.isNotEmpty &&
-                                txtDescricaoPaciente.text.isNotEmpty &&
-                                ListGeneroResponsavelPaciente[indexResponsavel] != null &&
-                                ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                                ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty)
-                            ? adicionarPaciente(
-                                context,
-                                idUsuario(),
-                                dataInicioPaciente,
-                                urlImagePaciente,
-                                txtNomePaciente.text,
-                                txtDataNascimentoPaciente.text,
-                                txtCPFPaciente.text,
-                                txtRGPaciente.text,
-                                _selectedGeneroPaciente.toString(),
-                                selecioneEscolaridadePaciente,
-                                selecionePeriodoEscolaPaciente,
-                                txtProfessoraPaciente.text,
-                                txtTelefoneProfessoraPaciente.text,
-                                txtLogradouroPaciente.text,
-                                txtNumeroPaciente.text,
-                                txtBairroPaciente.text,
-                                txtCidadePaciente.text,
-                                selecioneEstadoPaciente,
-                                txtCEPPaciente.text,
-                                selecioneTipoConsultaPaciente,
-                                txtDescricaoPaciente.text,
-                                indexResponsavel,
-                                ListGeneroResponsavelPaciente,
-                                ListNomeResponsavelPaciente,
-                                ListIdadeResponsavelPaciente,
-                                ListTelefoneResponsavelPaciente,
-                                ListRelacaoResponsavelPaciente,
-                                ListEscolaridadeResponsavelPaciente,
-                                ListProfissaoResponsavelPaciente,
-                                fileDoc)
-                            : erro(context, 'Preencha os campos obrigatórios!');
-                  }),
-              SizedBox(width: 10),
-              OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                    foregroundColor: cores('corTextoBotao'),
-                    backgroundColor: cores('corBotao'),
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(32),
-                    )),
-                child: Text(
-                  'Cancelar',
-                  style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
+                  },
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+              )
+            : SizedBox(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                      foregroundColor: cores('corTextoBotao'),
+                      minimumSize: const Size(45, 45),
+                      backgroundColor: Colors.grey,
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32),
+                      )),
+                  child: const Icon(Icons.add),
+                  onPressed: () {},
+                ),
               ),
-            ],
+      ],
+    );
+  }
+
+  containerAnexo() {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+
+    return Column(
+      children: [
+        Divider(
+          thickness: 2,
+          height: 50,
+          color: cores('corTexto'),
+        ),
+        Center(
+          child: ElevatedButton(
+            style: ButtonStyle(
+              shadowColor: MaterialStatePropertyAll(cores('corSombra')),
+              backgroundColor: MaterialStatePropertyAll(cores('corDetalhe')),
+            ),
+            onPressed: () async {
+              fileDoc = await pickDocument();
+              setState(() {
+                nomeArquivo = ph.basename(fileDoc!.path);
+              });
+            },
+            child: Text(
+              nomeArquivo.isEmpty ? 'Anexar Documento' : nomeArquivo,
+              style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+            ),
           ),
-          const SizedBox(height: 60),
-        ],
-      ),
+        ),
+        Divider(
+          thickness: 2,
+          height: 50,
+          color: cores('corTexto'),
+        ),
+      ],
+    );
+  }
+
+  rowBotao() {
+    TamanhoFonte tamanhoFonte = TamanhoFonte();
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        OutlinedButton(
+            style: OutlinedButton.styleFrom(
+                foregroundColor: cores('corTextoBotao'),
+                backgroundColor: cores('corBotao'),
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32),
+                )),
+            child: Text(
+              widget.tipo == 'editar' ? 'Atualizar' : 'Criar',
+              style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
+            ),
+            onPressed: () async {
+              fileImage != null
+                  ? urlImagePaciente = (await uploadImageUsers(fileImage, 'pacientes'))!
+                  : urlImagePaciente = urlImagePaciente;
+
+              if (apagarImagem == true) {
+                await deletarImagem(urlImagePaciente);
+                await apagarImagemUser(uidPaciente);
+              }
+
+              widget.tipo == 'editar'
+                  ? (txtNomePaciente.text.isNotEmpty &&
+                          txtDataNascimentoPaciente.text.isNotEmpty &&
+                          txtCPFPaciente.text.isNotEmpty &&
+                          _selectedGeneroPaciente != null &&
+                          txtEscolaPaciente.text.isNotEmpty &&
+                          selecioneEscolaridadePaciente.isNotEmpty &&
+                          selecionePeriodoEscolaPaciente.isNotEmpty &&
+                          txtProfessoraPaciente.text.isNotEmpty &&
+                          txtLogradouroPaciente.text.isNotEmpty &&
+                          txtNumeroPaciente.text.isNotEmpty &&
+                          txtBairroPaciente.text.isNotEmpty &&
+                          txtCidadePaciente.text.isNotEmpty &&
+                          selecioneEstadoPaciente.isNotEmpty &&
+                          txtCEPPaciente.text.isNotEmpty &&
+                          selecioneTipoConsultaPaciente.isNotEmpty &&
+                          txtDescricaoPaciente.text.isNotEmpty &&
+                          ListGeneroResponsavelPaciente[indexResponsavel] != null &&
+                          ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                          ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                          ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                          ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                          ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty)
+                      ? editarPaciente(
+                          context,
+                          idUsuario(),
+                          widget.uid,
+                          urlImagePaciente,
+                          txtDataAnamnesePaciente.text,
+                          txtNomePaciente.text,
+                          txtDataNascimentoPaciente.text,
+                          txtCPFPaciente.text,
+                          txtRGPaciente.text,
+                          _selectedGeneroPaciente.toString(),
+                          txtEscolaPaciente.text,
+                          selecioneEscolaridadePaciente,
+                          selecionePeriodoEscolaPaciente,
+                          txtProfessoraPaciente.text,
+                          txtTelefoneProfessoraPaciente.text,
+                          txtLogradouroPaciente.text,
+                          txtNumeroPaciente.text,
+                          txtBairroPaciente.text,
+                          txtCidadePaciente.text,
+                          selecioneEstadoPaciente,
+                          txtCEPPaciente.text,
+                          selecioneTipoConsultaPaciente,
+                          txtDescricaoPaciente.text,
+                          qtdResponsavel,
+                          ListGeneroResponsavelPaciente,
+                          ListNomeResponsavelPaciente,
+                          ListIdadeResponsavelPaciente,
+                          ListTelefoneResponsavelPaciente,
+                          ListRelacaoResponsavelPaciente,
+                          ListEscolaridadeResponsavelPaciente,
+                          ListProfissaoResponsavelPaciente,
+                          fileDoc,
+                        )
+                      : erro(context, 'Preencha os campos obrigatórios!')
+                  : (txtNomePaciente.text.isNotEmpty &&
+                          txtDataNascimentoPaciente.text.isNotEmpty &&
+                          txtCPFPaciente.text.isNotEmpty &&
+                          _selectedGeneroPaciente != null &&
+                          txtEscolaPaciente.text.isNotEmpty &&
+                          selecioneEscolaridadePaciente.isNotEmpty &&
+                          selecionePeriodoEscolaPaciente.isNotEmpty &&
+                          txtProfessoraPaciente.text.isNotEmpty &&
+                          txtLogradouroPaciente.text.isNotEmpty &&
+                          txtNumeroPaciente.text.isNotEmpty &&
+                          txtBairroPaciente.text.isNotEmpty &&
+                          txtCidadePaciente.text.isNotEmpty &&
+                          selecioneEstadoPaciente.isNotEmpty &&
+                          txtCEPPaciente.text.isNotEmpty &&
+                          selecioneTipoConsultaPaciente.isNotEmpty &&
+                          txtDescricaoPaciente.text.isNotEmpty &&
+                          ListGeneroResponsavelPaciente[indexResponsavel] != null &&
+                          ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                          ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                          ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                          ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
+                          ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty)
+                      ? adicionarPaciente(
+                          context,
+                          idUsuario(),
+                          urlImagePaciente,
+                          txtDataAnamnesePaciente.text,
+                          txtNomePaciente.text,
+                          txtDataNascimentoPaciente.text,
+                          txtCPFPaciente.text,
+                          txtRGPaciente.text,
+                          _selectedGeneroPaciente.toString(),
+                          txtEscolaPaciente.text,
+                          selecioneEscolaridadePaciente,
+                          selecionePeriodoEscolaPaciente,
+                          txtProfessoraPaciente.text,
+                          txtTelefoneProfessoraPaciente.text,
+                          txtLogradouroPaciente.text,
+                          txtNumeroPaciente.text,
+                          txtBairroPaciente.text,
+                          txtCidadePaciente.text,
+                          selecioneEstadoPaciente,
+                          txtCEPPaciente.text,
+                          selecioneTipoConsultaPaciente,
+                          txtDescricaoPaciente.text,
+                          indexResponsavel,
+                          ListGeneroResponsavelPaciente,
+                          ListNomeResponsavelPaciente,
+                          ListIdadeResponsavelPaciente,
+                          ListTelefoneResponsavelPaciente,
+                          ListRelacaoResponsavelPaciente,
+                          ListEscolaridadeResponsavelPaciente,
+                          ListProfissaoResponsavelPaciente,
+                          fileDoc)
+                      : erro(context, 'Preencha os campos obrigatórios!');
+            }),
+        SizedBox(width: 10),
+        OutlinedButton(
+          style: OutlinedButton.styleFrom(
+              foregroundColor: cores('corTextoBotao'),
+              backgroundColor: cores('corBotao'),
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32),
+              )),
+          child: Text(
+            'Cancelar',
+            style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ],
     );
   }
 

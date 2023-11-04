@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:brasil_fields/brasil_fields.dart';
-import 'package:fono/connections/fireAuth.dart';
-import 'package:fono/connections/fireCloudProntuarios.dart';
+import 'package:fonocare/connections/fireAuth.dart';
+import 'package:fonocare/connections/fireCloudProntuarios.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 

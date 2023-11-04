@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fono/connections/fireCloudProntuarios.dart';
-import 'package:fono/view/TelaDadosProntuarios.dart';
+import 'package:fonocare/connections/fireCloudProntuarios.dart';
+import 'package:fonocare/view/TelaDadosProntuarios.dart';
 import 'package:intl/intl.dart';
 
 import '../connections/fireCloudConsultas.dart';

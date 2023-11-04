@@ -72,8 +72,8 @@ class _TelaCadastroState extends State<TelaCadastro> {
               erro(context, 'Senhas não coincidem.');
             } else {
               if (txtSenha.text.length >= 6) {
-                urlImage!.isEmpty ? urlImage = await uploadImageUsers(fileImage, 'users') : urlImage = '';
-                criarConta(context, urlImage, _selectedGeneroFono, txtNome.text, txtDtNascimento.text, txtEmail.text,
+                urlImage != null ? urlImage = await uploadImageUsers(fileImage, 'users') : urlImage = '';
+                criarConta(context, urlImage, _selectedGeneroFono.toString(), txtNome.text, txtDtNascimento.text, txtEmail.text,
                     txtCPF.text, txtCRFa.text, txtTelefone.text, txtSenha.text);
               } else {
                 erro(context, 'Senha deve possuir mais de 6 caracteres.');
@@ -229,8 +229,8 @@ class _TelaCadastroState extends State<TelaCadastro> {
                   const SizedBox(height: 20),
                   campoTexto('CRFa', txtCRFa, Icons.credit_card,
                       formato: MaskTextInputFormatter(
-                        mask: '#######-#', // A máscara define 8 dígitos obrigatórios
-                        filter: {"#": RegExp(r'[0-9]')}, // Permite apenas dígitos numéricos
+                        mask: '#-#####',
+                        filter: {"#": RegExp(r'[0-9]')},
                       ),
                       numeros: true),
                   const SizedBox(height: 20),

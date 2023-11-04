@@ -51,9 +51,10 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
           "Prontuário de Atendimento",
           style: TextStyle(color: cores('corTexto'), fontSize: 24),
         ),
-        backgroundColor: cores('corTerciaria'),
+        backgroundColor: cores('corFundo'),
       ),
       body: SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
         child: Container(
           child: Column(
             children: [
@@ -72,8 +73,8 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
                   },
                   onTap: () {},
                   height: 200),
-              Container(
-                height: MediaQuery.of(context).size.height,
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.75,
                 child: StreamBuilder<QuerySnapshot>(
                     stream: pacientes != null
                         ? (_paciente.isEmpty
