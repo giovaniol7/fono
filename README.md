@@ -1,4 +1,4 @@
-<img src="images/icon.png">
+<img src="images/icon.png" width="300" height="200" alt="Logo do App">
 # FonoCare
 
 Aplicativo desenvolvido em Dart, com Framework Flutter. 
