@@ -140,7 +140,39 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     color: cores('corSimbolo'),
                   ),
                   onPressed: () async {
-                    await apagarPaciente(context, widget.uid);
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Confirmar exclusão'),
+                            content: const Text('Tem certeza de que deseja apagar este Paciente?'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text(
+                                  'Cancelar',
+                                  style: TextStyle(color: Colors.blue),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              TextButton(
+                                child: const Text(
+                                  'Apagar',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                                onPressed: () async {
+                                  try {
+                                    await apagarPaciente(context, widget.uid);
+                                  } catch (e) {
+                                    erro(context, 'Erro ao deletar Prontuário: $e');
+                                  }
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        });
                   },
                 )
               : Container(),

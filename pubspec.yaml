@@ -22,7 +22,7 @@ dependencies:
   google_sign_in: ^6.1.5
   brasil_fields: ^1.14.0
   image_picker: ^1.0.4
-  syncfusion_flutter_calendar: ^23.1.42
+  syncfusion_flutter_calendar: ^23.1.44
   flutter_localization: ^0.1.14
   search_cep: ^4.0.2
   flutter_launcher_icons: ^0.13.1

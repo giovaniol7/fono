@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fonocare/controllers/calcularFinanceiro.dart';
 import 'package:fonocare/view/TelaAdicionarProntuarios.dart';
+import 'package:fonocare/widgets/helpDialog.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -30,8 +31,8 @@ class _TelaInicialState extends State<TelaInicial> {
   late String? nome = '';
   late String? urlImage = '';
   late String? genero = 'Gender.male';
-  late double? receitas = 0.0;
-  late double? despesas = 0.0;
+  late double? entradas = 0.0;
+  late double? saidas = 0.0;
   late double? saldo = 0.0;
   late double? aReceber = 0.0;
   late double? aPagar = 0.0;
@@ -54,8 +55,8 @@ class _TelaInicialState extends State<TelaInicial> {
     double pag = await calcularAPagar();
 
     setState(() {
-      receitas = financias['somaGanhos'];
-      despesas = financias['somaDespesas'];
+      entradas = financias['somaGanhos'];
+      saidas = financias['somaDespesas'];
       saldo = financias['somaRenda'];
 
       nome = usuario['nome'];
@@ -91,14 +92,10 @@ class _TelaInicialState extends State<TelaInicial> {
                         ? Center(
                             child: Column(
                               children: [
-                                const SizedBox(
-                                  height: 60,
-                                ),
+                                const SizedBox(height: 60),
                                 calendarHome(context, tamanhoWidgets, tamanhoFonte),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas, despesas,
+                                const SizedBox(height: 10),
+                                contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, entradas, saidas,
                                     saldo, aReceber, aPagar, _obscureText),
                               ],
                             ),
@@ -110,12 +107,10 @@ class _TelaInicialState extends State<TelaInicial> {
                                 Expanded(
                                   child: calendarHome(context, tamanhoWidgets, tamanhoFonte),
                                 ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
+                                const SizedBox(width: 10),
                                 Expanded(
-                                  child: contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas,
-                                      despesas, saldo, aReceber, aPagar, _obscureText),
+                                  child: contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, entradas,
+                                      saidas, saldo, aReceber, aPagar, _obscureText),
                                 ),
                               ],
                             ),
@@ -152,7 +147,9 @@ class _TelaInicialState extends State<TelaInicial> {
                               color: cores('corSimbolo'),
                               size: tamanhoFonte.iconPequeno(context),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              helpDialog(context);
+                            },
                           ),
                         ],
                       ),
@@ -215,10 +212,11 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                     } else {
                       DataSource dataSource = snapshot.data!;
                       return SfCalendar(
+                        //timeZone: 'America/Sao_Paulo',
                         minDate: DateTime.now(),
+                        initialSelectedDate: DateTime.now(),
                         showTodayButton: true,
                         controller: _calendarController,
-                        showWeekNumber: false,
                         firstDayOfWeek: 7,
                         showDatePickerButton: true,
                         dataSource: dataSource,
@@ -248,7 +246,7 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                             ),
                             monthHeaderSettings: MonthHeaderSettings(
                                 monthFormat: 'MMM yyyy',
-                                height: 45,
+                                height: 50,
                                 textAlign: TextAlign.center,
                                 backgroundColor: cores('corDetalhe'),
                                 monthTextStyle:
@@ -258,12 +256,12 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                                 dayFormat: 'EEE',
                                 width: 50,
                                 dayTextStyle: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                   color: cores('corTexto'),
                                 ),
                                 dateTextStyle: TextStyle(
-                                  fontSize: 15,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                   color: cores('corSimbolo'),
                                 )),
@@ -276,16 +274,14 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
             ),
           ),
         ),
-        SizedBox(
-          height: 20,
-        ),
+        SizedBox(height: 20),
       ],
     ),
   );
 }
 
 contaHome(
-    context, setState, tamanhoWidgets, tamanhoFonte, ratio, receitas, despesas, saldo, aReceber, aPagar, _obscureText) {
+    context, setState, tamanhoWidgets, tamanhoFonte, ratio, entradas, saidas, saldo, aReceber, aPagar, _obscureText) {
   NumberFormat numberFormat = NumberFormat("#,##0.00", "pt_BR");
 
   return Container(
@@ -296,9 +292,7 @@ contaHome(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Text('Resumo Financeiro', style: textStyle(context, 'styleTitulo')),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -321,14 +315,14 @@ contaHome(
                     size: tamanhoFonte.iconMedio(context),
                   ),
                   Text(
-                    'Receitas',
+                    'Entrada',
                     style: TextStyle(
                       color: cores('corTextoPadrao'),
                       fontSize: tamanhoFonte.letraPequena(context),
                     ),
                   ),
                   Text(
-                    _obscureText == true ? 'R\$ ${numberFormat.format(receitas)}' : '${"⬮" * 4}',
+                    _obscureText == true ? 'R\$ ${numberFormat.format(entradas)}' : '${"⬮" * 4}',
                     style: TextStyle(
                         color: cores('corReceitas'),
                         fontSize: tamanhoFonte.letraMedia(context),
@@ -356,14 +350,14 @@ contaHome(
                     size: tamanhoFonte.iconMedio(context),
                   ),
                   Text(
-                    'Despesas',
+                    'Saída',
                     style: TextStyle(
                       color: cores('corTextoPadrao'),
                       fontSize: tamanhoFonte.letraPequena(context),
                     ),
                   ),
                   Text(
-                    _obscureText == true ? 'R\$ ${numberFormat.format(despesas)}' : '${"⬮" * 4}',
+                    _obscureText == true ? 'R\$ ${numberFormat.format(saidas)}' : '${"⬮" * 4}',
                     style: TextStyle(
                         color: cores('corDespesas'),
                         fontSize: tamanhoFonte.letraMedia(context),
@@ -374,9 +368,7 @@ contaHome(
             ),
           ],
         ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -396,18 +388,14 @@ contaHome(
             ),
           ],
         ),
-        SizedBox(
-          height: 10,
-        ),
+        SizedBox(height: 10),
         Container(
           margin: EdgeInsets.all(10),
           decoration: decoracaoContainer('decPadrao'),
           child: Column(
             children: [
               Text('Fluxo de Caixa', style: textStyle(context, 'styleSubtitulo')),
-              SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: 10),
               Column(
                 //mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -444,9 +432,7 @@ contaHome(
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 5,
-                  ),
+                  SizedBox(height: 5),
                   Card(
                     color: cores('corDespesasCard'),
                     elevation: 7,
@@ -481,9 +467,7 @@ contaHome(
                   ),
                 ],
               ),
-              SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: 10),
             ],
           ),
         ),

@@ -24,74 +24,92 @@ listarConsultas() async {
 }
 
 Future<Map<String, String>> buscarPorNomeHoraConsultas(context, nomePaciente, time) async {
-  String id = '';
-  String uidPaciente = '';
   Map<String, String> consultas = {};
 
-  String horarioConsulta = "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
+  try {
+    String id = '';
+    String uidPaciente = '';
 
-  await FirebaseFirestore.instance.collection(nomeColecao).where('nomePaciente', isEqualTo: nomePaciente).where('horarioConsulta', isEqualTo: horarioConsulta).get().then((q) {
-    if (q.docs.isNotEmpty) {
-      id = q.docs[0].id;
-      uidPaciente = q.docs[0].data()['uidPaciente'];
-    }
-  });
+    String horarioConsulta = "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
 
-  consultas = {
-    'id': id,
-    'uidPaciente': uidPaciente,
-  };
+    await FirebaseFirestore.instance
+        .collection(nomeColecao)
+        .where('nomePaciente', isEqualTo: nomePaciente)
+        .where('horarioConsulta', isEqualTo: horarioConsulta)
+        .get()
+        .then((q) {
+      if (q.docs.isNotEmpty) {
+        id = q.docs[0].id;
+        uidPaciente = q.docs[0].data()['uidPaciente'];
+      }
+    });
+
+    consultas = {
+      'id': id,
+      'uidPaciente': uidPaciente,
+    };
+  } catch (e) {
+    erro(context, 'Erro ao adicionar consultas.');
+  }
 
   return consultas;
 }
 
 adicionarConsultas(context, nomePaciente, dataConsulta, horarioConsulta, duracaoConsulta, frequenciaConsulta,
     semanaConsulta, colorConsulta) async {
-  String uidConsulta = '';
-  CollectionReference consultas = FirebaseFirestore.instance.collection(nomeColecao);
-  String uidPaciente = await buscarIdPaciente(context, nomePaciente);
-  Map<String, dynamic> data = {
-    'uidFono': idUsuario(),
-    'uidPaciente': uidPaciente,
-    'nomePaciente': nomePaciente,
-    'dataConsulta': dataConsulta,
-    'horarioConsulta': horarioConsulta,
-    'duracaoConsulta': duracaoConsulta,
-    'frequenciaConsulta': frequenciaConsulta,
-    'semanaConsulta': semanaConsulta,
-    'colorConsulta': colorConsulta,
-  };
-  DocumentReference docRef = await consultas.add(data);
-  await FirebaseFirestore.instance
-      .collection(nomeColecao)
-      .where('nomePaciente', isEqualTo: nomePaciente)
-      .where('dataConsulta', isEqualTo: dataConsulta)
-      .get()
-      .then((us) {
-    uidConsulta = us.docs[0].id;
-  });
-  await docRef.update({'uidConsulta': uidConsulta});
-  sucesso(context, 'O horário foi agendado com sucesso.');
-  Navigator.pop(context);
+  if (nomePaciente != null && dataConsulta != null && horarioConsulta != null && duracaoConsulta != null) {
+    try {
+      CollectionReference consultas = FirebaseFirestore.instance.collection(nomeColecao);
+      String uidPaciente = await buscarIdPaciente(context, nomePaciente);
+      DocumentReference novoDocumento = consultas.doc();
+      Map<String, dynamic> data = {
+        'uidConsulta': novoDocumento.id,
+        'uidFono': idUsuario(),
+        'uidPaciente': uidPaciente,
+        'nomePaciente': nomePaciente,
+        'dataConsulta': dataConsulta,
+        'horarioConsulta': horarioConsulta,
+        'duracaoConsulta': duracaoConsulta,
+        'frequenciaConsulta': frequenciaConsulta,
+        'semanaConsulta': semanaConsulta,
+        'colorConsulta': colorConsulta,
+      };
+      await consultas.add(data);
+      sucesso(context, 'O horário foi agendado com sucesso.');
+      Navigator.pop(context);
+    } catch (e) {
+      erro(context, 'Erro ao adicionar consultas.');
+    }
+  } else {
+    erro(context, 'Preencha os campos obrigatórios.');
+  }
 }
 
-editarConsultas(context, uidConsulta, uidFono, uidPaciente, nomePaciente, dataConsulta, horarioConsulta, duracaoConsulta,
-    frequenciaConsulta, semanaConsulta, colorConsulta) async {
-  Map<String, dynamic> data = {
-    'uidConsulta': uidConsulta,
-    'uidFono': uidFono,
-    'nomePaciente': nomePaciente,
-    'uidPaciente': uidPaciente,
-    'dataConsulta': dataConsulta,
-    'horarioConsulta': horarioConsulta,
-    'duracaoConsulta': duracaoConsulta,
-    'frequenciaConsulta': frequenciaConsulta,
-    'semanaConsulta': semanaConsulta,
-    'colorConsulta': colorConsulta,
-  };
-  await FirebaseFirestore.instance.collection(nomeColecao).doc(uidConsulta).update(data);
-  sucesso(context, 'O horário foi alterado com sucesso.');
-  Navigator.pop(context);
+editarConsultas(context, uidConsulta, uidFono, uidPaciente, nomePaciente, dataConsulta, horarioConsulta,
+    duracaoConsulta, frequenciaConsulta, semanaConsulta, colorConsulta) async {
+  if (nomePaciente != null && dataConsulta != null && horarioConsulta != null && duracaoConsulta != null) {
+    try {
+      Map<String, dynamic> data = {
+        'uidConsulta': uidConsulta,
+        'uidFono': uidFono,
+        'nomePaciente': nomePaciente,
+        'uidPaciente': uidPaciente,
+        'dataConsulta': dataConsulta,
+        'horarioConsulta': horarioConsulta,
+        'duracaoConsulta': duracaoConsulta,
+        'frequenciaConsulta': frequenciaConsulta,
+        'semanaConsulta': semanaConsulta,
+        'colorConsulta': colorConsulta,
+      };
+      await FirebaseFirestore.instance.collection(nomeColecao).doc(uidConsulta).update(data);
+      sucesso(context, 'O horário foi alterado com sucesso.');
+      Navigator.pop(context);
+    } catch (e) {
+      erro(context, 'Erro ao editar consultas.');
+    }
+  } else {
+    erro(context, 'Preencha os campos obrigatórios.');
+  }
 }
 
 apagarConsultas(context, uidConsulta) async {
@@ -100,7 +118,7 @@ apagarConsultas(context, uidConsulta) async {
     sucesso(context, 'Consulta apagada com sucesso!');
     Navigator.pop(context);
   } catch (e) {
-    erro(context, 'Erro ao remover a consulta');
+    erro(context, 'Erro ao remover a consulta.');
   }
 }
 

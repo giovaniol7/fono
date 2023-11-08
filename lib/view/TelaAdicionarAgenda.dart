@@ -8,6 +8,7 @@ import '../connections/fireCloudPacientes.dart';
 import '../models/maps.dart';
 import '../widgets/TextFieldSuggestions.dart';
 import '../widgets/campoTexto.dart';
+import '../widgets/mensagem.dart';
 import '/controllers/estilos.dart';
 
 class TelaAdicionarAgenda extends StatefulWidget {
@@ -102,7 +103,39 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                       color: cores('corSimbolo'),
                     ),
                     onPressed: () async {
-                      await apagarConsultas(context, id);
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Confirmar exclusão'),
+                              content: const Text('Tem certeza de que deseja apagar este Horário?'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text(
+                                    'Cancelar',
+                                    style: TextStyle(color: Colors.blue),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: const Text(
+                                    'Apagar',
+                                    style: TextStyle(color: Colors.red),
+                                  ),
+                                  onPressed: () async {
+                                    try {
+                                      await apagarConsultas(context, id);
+                                    } catch (e) {
+                                      erro(context, 'Erro ao deletar Horário: $e');
+                                    }
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          });
                     },
                   )
                 : Container(),
@@ -383,11 +416,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                         ),
                         onPressed: () async {
                           String colorHex = selecioneCorConsulta.value.toRadixString(16).padLeft(8, '0');
-                          if (widget.tipo == 'adicionar' &&
-                              nomeConsulta.text.isNotEmpty &&
-                              dataConsulta.text.isNotEmpty &&
-                              horarioConsulta.text.isNotEmpty &&
-                              duracaoConsulta.text.isNotEmpty) {
+                          if (widget.tipo == 'adicionar') {
                             adicionarConsultas(
                               context,
                               nomeConsulta.text,
@@ -398,11 +427,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                               selecioneSemanaConsulta,
                               colorHex,
                             );
-                          } else if (widget.tipo == 'editar' &&
-                              nomeConsulta.text.isNotEmpty &&
-                              dataConsulta.text.isNotEmpty &&
-                              horarioConsulta.text.isNotEmpty &&
-                              duracaoConsulta.text.isNotEmpty) {
+                          } else {
                             editarConsultas(
                               context,
                               id,

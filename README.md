@@ -1,16 +1,21 @@
-# fonocare
+<img src="main/images/icon.png">
+# FonoCare
 
-A new Flutter project.
+Aplicativo desenvolvido em Dart, com Framework Flutter. 
+Disponível para Android, iOS, Desktop (Windows) e WebApp.
+Esse aplicativo está na versão 1.0.
 
-## Getting Started
+Todo o banco de dados foi feito através do Firebase. Exigindo a internet do dispositivo para utilizar.
+Foram utilizados packages do pub.dev.
 
-This project is a starting point for a Flutter application.
+O aplicativo foi desenvolvido para uma fonoaudióloga. 
+Os recursos que ele possui foi implementado de acordo com a necessidade da cliente.
+Possui os recursos de:
+    - Cadastro Usuário;
+    - Cadastro Paciente; 
+    - Anamneses;
+    - Prontuários;
+    - Bloco de Notas;
+    - Contabilidade;
+    - Agenda.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

@@ -9,7 +9,12 @@ String nomeColecao = 'prontuarios';
 Future<String?> buscarIdProntuario(context, nome, dataProntuario) async {
   var id = '';
 
-  await FirebaseFirestore.instance.collection(nomeColecao).where('nomePaciente', isEqualTo: nome).where('dataProntuario', isEqualTo: dataProntuario).get().then((q) {
+  await FirebaseFirestore.instance
+      .collection(nomeColecao)
+      .where('nomePaciente', isEqualTo: nome)
+      .where('dataProntuario', isEqualTo: dataProntuario)
+      .get()
+      .then((q) {
     if (q.docs.isNotEmpty) {
       id = q.docs[0].id;
     }
@@ -20,38 +25,63 @@ Future<String?> buscarIdProntuario(context, nome, dataProntuario) async {
 
 adicionarProntuario(context, uidFono, uidPaciente, nomePaciente, dataProntuario, horarioProntuario, objetivosProntuario,
     materiaisProntuario, resultadosProntuario) async {
-  CollectionReference prontuarios = FirebaseFirestore.instance.collection(nomeColecao);
-  Map<String, dynamic> data = {
-    'uidFono': uidFono,
-    'uidPaciente': uidPaciente,
-    'nomePaciente': nomePaciente,
-    'dataProntuario': dataProntuario,
-    'horarioProntuario': horarioProntuario,
-    'objetivosProntuario': objetivosProntuario,
-    'materiaisProntuario': materiaisProntuario,
-    'resultadosProntuario': resultadosProntuario,
-  };
-  await prontuarios.add(data);
-  sucesso(context, 'O prontuário foi adicionado com sucesso.');
-  Navigator.pop(context);
+  if (nomePaciente != null &&
+      objetivosProntuario != null &&
+      materiaisProntuario != null &&
+      resultadosProntuario != null) {
+    try {
+      CollectionReference prontuarios = FirebaseFirestore.instance.collection(nomeColecao);
+      DocumentReference novoDocumento = prontuarios.doc();
+      Map<String, dynamic> data = {
+        'uidProntuario': novoDocumento.id,
+        'uidFono': uidFono,
+        'uidPaciente': uidPaciente,
+        'nomePaciente': nomePaciente,
+        'dataProntuario': dataProntuario,
+        'horarioProntuario': horarioProntuario,
+        'objetivosProntuario': objetivosProntuario,
+        'materiaisProntuario': materiaisProntuario,
+        'resultadosProntuario': resultadosProntuario,
+      };
+      await novoDocumento.set(data);
+      sucesso(context, 'O prontuário foi adicionado com sucesso.');
+      Navigator.pop(context);
+    } catch (e) {
+      erro(context, 'Erro ao adicionar prontuário.');
+    }
+  } else {
+    erro(context, 'Preencha os campos obrigatórios.');
+  }
 }
 
-editarProntuario(context, uidFono, uidPaciente, nomePaciente, dataProntuario, horarioProntuario, objetivosProntuario,
-    materiaisProntuario, resultadosProntuario) async {
-  Map<String, dynamic> data = {
-    'uidFono': uidFono,
-    'uidPaciente': uidPaciente,
-    'nomePaciente': nomePaciente,
-    'dataProntuario': dataProntuario,
-    'horarioProntuario': horarioProntuario,
-    'objetivosProntuario': objetivosProntuario,
-    'materiaisProntuario': materiaisProntuario,
-    'resultadosProntuario': resultadosProntuario,
-  };
-  String? idProntuario = await buscarIdProntuario(context, nomePaciente, dataProntuario);
-  await FirebaseFirestore.instance.collection(nomeColecao).doc(idProntuario).update(data);
-  sucesso(context, 'O prontuário foi atualizado com sucesso.');
-  Navigator.pop(context);
+editarProntuario(context, uidProntuario, uidFono, uidPaciente, nomePaciente, dataProntuario, horarioProntuario,
+    objetivosProntuario, materiaisProntuario, resultadosProntuario) async {
+  if (nomePaciente != null &&
+      objetivosProntuario != null &&
+      materiaisProntuario != null &&
+      resultadosProntuario != null) {
+    try {
+      Map<String, dynamic> data = {
+        'uidProntuario': uidProntuario,
+        'uidFono': uidFono,
+        'uidPaciente': uidPaciente,
+        'nomePaciente': nomePaciente,
+        'dataProntuario': dataProntuario,
+        'horarioProntuario': horarioProntuario,
+        'objetivosProntuario': objetivosProntuario,
+        'materiaisProntuario': materiaisProntuario,
+        'resultadosProntuario': resultadosProntuario,
+      };
+      String? idProntuario = await buscarIdProntuario(context, nomePaciente, dataProntuario);
+      await FirebaseFirestore.instance.collection(nomeColecao).doc(idProntuario).update(data);
+      sucesso(context, 'O prontuário foi atualizado com sucesso.');
+      Navigator.pop(context);
+    } catch (e) {
+      erro(context, 'Erro ao editar prontuários.');
+    }
+  } else {
+    erro(context, 'Preencha os campos obrigatórios.');
+  }
 }
 
 apagarProntuario(context, id) async {
@@ -60,7 +90,7 @@ apagarProntuario(context, id) async {
     sucesso(context, 'Prontuário apagado com sucesso!');
     Navigator.pop(context);
   } catch (e) {
-    erro(context, 'Erro ao remover a consulta');
+    erro(context, 'Erro ao remover a prontuário.');
   }
 }
 
@@ -81,33 +111,37 @@ recuperarProntuario(context, uid) async {
 
   Map<String, dynamic> prontuarios = {};
 
-  await FirebaseFirestore.instance.collection(nomeColecao).where('uidPaciente', isEqualTo: uid).get().then((q) {
-    if (q.docs.isNotEmpty) {
-      uidProntuario = q.docs[0].id;
-      uidFono = q.docs[0].data()['uidFono'];
-      uidPaciente = q.docs[0].data()['uidPaciente'];
-      nomePaciente = q.docs[0].data()['nomePaciente'];
-      dataProntuario = q.docs[0].data()['dataProntuario'];
-      horarioProntuario = q.docs[0].data()['horarioProntuario'];
-      objetivosProntuario = q.docs[0].data()['objetivosProntuario'];
-      materiaisProntuario = q.docs[0].data()['materiaisProntuario'];
-      resultadosProntuario = q.docs[0].data()['resultadosProntuario'];
-    }
-  });
+  try {
+    await FirebaseFirestore.instance.collection(nomeColecao).where('uidPaciente', isEqualTo: uid).get().then((q) {
+      if (q.docs.isNotEmpty) {
+        uidProntuario = q.docs[0].data()['uidProntuario'];
+        uidFono = q.docs[0].data()['uidFono'];
+        uidPaciente = q.docs[0].data()['uidPaciente'];
+        nomePaciente = q.docs[0].data()['nomePaciente'];
+        dataProntuario = q.docs[0].data()['dataProntuario'];
+        horarioProntuario = q.docs[0].data()['horarioProntuario'];
+        objetivosProntuario = q.docs[0].data()['objetivosProntuario'];
+        materiaisProntuario = q.docs[0].data()['materiaisProntuario'];
+        resultadosProntuario = q.docs[0].data()['resultadosProntuario'];
+      }
+    });
 
-  prontuarios = {
-    'uidProntuario': uidProntuario,
-    'uidFono': uidFono,
-    'uidPaciente': uidPaciente,
-    'nomePaciente': nomePaciente,
-    'dataProntuario': dataProntuario,
-    'horarioProntuario': horarioProntuario,
-    'objetivosProntuario': objetivosProntuario,
-    'materiaisProntuario': materiaisProntuario,
-    'resultadosProntuario': resultadosProntuario,
-  };
+    prontuarios = {
+      'uidProntuario': uidProntuario,
+      'uidFono': uidFono,
+      'uidPaciente': uidPaciente,
+      'nomePaciente': nomePaciente,
+      'dataProntuario': dataProntuario,
+      'horarioProntuario': horarioProntuario,
+      'objetivosProntuario': objetivosProntuario,
+      'materiaisProntuario': materiaisProntuario,
+      'resultadosProntuario': resultadosProntuario,
+    };
 
-  return prontuarios;
+    return prontuarios;
+  } catch (e) {
+    erro(context, 'Erro ao recuperar prontuário.');
+  }
 }
 
 recuperarProntuarioData(context, uid, data) async {
@@ -123,31 +157,40 @@ recuperarProntuarioData(context, uid, data) async {
 
   Map<String, dynamic> prontuarios = {};
 
-  await FirebaseFirestore.instance.collection(nomeColecao).where('uidPaciente', isEqualTo: uid).where('dataProntuario', isEqualTo: data).get().then((q) {
-    if (q.docs.isNotEmpty) {
-      uidProntuario = q.docs[0].id;
-      uidFono = q.docs[0].data()['uidFono'];
-      uidPaciente = q.docs[0].data()['uidPaciente'];
-      nomePaciente = q.docs[0].data()['nomePaciente'];
-      dataProntuario = q.docs[0].data()['dataProntuario'];
-      horarioProntuario = q.docs[0].data()['horarioProntuario'];
-      objetivosProntuario = q.docs[0].data()['objetivosProntuario'];
-      materiaisProntuario = q.docs[0].data()['materiaisProntuario'];
-      resultadosProntuario = q.docs[0].data()['resultadosProntuario'];
-    }
-  });
+  try {
+    await FirebaseFirestore.instance
+        .collection(nomeColecao)
+        .where('uidPaciente', isEqualTo: uid)
+        .where('dataProntuario', isEqualTo: data)
+        .get()
+        .then((q) {
+      if (q.docs.isNotEmpty) {
+        uidProntuario = q.docs[0].data()['uidProntuario'];
+        uidFono = q.docs[0].data()['uidFono'];
+        uidPaciente = q.docs[0].data()['uidPaciente'];
+        nomePaciente = q.docs[0].data()['nomePaciente'];
+        dataProntuario = q.docs[0].data()['dataProntuario'];
+        horarioProntuario = q.docs[0].data()['horarioProntuario'];
+        objetivosProntuario = q.docs[0].data()['objetivosProntuario'];
+        materiaisProntuario = q.docs[0].data()['materiaisProntuario'];
+        resultadosProntuario = q.docs[0].data()['resultadosProntuario'];
+      }
+    });
 
-  prontuarios = {
-    'uidProntuario': uidProntuario,
-    'uidFono': uidFono,
-    'uidPaciente': uidPaciente,
-    'nomePaciente': nomePaciente,
-    'dataProntuario': dataProntuario,
-    'horarioProntuario': horarioProntuario,
-    'objetivosProntuario': objetivosProntuario,
-    'materiaisProntuario': materiaisProntuario,
-    'resultadosProntuario': resultadosProntuario,
-  };
+    prontuarios = {
+      'uidProntuario': uidProntuario,
+      'uidFono': uidFono,
+      'uidPaciente': uidPaciente,
+      'nomePaciente': nomePaciente,
+      'dataProntuario': dataProntuario,
+      'horarioProntuario': horarioProntuario,
+      'objetivosProntuario': objetivosProntuario,
+      'materiaisProntuario': materiaisProntuario,
+      'resultadosProntuario': resultadosProntuario,
+    };
 
-  return prontuarios;
+    return prontuarios;
+  } catch (e) {
+    erro(context, 'Erro ao recuperar prontuário.');
+  }
 }

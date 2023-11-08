@@ -11,6 +11,7 @@ import '../connections/fireCloudPacientes.dart';
 import '../controllers/estilos.dart';
 import '../widgets/TextFieldSuggestions.dart';
 import '../widgets/campoTexto.dart';
+import '../widgets/mensagem.dart';
 import '../widgets/toggleSwitch.dart';
 
 class TelaAdicionarProntuarios extends StatefulWidget {
@@ -56,6 +57,7 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
       var paciente = await recuperarPacientePorNome(context, nome);
       String uidPaciente = paciente['uidPaciente'];
       DateTime dataSeteDiasAtras = widget.dataClicada.subtract(Duration(days: 7));
+      print(dataSeteDiasAtras);
       String dataFormatada = DateFormat('dd/MM/yyyy').format(dataSeteDiasAtras);
       prontuarios = await recuperarProntuarioData(context, uidPaciente, dataFormatada);
     } else if (widget.tipo == 'editar') {
@@ -119,10 +121,41 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
                     color: cores('corSimbolo'),
                   ),
                   onPressed: () async {
-                    await apagarProntuario(context, uidProntuario);
-                  },
-                )
-              : Container(),
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Confirmar exclusão'),
+                            content: const Text('Tem certeza de que deseja apagar este Prontuário?'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text(
+                                  'Cancelar',
+                                  style: TextStyle(color: Colors.blue),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              TextButton(
+                                child: const Text(
+                                  'Apagar',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                                onPressed: () async {
+                                  try {
+                                    await apagarProntuario(context, uidProntuario);
+                                  } catch (e) {
+                                    erro(context, 'Erro ao deletar Prontuário: $e');
+                                  }
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        });
+                  }
+                ) : Container(),
         ],
         iconTheme: IconThemeData(color: cores('corTexto')),
         leading: IconButton(
@@ -230,13 +263,13 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
                 ),
                 const SizedBox(height: 20),
                 campoTexto('Objetivos da Sessão', txtObjetivosProntuarios, Icons.description,
-                    maxPalavras: 500, maxLinhas: 5, tamanho: 20.0),
+                    maxPalavras: 2000, maxLinhas: 5, tamanho: 20.0),
                 const SizedBox(height: 20),
                 campoTexto('Materiais/Estratégias', txtMateriaisProntuarios, Icons.description,
-                    maxPalavras: 500, maxLinhas: 5, tamanho: 20.0),
+                    maxPalavras: 2000, maxLinhas: 5, tamanho: 20.0),
                 const SizedBox(height: 20),
                 campoTexto('Resultados', txtResultadosProntuarios, Icons.description,
-                    maxPalavras: 500, maxLinhas: 5, tamanho: 20.0),
+                    maxPalavras: 2000, maxLinhas: 5, tamanho: 20.0),
                 const SizedBox(height: 40),
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -275,6 +308,7 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
                                   txtResultadosProntuarios.text)
                               : editarProntuario(
                                   context,
+                                  uidProntuario,
                                   idUsuario(),
                                   uidPaciente,
                                   txtNome.text,

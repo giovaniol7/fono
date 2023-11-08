@@ -1,4 +1,5 @@
 import 'package:fonocare/connections/fireCloudContas.dart';
+import 'package:fonocare/models/maps.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
@@ -20,7 +21,7 @@ class TelaContas extends StatefulWidget {
 }
 
 class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateMixin {
-  var contas;
+  var geral;
   var contasDebito;
   var contasCredito;
   var windowsIdFono;
@@ -28,6 +29,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
   double somaGanhos = 0;
   late double? saldo = 0.0;
   late TabController _tabController;
+  String selecioneMes = 'Jan.';
   NumberFormat numberFormat = NumberFormat("#,##0.00", "pt_BR");
 
   Future<void> atualizarDados() async {
@@ -36,11 +38,13 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
 
   carregarDados() async {
     var financias = await calcularFinanceiro();
-    contas = await recuperarConta();
+    geral = await recuperarGeral();
     contasDebito = await recuperarDebito();
     contasCredito = await recuperarCredito();
 
     setState(() {
+      int mesAtual = DateTime.now().month;
+      selecioneMes = intMesToAbrev[mesAtual] ?? 'Desconhecido';
       saldo = financias['somaRenda'];
     });
   }
@@ -63,7 +67,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
   Widget build(BuildContext context) {
     TamanhoWidgets tamanhoWidgets = TamanhoWidgets();
     TamanhoFonte tamanhoFonte = TamanhoFonte();
-    
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -99,6 +103,48 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
+                  Text(
+                    'Selecione o Mês: ',
+                    style: TextStyle(
+                        fontSize: tamanhoFonte.letraPequena(context),
+                        color: cores('corTexto'),
+                        fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(width: 10),
+                  DropdownButton(
+                    alignment: Alignment.center,
+                    menuMaxHeight: 300,
+                    hint: Text(
+                      'Selecione o Mês: ',
+                      style: TextStyle(color: cores('corTexto')),
+                    ),
+                    icon: Icon(
+                      Icons.arrow_drop_down,
+                      color: cores('corTexto'),
+                    ),
+                    iconSize: 30,
+                    iconEnabledColor: cores('corTexto'),
+                    style: TextStyle(
+                      color: cores('corTexto'),
+                      fontWeight: FontWeight.w400,
+                      fontSize: tamanhoFonte.letraPequena(context),
+                    ),
+                    underline: Container(
+                      height: 0,
+                    ),
+                    value: selecioneMes,
+                    onChanged: (newValue) {
+                      setState(() {
+                        selecioneMes = newValue!;
+                      });
+                    },
+                    items: nomeMesesAbrev.map((state) {
+                      return DropdownMenuItem(
+                        value: state,
+                        child: Text(state),
+                      );
+                    }).toList(),
+                  ),
                   Center(
                     child: Padding(
                         padding: const EdgeInsets.only(top: 5, bottom: 10),
@@ -136,14 +182,17 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
               child: TabBar(
                 controller: _tabController,
                 tabs: const [
-                  Tab(text: 'Crédito'),
-                  Tab(text: 'Débito'),
-                  Tab(text: 'Geral'),
+                  Tab(text: 'Saídas'),
+                  Tab(text: 'Entradas'),
+                  Tab(text: 'Tudo'),
                 ],
                 indicatorColor: cores('corTexto'),
                 labelColor: cores('corDetalhe'),
                 unselectedLabelColor: cores('corTexto'),
-                labelStyle: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context), fontWeight: FontWeight.bold),
+                labelStyle: TextStyle(
+                    color: cores('corTexto'),
+                    fontSize: tamanhoFonte.letraPequena(context),
+                    fontWeight: FontWeight.bold),
               ),
             ),
             Expanded(
@@ -152,7 +201,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                 children: [
                   TabContent(contasCredito),
                   TabContent(contasDebito),
-                  TabContent(contas),
+                  TabContent(geral),
                 ],
               ),
             ),
@@ -197,14 +246,23 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
               default:
                 final dados = snapshot.requireData;
                 Map<String, List<QueryDocumentSnapshot>> contasPorMes = {};
+
                 dados.docs.forEach((doc) {
                   String dataString = doc['data'];
                   DateTime data = DateFormat('dd/MM/yyyy').parse(dataString);
                   String mesAno = DateFormat('MM/yyyy').format(data);
-                  if (!contasPorMes.containsKey(mesAno)) {
-                    contasPorMes[mesAno] = [];
+
+                  String mesSelecionadoFormatado = intMesToAbrev.entries.firstWhere(
+                        (entry) => entry.value == selecioneMes,
+                    orElse: () => MapEntry(0, ''), // Valor padrão se não encontrar
+                  ).key.toString().padLeft(2, '0');
+
+                  if (selecioneMes == 'Todos' || mesAno.startsWith(mesSelecionadoFormatado)) {
+                    if (!contasPorMes.containsKey(mesAno)) {
+                      contasPorMes[mesAno] = [];
+                    }
+                    contasPorMes[mesAno]!.add(doc);
                   }
-                  contasPorMes[mesAno]!.add(doc);
                 });
 
                 List<String> mesesOrdenados = contasPorMes.keys.toList();
@@ -273,11 +331,33 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                         try {
                           await FirebaseFirestore.instance.collection('contas').doc(doc.data()['uidConta']).delete();
                         } catch (e) {
-                          erro(context, 'Erro ao deletar documento: $e');
+                          erro(context, 'Erro ao deletar contas: $e');
                         }
                         Navigator.of(context).pop();
                       },
                     ),
+                    doc.data()['estadoRecebido'] == 'Pacientes'
+                        ? TextButton(
+                            child: const Text(
+                              'Apagar Todos',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            onPressed: () async {
+                              try {
+                                CollectionReference colecao = FirebaseFirestore.instance.collection('contas');
+                                QuerySnapshot consulta =
+                                    await colecao.where('uidPaciente', isEqualTo: doc.data()['uidPaciente']).get();
+                                for (QueryDocumentSnapshot doc in consulta.docs) {
+                                  await colecao.doc(doc.id).delete();
+                                }
+                                sucesso(context, 'Contas apagados com sucesso!');
+                              } catch (e) {
+                                erro(context, 'Erro ao apagar contas: $e');
+                              }
+                              Navigator.of(context).pop();
+                            },
+                          )
+                        : Column(),
                   ],
                 );
               });
@@ -290,7 +370,11 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: Text('Descrição da Transição ${doc.data()['nomeConta']}'),
-                  content: Text(doc.data()['descricaoConta']),
+                  content: Text(doc.data()['descricaoConta'] +
+                      '\n' +
+                      doc.data()['uidPaciente'] +
+                      '\n' +
+                      doc.data()['estadoRecebido']),
                   actions: <Widget>[
                     TextButton(
                       child: const Text(
@@ -409,87 +493,3 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
         ));
   }
 }
-
-/*
-Row(
-  mainAxisAlignment: MainAxisAlignment.spaceAround,
-  children: <Widget>[
-    Padding(
-      padding: const EdgeInsets.only(left: 10),
-      child: Column(
-        children: <Widget>[
-          Icon(
-            Icons.money_off,
-            color: cores('corSimbolo'),
-            size: kIsWeb || Platform.isWindows
-                ? MediaQuery.of(context).size.width * 0.03
-                : MediaQuery.of(context).size.height * 0.03,
-          ),
-          Text(
-            numberFormat.format(somaDespesas),
-            style: TextStyle(
-              color: cores('corTexto'),
-              fontSize: kIsWeb || Platform.isWindows
-                  ? MediaQuery.of(context).size.width * 0.02
-                  : MediaQuery.of(context).size.height * 0.02,
-            ),
-          ),
-        ],
-      ),
-    ),
-    Padding(
-      padding: const EdgeInsets.only(right: 10),
-      child: Column(
-        children: <Widget>[
-          Icon(
-            Icons.monetization_on_rounded,
-            color: cores('corSimbolo'),
-            size: kIsWeb || Platform.isWindows
-                ? MediaQuery.of(context).size.width * 0.03
-                : MediaQuery.of(context).size.height * 0.03,
-          ),
-          Text(
-            numberFormat.format(somaGanhos),
-            style: TextStyle(
-              color: cores('corTexto'),
-              fontSize: kIsWeb || Platform.isWindows
-                  ? MediaQuery.of(context).size.width * 0.02
-                  : MediaQuery.of(context).size.height * 0.02,
-            ),
-          )
-        ],
-      ),
-    )
-  ],
-);
-Widget listarContas(doc) {
-    return Container(
-      child: Card(
-        elevation: 7,
-        shadowColor: cores('rosa_fraco'),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        margin: EdgeInsets.all(5),
-        child: ListTile(
-          leading: doc.data()['selecioneTipoConta'] == 'Recebido' ? Icon(Icons.attach_money, color: cores('verde')) : Icon(Icons.money_off, color: cores('verde'),),
-          title: Expanded(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                doc.data()['nomeConta'],
-                style: TextStyle(fontWeight: FontWeight.bold, color: cores('verde')),
-              ),
-              Text(
-                doc.data()['selecioneFormaPagamento'],
-                style: TextStyle(fontWeight: FontWeight.normal, color: cores('verde/azul')),
-              ),
-            ],
-          )),
-          onTap: () {},
-        ),
-      ),
-    );
-  }
- */

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../models/maps.dart';
 import '../widgets/toggleSwitch.dart';
 import '../widgets/TextFieldSuggestions.dart';
 import '../widgets/campoTexto.dart';
@@ -22,29 +23,27 @@ class TelaAdicionarContas extends StatefulWidget {
 }
 
 class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
-  var txtNome = TextEditingController();
-  var txtPreco = TextEditingController();
-  var txtData = TextEditingController();
-  var txtDescricaoConta = TextEditingController();
   String _paciente = '';
   List<String> listPacientes = [];
   List<String> listUID = [];
   late DateTime now;
   late int hour;
   late int minute;
-  int index = 0;
-  int index2 = 0;
-  int index3 = 1;
-  int index4 = 0;
   String horaCompra = '';
-  bool estadoPago = true;
-  String estadoTipo = 'Trabalho';
-  String estadoRecebido = 'Outros';
+  int indexTransacao = 0;
+  int indexTipoTransacao = 0;
+  int indexEstadoRecebido = 0;
+  int indexEstadoTipo = 0;
   String selecioneTipoTransacao = 'Recebido';
+  String selecioneEstadoRecebido = 'Pacientes';
+  bool selecioneEstadoPago = true;
+  String selecioneEstadoTipo = 'Trabalho';
+  var txtNome = TextEditingController();
+  var txtPreco = TextEditingController();
   String selecioneFormaPagamento = 'Cartão Débito';
   String selecioneQntdParcelas = '1x';
-  final List<String> formaPagamento = ["Cartão Débito", "Cartão Crédito", "Pix", "Dinheiro", "Carnê"];
-  final List<String> qntdParcelas = ["1x", "2x", "3x", "4x", "5x", "6x", "7x", "8x", "9x", "10x", "11x", "12x"];
+  var txtData = TextEditingController();
+  var txtDescricaoConta = TextEditingController();
 
   Future<void> atualizarDados() async {
     await carregarDados();
@@ -111,19 +110,15 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                     'Selecione Tipo de Transação:',
                     style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                   ),
-                  toggleSwitch2(
-                    index,
-                    'Recebido',
-                    'Gasto',
-                    Icons.attach_money,
-                    Icons.money_off,
-                    (value) {
-                      setState(() {
-                        selecioneTipoTransacao = value == 0 ? 'Recebido' : 'Gasto';
-                        index = value!;
-                      });
-                    },
-                  ),
+                  toggleSwitch2(indexTransacao, 'Recebido', 'Gasto', Icons.attach_money, Icons.money_off, (value) {
+                    setState(() {
+                      selecioneTipoTransacao = value == 0 ? 'Recebido' : 'Gasto';
+                      selecioneTipoTransacao == 'Recebido'
+                          ? (indexEstadoRecebido = 0, selecioneEstadoRecebido = 'Pacientes')
+                          : selecioneEstadoRecebido = 'Outros';
+                      indexTransacao = value!;
+                    });
+                  }),
                   const SizedBox(height: 20),
                   Text(
                     selecioneTipoTransacao == 'Recebido'
@@ -132,54 +127,39 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                     style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                   ),
                   selecioneTipoTransacao == 'Gasto'
-                      ? toggleSwitch2(
-                          index2,
-                          'Pago',
-                          'Não Pago',
-                          Icons.attach_money,
-                          Icons.money_off,
+                      ? toggleSwitch2(indexTipoTransacao, 'Pago', 'Não Pago', Icons.attach_money, Icons.money_off,
                           (value) {
-                            setState(() {
-                              estadoPago = value == 0 ? true : false;
-                              index2 = value!;
-                            });
-                          },
-                        )
+                          setState(() {
+                            selecioneEstadoPago = value == 0 ? true : false;
+                            indexTipoTransacao = value!;
+                          });
+                        })
                       : toggleSwitch2(
-                          index3,
-                          'Pacientes',
-                          'Outros',
-                          FontAwesomeIcons.child,
-                          FontAwesomeIcons.shuffle,
+                          indexEstadoRecebido, 'Pacientes', 'Outros', FontAwesomeIcons.child, FontAwesomeIcons.shuffle,
                           (value) {
-                            setState(() {
-                              estadoRecebido = value == 0 ? 'Pacientes' : 'Outros';
-                              index3 = value!;
-                            });
-                          },
-                        ),
+                          setState(() {
+                            selecioneEstadoRecebido = value == 0 ? 'Pacientes' : 'Outros';
+                            indexEstadoRecebido = value!;
+                          });
+                        }),
+                  selecioneEstadoRecebido == 'Outros' ? const SizedBox(height: 20) : Container(),
+                  selecioneEstadoRecebido == 'Outros'
+                      ? Text(
+                          'Selecione o Tipo de ${selecioneTipoTransacao}:',
+                          style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
+                        )
+                      : Container(),
+                  selecioneEstadoRecebido == 'Outros'
+                      ? toggleSwitch3(indexEstadoTipo, 'Trabalho', 'Pessoal', 'Outros', FontAwesomeIcons.briefcase,
+                          FontAwesomeIcons.solidUser, FontAwesomeIcons.shuffle, (value) {
+                          setState(() {
+                            selecioneEstadoTipo = value == 0 ? 'Trabalho' : (value == 1 ? 'Pessoal' : 'Outros');
+                            indexEstadoTipo = value!;
+                          });
+                        })
+                      : Container(),
                   const SizedBox(height: 20),
-                  Text(
-                    'Selecione o Tipo de ${selecioneTipoTransacao}:',
-                    style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
-                  ),
-                  toggleSwitch3(
-                    index4,
-                    'Trabalho',
-                    'Pessoal',
-                    'Outros',
-                    FontAwesomeIcons.briefcase,
-                    FontAwesomeIcons.solidUser,
-                    FontAwesomeIcons.shuffle,
-                    (value) {
-                      setState(() {
-                        estadoTipo = value == 0 ? 'Trabalho' : (value == 1 ? 'Pessoal' : 'Outros');
-                        index4 = value!;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  estadoRecebido == 'Pacientes' && selecioneTipoTransacao == 'Recebido'
+                  selecioneEstadoRecebido == 'Pacientes' && selecioneTipoTransacao == 'Recebido'
                       ? TextFieldSuggestions(
                           icone: Icons.label,
                           list: listPacientes,
@@ -336,33 +316,24 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                           style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                         ),
                         onPressed: () {
-                          if (selecioneTipoTransacao.isNotEmpty &&
-                              estadoTipo.isNotEmpty &&
-                              txtNome.text.isNotEmpty &&
-                              txtPreco.text.isNotEmpty &&
-                              selecioneFormaPagamento.isNotEmpty &&
-                              selecioneQntdParcelas.isNotEmpty &&
-                              txtData.text.isNotEmpty &&
-                              horaCompra.isNotEmpty) {
-                            adicionarContas(
-                                context,
-                                listUID,
-                                listPacientes,
-                                idUsuario(),
-                                selecioneTipoTransacao,
-                                estadoTipo,
-                                txtNome.text,
-                                txtPreco.text,
-                                selecioneFormaPagamento,
-                                selecioneQntdParcelas,
-                                txtData.text,
-                                horaCompra,
-                                txtDescricaoConta.text,
-                                estadoPago,
-                                estadoRecebido);
-                          } else {
-                            erro(context, 'Preencha os campos obrigatórios!');
-                          }
+                          selecioneEstadoRecebido == 'Pacientes' ? selecioneEstadoTipo = 'Trabalho' : null;
+                          adicionarContas(
+                            context,
+                            listUID,
+                            listPacientes,
+                            idUsuario(),
+                            selecioneTipoTransacao,
+                            selecioneEstadoRecebido,
+                            selecioneEstadoPago,
+                            selecioneEstadoTipo,
+                            txtNome.text,
+                            txtPreco.text,
+                            selecioneFormaPagamento,
+                            selecioneQntdParcelas,
+                            txtData.text,
+                            horaCompra,
+                            txtDescricaoConta.text,
+                          );
                         },
                       ),
                       SizedBox(width: 10),

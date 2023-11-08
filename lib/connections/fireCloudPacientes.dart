@@ -83,54 +83,52 @@ adicionarPaciente(
     listEscolaridadeResponsavel,
     listProfissaoResponsavel,
     fileDoc) async {
-  CollectionReference pacientes = FirebaseFirestore.instance.collection(nomeColecao);
-  String? urlDocPaciente = fileDoc != null ? await uploadDocToFirebase(fileDoc) : '';
-  String uidPaciente = '';
-  Map<String, dynamic> data = {
-    'uidFono': uidFono,
-    'urlImagePaciente': urlImagePaciente,
-    'dataAnamnesePaciente': dataAnamnesePaciente,
-    'nomePaciente': nomePaciente,
-    'dtNascimentoPaciente': dataNascimentoPaciente,
-    'CPFPaciente': CPFPaciente,
-    'RGPaciente': RGPaciente,
-    'generoPaciente': generoPaciente,
-    'escolaPaciente': escolaPaciente,
-    'escolaridadePaciente': escolaridadePaciente,
-    'periodoEscolaPaciente': periodoEscolaPaciente,
-    'professoraPaciente': professoraPaciente,
-    'telefoneProfessoraPaciente': telefoneProfessoraPaciente,
-    'lougradouroPaciente': lougradouroPaciente,
-    'numeroPaciente': numeroPaciente,
-    'bairroPaciente': bairroPaciente,
-    'cidadePaciente': cidadePaciente,
-    'estadoPaciente': estadoPaciente,
-    'cepPaciente': cepPaciente,
-    'tipoConsultaPaciente': tipoConsultaPaciente,
-    'descricaoPaciente': descricaoPaciente,
-    'qtdResponsavel': qtdResponsavel + 1,
-    'urlDocPaciente': urlDocPaciente
-  };
-  for (int i = 0; i < listGeneroResponsavel.length; i++) {
-    data['generoResponsavel$i'] = listGeneroResponsavel[i].toString();
-    data['nomeResponsavel$i'] = listNomeResponsavel[i].text;
-    data['idadeResponsavel$i'] = listIdadeResponsavel[i].text;
-    data['telefoneResponsavel$i'] = listTelefoneResponsavel[i].text;
-    data['relacaoResponsavel$i'] = listRelacaoResponsavel[i];
-    data['escolaridadeResponsavel$i'] = listEscolaridadeResponsavel[i].text;
-    data['profissaoResponsavel$i'] = listProfissaoResponsavel[i].text;
+  try {
+    String nomeSemEspacos = nomePaciente.trimRight();
+    CollectionReference pacientes = FirebaseFirestore.instance.collection(nomeColecao);
+    String? urlDocPaciente = fileDoc != null ? await uploadDocToFirebase(fileDoc) : '';
+    DocumentReference novoDocumento = pacientes.doc();
+    Map<String, dynamic> data = {
+      'uidPaciente': novoDocumento.id,
+      'uidFono': uidFono,
+      'urlImagePaciente': urlImagePaciente,
+      'dataAnamnesePaciente': dataAnamnesePaciente,
+      'nomePaciente': nomeSemEspacos,
+      'dtNascimentoPaciente': dataNascimentoPaciente,
+      'CPFPaciente': CPFPaciente,
+      'RGPaciente': RGPaciente,
+      'generoPaciente': generoPaciente,
+      'escolaPaciente': escolaPaciente,
+      'escolaridadePaciente': escolaridadePaciente,
+      'periodoEscolaPaciente': periodoEscolaPaciente,
+      'professoraPaciente': professoraPaciente,
+      'telefoneProfessoraPaciente': telefoneProfessoraPaciente,
+      'lougradouroPaciente': lougradouroPaciente,
+      'numeroPaciente': numeroPaciente,
+      'bairroPaciente': bairroPaciente,
+      'cidadePaciente': cidadePaciente,
+      'estadoPaciente': estadoPaciente,
+      'cepPaciente': cepPaciente,
+      'tipoConsultaPaciente': tipoConsultaPaciente,
+      'descricaoPaciente': descricaoPaciente,
+      'qtdResponsavel': qtdResponsavel + 1,
+      'urlDocPaciente': urlDocPaciente
+    };
+    for (int i = 0; i < listGeneroResponsavel.length; i++) {
+      data['generoResponsavel$i'] = listGeneroResponsavel[i].toString();
+      data['nomeResponsavel$i'] = listNomeResponsavel[i].text;
+      data['idadeResponsavel$i'] = listIdadeResponsavel[i].text;
+      data['telefoneResponsavel$i'] = listTelefoneResponsavel[i].text;
+      data['relacaoResponsavel$i'] = listRelacaoResponsavel[i];
+      data['escolaridadeResponsavel$i'] = listEscolaridadeResponsavel[i].text;
+      data['profissaoResponsavel$i'] = listProfissaoResponsavel[i].text;
+    }
+    await pacientes.add(data);
+    sucesso(context, 'O paciente foi adicionado com sucesso.');
+    Navigator.pop(context);
+  } catch (e) {
+    erro(context, 'Erro ao adicionar paciente.');
   }
-  DocumentReference docRef = await pacientes.add(data);
-  await FirebaseFirestore.instance
-      .collection('pacientes')
-      .where('nomePaciente', isEqualTo: nomePaciente)
-      .get()
-      .then((us) {
-    uidPaciente = us.docs[0].id;
-  });
-  await docRef.update({'uidPaciente': uidPaciente});
-  sucesso(context, 'O paciente foi adicionado com sucesso.');
-  Navigator.pop(context);
 }
 
 editarPaciente(
@@ -166,44 +164,49 @@ editarPaciente(
     listEscolaridadeResponsavel,
     listProfissaoResponsavel,
     fileDoc) async {
-  String? urlDocPaciente = fileDoc != null ? await uploadDocToFirebase(fileDoc) : '';
-  Map<String, dynamic> data = {
-    'uidFono': uidFono,
-    'urlImagePaciente': urlImagePaciente,
-    'dataAnamnesePaciente': dataAnamnesePaciente,
-    'nomePaciente': nomePaciente,
-    'dtNascimentoPaciente': dataNascimentoPaciente,
-    'CPFPaciente': CPFPaciente,
-    'RGPaciente': RGPaciente,
-    'generoPaciente': generoPaciente,
-    'escolaPaciente': escolaPaciente,
-    'escolaridadePaciente': escolaridadePaciente,
-    'periodoEscolaPaciente': periodoEscolaPaciente,
-    'professoraPaciente': professoraPaciente,
-    'telefoneProfessoraPaciente': telefoneProfessoraPaciente,
-    'lougradouroPaciente': lougradouroPaciente,
-    'numeroPaciente': numeroPaciente,
-    'bairroPaciente': bairroPaciente,
-    'cidadePaciente': cidadePaciente,
-    'estadoPaciente': estadoPaciente,
-    'cepPaciente': cepPaciente,
-    'tipoConsultaPaciente': tipoConsultaPaciente,
-    'descricaoPaciente': descricaoPaciente,
-    'qtdResponsavel': qtdResponsavel,
-    'urlDocPaciente': urlDocPaciente
-  };
-  for (int i = 0; i < listGeneroResponsavel.length; i++) {
-    data['generoResponsavel$i'] = listGeneroResponsavel[i].toString();
-    data['nomeResponsavel$i'] = listNomeResponsavel[i].text;
-    data['idadeResponsavel$i'] = listIdadeResponsavel[i].text;
-    data['telefoneResponsavel$i'] = listTelefoneResponsavel[i].text;
-    data['relacaoResponsavel$i'] = listRelacaoResponsavel[i];
-    data['escolaridadeResponsavel$i'] = listEscolaridadeResponsavel[i].text;
-    data['profissaoResponsavel$i'] = listProfissaoResponsavel[i].text;
+  try{
+    String nomeSemEspacos = nomePaciente.trimRight();
+    String? urlDocPaciente = fileDoc != null ? await uploadDocToFirebase(fileDoc) : '';
+    Map<String, dynamic> data = {
+      'uidFono': uidFono,
+      'urlImagePaciente': urlImagePaciente,
+      'dataAnamnesePaciente': dataAnamnesePaciente,
+      'nomePaciente': nomeSemEspacos,
+      'dtNascimentoPaciente': dataNascimentoPaciente,
+      'CPFPaciente': CPFPaciente,
+      'RGPaciente': RGPaciente,
+      'generoPaciente': generoPaciente,
+      'escolaPaciente': escolaPaciente,
+      'escolaridadePaciente': escolaridadePaciente,
+      'periodoEscolaPaciente': periodoEscolaPaciente,
+      'professoraPaciente': professoraPaciente,
+      'telefoneProfessoraPaciente': telefoneProfessoraPaciente,
+      'lougradouroPaciente': lougradouroPaciente,
+      'numeroPaciente': numeroPaciente,
+      'bairroPaciente': bairroPaciente,
+      'cidadePaciente': cidadePaciente,
+      'estadoPaciente': estadoPaciente,
+      'cepPaciente': cepPaciente,
+      'tipoConsultaPaciente': tipoConsultaPaciente,
+      'descricaoPaciente': descricaoPaciente,
+      'qtdResponsavel': qtdResponsavel,
+      'urlDocPaciente': urlDocPaciente
+    };
+    for (int i = 0; i < listGeneroResponsavel.length; i++) {
+      data['generoResponsavel$i'] = listGeneroResponsavel[i].toString();
+      data['nomeResponsavel$i'] = listNomeResponsavel[i].text;
+      data['idadeResponsavel$i'] = listIdadeResponsavel[i].text;
+      data['telefoneResponsavel$i'] = listTelefoneResponsavel[i].text;
+      data['relacaoResponsavel$i'] = listRelacaoResponsavel[i];
+      data['escolaridadeResponsavel$i'] = listEscolaridadeResponsavel[i].text;
+      data['profissaoResponsavel$i'] = listProfissaoResponsavel[i].text;
+    }
+    await FirebaseFirestore.instance.collection(nomeColecao).doc(uidPaciente).update(data);
+    sucesso(context, 'O paciente foi atualizado com sucesso.');
+    Navigator.pop(context);
+  } catch (e) {
+    erro(context, 'Erro ao editar paciente.');
   }
-  await FirebaseFirestore.instance.collection(nomeColecao).doc(uidPaciente).update(data);
-  sucesso(context, 'O paciente foi atualizado com sucesso.');
-  Navigator.pop(context);
 }
 
 apagarPaciente(context, id) async {
@@ -212,7 +215,7 @@ apagarPaciente(context, id) async {
     sucesso(context, 'Paciente apagado com sucesso!');
     Navigator.pop(context);
   } catch (e) {
-    erro(context, 'Erro ao remover a consulta');
+    erro(context, 'Erro ao remover a paciente.');
   }
 }
 

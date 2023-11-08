@@ -48,6 +48,37 @@ Map<int, String> nomeMeses = {
   12: 'Dezembro'
 };
 
+Map<int, String> intMesToAbrev = {
+  1: 'Jan.',
+  2: 'Fev.',
+  3: 'Mar.',
+  4: 'Abr.',
+  5: 'Maio',
+  6: 'Jun.',
+  7: 'Jul.',
+  8: 'Ago.',
+  9: 'Set.',
+  10: 'Out.',
+  11: 'Nov.',
+  12: 'Dez.'
+};
+
+final List<String> nomeMesesAbrev = [
+  'Jan.',
+  'Fev.',
+  'Mar.',
+  'Abr.',
+  'Maio',
+  'Jun.',
+  'Jul.',
+  'Ago.',
+  'Set.',
+  'Out.',
+  'Nov.',
+  'Dez.',
+  'Todos'
+];
+
 final List<String> estados = [
   "AC",
   "AL",
@@ -172,3 +203,7 @@ String getColorName(Color color) {
 
   return color.toString();
 }
+
+final List<String> formaPagamento = ["Cartão Débito", "Cartão Crédito", "Pix", "Dinheiro", "Carnê"];
+
+final List<String> qntdParcelas = ["1x", "2x", "3x", "4x", "5x", "6x", "7x", "8x", "9x", "10x", "11x", "12x"];

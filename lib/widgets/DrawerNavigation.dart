@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fonocare/view/TelaAgenda.dart';
+import 'package:fonocare/view/TelaBlocoDeNotas.dart';
 import 'package:fonocare/view/TelaContas.dart';
 import 'package:fonocare/view/TelaEditarPerfil.dart';
 import 'package:fonocare/view/TelaPacientes.dart';
@@ -173,6 +174,24 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
+              /*Navigator.pushNamed(context, '/pacientes');*/
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.note_alt_sharp,
+              color: cores(corSimbolo),
+            ),
+            title: Text(
+              'Bloco de Notas',
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+            ),
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TelaBlocoDeNotas(),
+                  ));
               /*Navigator.pushNamed(context, '/pacientes');*/
             },
           ),

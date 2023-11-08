@@ -64,21 +64,6 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
           padding: EdgeInsets.all(10),
           child: Column(
             children: [
-              /*Padding(padding: EdgeInsets.only(top: 20)),
-              TextFieldSuggestions(
-                  margem: EdgeInsets.only(top: 5, left: 24, bottom: 20, right: 24),
-                  list: listaPaciente,
-                  labelText: _outroPaciente,
-                  textSuggetionsColor: cores('corTexto'),
-                  suggetionsBackgroundColor: cores('branco'),
-                  outlineInputBorderColor: cores('corTexto'),
-                  returnedValue: (String value) {
-                    setState(() {
-                      _paciente = value;
-                    });
-                  },
-                  onTap: () {},
-                  height: 200),*/
               Center(
                 child: Text(
                   'Prontuários de $nomePaciente',
@@ -144,6 +129,8 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
 }
 
 Widget cardProntuario(context, doc) {
+  TamanhoFonte tamanhoFonte = TamanhoFonte();
+
   return Container(
     child: Card(
       color: Colors.red.shade50,
@@ -156,7 +143,8 @@ Widget cardProntuario(context, doc) {
       child: ListTile(
         title: Text(
           doc.data()['dataProntuario'],
-          style: TextStyle(color: cores('corTexto'), fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context), fontWeight: FontWeight.bold),
         ),
         trailing: IconButton(
           icon: Icon(

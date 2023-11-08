@@ -124,7 +124,6 @@ class _TelaAgendaState extends State<TelaAgenda> {
                       ),
                     );
                   }
-                  atualizarDados();
                 },
                 dataSource: MeetingDataSource(_futureAppointments),
                 monthViewSettings: MonthViewSettings(showAgenda: true),
@@ -134,7 +133,7 @@ class _TelaAgendaState extends State<TelaAgenda> {
       ),
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
-        onPressed: () {
+        onPressed: () async {
           Appointment tappedAppointment = Appointment(
             startTime: DateTime.now(),
             endTime: DateTime.now(),
@@ -145,7 +144,6 @@ class _TelaAgendaState extends State<TelaAgenda> {
               MaterialPageRoute(
                 builder: (context) => TelaAdicionarAgenda(adicionar, tappedAppointment),
               ));
-          //atualizarDados();
         },
         child: Icon(
           Icons.add,
