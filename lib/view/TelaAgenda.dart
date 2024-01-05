@@ -91,8 +91,8 @@ class _TelaAgendaState extends State<TelaAgenda> {
                 timeSlotViewSettings: TimeSlotViewSettings(
                   nonWorkingDays: <int>[DateTime.saturday, DateTime.sunday],
                   timeInterval: Duration(minutes: 30),
-                  startHour: 07,
-                  endHour: 20,
+                  startHour: 08,
+                  endHour: 19.5,
                   timeFormat: 'HH:mm',
                 ),
                 view: CalendarView.workWeek,

@@ -1,0 +1,93 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "blocoNotas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "uidFono",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dataBloco",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "blocoNotas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "uidFono",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dataBloco",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "contas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "uidFono",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dataHora",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "contas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "uidFono",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "tipoTransacao",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dataHora",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "pacientes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "uidFono",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nomePaciente",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "prontuarios",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "uidPaciente",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dataProntuario",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

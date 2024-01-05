@@ -24,6 +24,14 @@ class TelaCadastro extends StatefulWidget {
 class _TelaCadastroState extends State<TelaCadastro> {
   var urlImage;
   var fileImage;
+  final keyNome = GlobalKey<FormState>();
+  final keyEmail = GlobalKey<FormState>();
+  final keyDtNascimento = GlobalKey<FormState>();
+  final keyCPF = GlobalKey<FormState>();
+  final keyCRFa = GlobalKey<FormState>();
+  final keyTelefone = GlobalKey<FormState>();
+  final keySenha = GlobalKey<FormState>();
+  final keySenhaConfirmar = GlobalKey<FormState>();
   var txtNome = TextEditingController();
   var txtEmail = TextEditingController();
   var txtSenha = TextEditingController();
@@ -46,6 +54,17 @@ class _TelaCadastroState extends State<TelaCadastro> {
     setState(() {
       _obscureText2 = !_obscureText2;
     });
+  }
+
+  bool validarCampos() {
+    return (keyNome.currentState!.validate() &&
+        keyDtNascimento.currentState!.validate() &&
+        keyEmail.currentState!.validate() &&
+        keyCPF.currentState!.validate() &&
+        keyCRFa.currentState!.validate() &&
+        keyTelefone.currentState!.validate() &&
+        keySenha.currentState!.validate() &&
+        keySenhaConfirmar.currentState!.validate());
   }
 
   @override
@@ -73,8 +92,8 @@ class _TelaCadastroState extends State<TelaCadastro> {
             } else {
               if (txtSenha.text.length >= 6) {
                 urlImage != null ? urlImage = await uploadImageUsers(fileImage, 'users') : urlImage = '';
-                criarConta(context, urlImage, _selectedGeneroFono.toString(), txtNome.text, txtDtNascimento.text, txtEmail.text,
-                    txtCPF.text, txtCRFa.text, txtTelefone.text, txtSenha.text);
+                criarConta(context, urlImage, _selectedGeneroFono.toString(), txtNome.text, txtDtNascimento.text,
+                    txtEmail.text, txtCPF.text, txtCRFa.text, txtTelefone.text, txtSenha.text);
               } else {
                 erro(context, 'Senha deve possuir mais de 6 caracteres.');
               }
@@ -157,9 +176,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 10),
           Container(
             padding: EdgeInsets.all(10),
             child: Center(
@@ -208,35 +225,31 @@ class _TelaCadastroState extends State<TelaCadastro> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  campoTexto(
-                    'Nome Completo',
-                    txtNome,
-                    Icons.person,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Este campo é obrigatório.';
-                      }
-                      return null;
-                    },
-                  ),
+                  campoTexto('Nome Completo', txtNome, Icons.person, key: keyNome, validator: true),
                   const SizedBox(height: 20),
                   campoTexto('Data de Nascimento', txtDtNascimento, Icons.date_range,
-                      formato: DataInputFormatter(), numeros: true),
+                      formato: DataInputFormatter(), numeros: true, key: keyDtNascimento, validator: true),
                   const SizedBox(height: 20),
-                  campoTexto('Email', txtEmail, Icons.email),
+                  campoTexto('Email', txtEmail, Icons.email, key: keyEmail, validator: true),
                   const SizedBox(height: 20),
-                  campoTexto('CPF', txtCPF, Icons.credit_card, formato: CpfInputFormatter(), numeros: true),
+                  campoTexto('CPF', txtCPF, Icons.credit_card,
+                      formato: CpfInputFormatter(), numeros: true, key: keyCPF, validator: true),
                   const SizedBox(height: 20),
                   campoTexto('CRFa', txtCRFa, Icons.credit_card,
                       formato: MaskTextInputFormatter(
                         mask: '#-#####',
                         filter: {"#": RegExp(r'[0-9]')},
                       ),
-                      numeros: true),
+                      numeros: true,
+                      key: keyCRFa,
+                      validator: true),
                   const SizedBox(height: 20),
-                  campoTexto('Telefone', txtTelefone, Icons.phone, formato: TelefoneInputFormatter(), numeros: true),
+                  campoTexto('Telefone', txtTelefone, Icons.phone,
+                      formato: TelefoneInputFormatter(), numeros: true, key: keyTelefone, validator: true),
                   const SizedBox(height: 20),
                   campoTexto('Senha', txtSenha, Icons.lock,
+                      key: keySenha,
+                      validator: true,
                       sufIcon: IconButton(
                         icon: Icon(
                           _obscureText ? Icons.visibility_off : Icons.visibility,
@@ -247,6 +260,8 @@ class _TelaCadastroState extends State<TelaCadastro> {
                       senha: _obscureText),
                   const SizedBox(height: 20),
                   campoTexto('Confirmar Senha', txtSenhaCofirmar, Icons.lock,
+                      key: keySenhaConfirmar,
+                      validator: true,
                       sufIcon: IconButton(
                         icon: Icon(
                           _obscureText2 ? Icons.visibility_off : Icons.visibility,
@@ -261,38 +276,40 @@ class _TelaCadastroState extends State<TelaCadastro> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                              foregroundColor: cores('corTextoBotao'),
-                              backgroundColor: cores('corBotao'),
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(32),
-                              )),
-                          child: Text(
-                            'Criar',
-                            style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-                          ),
-                          onPressed: () {
-                            verificarSenhas();
-                          },
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: cores('corTextoBotao'),
+                            backgroundColor: cores('corBotao'),
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            )),
+                        child: Text(
+                          'Criar',
+                          style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                         ),
+                        onPressed: () {
+                          if (validarCampos()) {
+                            verificarSenhas();
+                          }
+                        },
+                      ),
                       SizedBox(width: 10),
                       OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                              foregroundColor: cores('corTextoBotao'),
-                              backgroundColor: cores('corBotao'),
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(32),
-                              )),
-                          child: Text(
-                            'Cancelar',
-                            style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
+                        style: OutlinedButton.styleFrom(
+                            foregroundColor: cores('corTextoBotao'),
+                            backgroundColor: cores('corBotao'),
+                            elevation: 5,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(32),
+                            )),
+                        child: Text(
+                          'Cancelar',
+                          style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                         ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
                     ],
                   ),
                   const SizedBox(height: 60),

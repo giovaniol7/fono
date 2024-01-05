@@ -7,7 +7,6 @@ import '../models/maps.dart';
 import '../widgets/toggleSwitch.dart';
 import '../widgets/TextFieldSuggestions.dart';
 import '../widgets/campoTexto.dart';
-import '../widgets/mensagem.dart';
 import '../connections/fireAuth.dart';
 import '../connections/fireCloudContas.dart';
 import '../connections/fireCloudPacientes.dart';
@@ -34,23 +33,26 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
   int indexTipoTransacao = 0;
   int indexEstadoRecebido = 0;
   int indexEstadoTipo = 0;
+  int indexQtdPagamento = 0;
   String selecioneTipoTransacao = 'Recebido';
   String selecioneEstadoRecebido = 'Pacientes';
   bool selecioneEstadoPago = true;
   String selecioneEstadoTipo = 'Trabalho';
+  bool selecioneQtdPagamentoPaciente = true;
   var txtNome = TextEditingController();
   var txtPreco = TextEditingController();
   String selecioneFormaPagamento = 'Cartão Débito';
   String selecioneQntdParcelas = '1x';
   var txtData = TextEditingController();
   var txtDescricaoConta = TextEditingController();
+  var varAtivo = '1';
 
   Future<void> atualizarDados() async {
     await carregarDados();
   }
 
   carregarDados() async {
-    listPacientes = await fazerListaPacientes();
+    listPacientes = await fazerListaPacientes(varAtivo);
     listUID = await fazerListaUIDPacientes();
 
     setState(() {});
@@ -245,6 +247,21 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                     ],
                   ),
                   const SizedBox(height: 20),
+                  selecioneEstadoRecebido == 'Pacientes'
+                      ? Column(children: [
+                          Text(
+                            'Quantas vezes adicionar Pag. do Paciente?',
+                            style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
+                          ),
+                          toggleSwitch2(indexQtdPagamento, 'Uma Cobrança', 'Várias Cobranças', Icons.one_x_mobiledata,
+                              Icons.repeat, (value) {
+                            setState(() {
+                              selecioneQtdPagamentoPaciente = value == 0 ? true : false;
+                              indexQtdPagamento = value!;
+                            });
+                          })
+                        ])
+                      : Container(),
                   selecioneFormaPagamento == "Cartão Crédito" || selecioneFormaPagamento == "Carnê"
                       ? Column(
                           children: [
@@ -326,6 +343,7 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                             selecioneEstadoRecebido,
                             selecioneEstadoPago,
                             selecioneEstadoTipo,
+                            selecioneQtdPagamentoPaciente,
                             txtNome.text,
                             txtPreco.text,
                             selecioneFormaPagamento,

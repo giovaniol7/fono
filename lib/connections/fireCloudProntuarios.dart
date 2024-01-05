@@ -31,9 +31,10 @@ adicionarProntuario(context, uidFono, uidPaciente, nomePaciente, dataProntuario,
       resultadosProntuario != null) {
     try {
       CollectionReference prontuarios = FirebaseFirestore.instance.collection(nomeColecao);
-      DocumentReference novoDocumento = prontuarios.doc();
+      DocumentReference novoDocumento;
+      String uidProntuario = '';
+
       Map<String, dynamic> data = {
-        'uidProntuario': novoDocumento.id,
         'uidFono': uidFono,
         'uidPaciente': uidPaciente,
         'nomePaciente': nomePaciente,
@@ -43,7 +44,17 @@ adicionarProntuario(context, uidFono, uidPaciente, nomePaciente, dataProntuario,
         'materiaisProntuario': materiaisProntuario,
         'resultadosProntuario': resultadosProntuario,
       };
-      await novoDocumento.set(data);
+
+      novoDocumento = await prontuarios.add(data);
+      await FirebaseFirestore.instance
+          .collection(nomeColecao)
+          .where('nomePaciente', isEqualTo: nomePaciente)
+          .get()
+          .then((us) {
+        uidProntuario = us.docs[0].id;
+      });
+      await novoDocumento.update({'uidProntuario': uidProntuario});
+
       sucesso(context, 'O prontuário foi adicionado com sucesso.');
       Navigator.pop(context);
     } catch (e) {

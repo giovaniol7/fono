@@ -79,6 +79,11 @@ final List<String> nomeMesesAbrev = [
   'Todos'
 ];
 
+List<int> getAnos() {
+  int anoAtual = DateTime.now().year;
+  return List.generate(23, (index) => anoAtual - 2 + index);
+}
+
 final List<String> estados = [
   "AC",
   "AL",

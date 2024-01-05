@@ -18,4 +18,3 @@ Possui os recursos de:
     - Bloco de Notas;
     - Contabilidade;
     - Agenda.
-

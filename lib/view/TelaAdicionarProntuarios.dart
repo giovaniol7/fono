@@ -42,22 +42,24 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
   var appointment;
   var prontuarios;
   int index = 0;
+  var uidPaciente = '';
   String selecioneProntuario = 'Presente';
+  var varAtivo = '1';
 
   Future<void> atualizarDados() async {
     await carregarDados();
   }
 
   carregarDados() async {
-    List<String> lista = await fazerListaPacientes();
+    print(widget.appointments);
+    List<String> lista = await fazerListaPacientes(varAtivo);
     appointment = await carregarAppointment(widget.appointments);
 
     if (widget.tipo == 'adicionar') {
       String nome = widget.appointments.subject;
       var paciente = await recuperarPacientePorNome(context, nome);
-      String uidPaciente = paciente['uidPaciente'];
+      uidPaciente = paciente['uidPaciente'];
       DateTime dataSeteDiasAtras = widget.dataClicada.subtract(Duration(days: 7));
-      print(dataSeteDiasAtras);
       String dataFormatada = DateFormat('dd/MM/yyyy').format(dataSeteDiasAtras);
       prontuarios = await recuperarProntuarioData(context, uidPaciente, dataFormatada);
     } else if (widget.tipo == 'editar') {
@@ -72,26 +74,14 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
       listaPaciente = lista;
       String dataFormatada = DateFormat('dd/MM/yyyy').format(widget.dataClicada);
 
-      if (widget.tipo == 'adicionar') {
-        labelText = appointment['nomeConsulta'];
-        _paciente = appointment['nomeConsulta'];
-        txtNome.text = appointment['nomeConsulta'];
-        txtData.text = dataFormatada;
-        txtTime.text = appointment['horarioConsulta'];
-        txtObjetivosProntuarios.text = prontuarios['objetivosProntuario'];
-        txtMateriaisProntuarios.text = prontuarios['materiaisProntuario'];
-        txtResultadosProntuarios.text = '';
-      } else if (widget.tipo == 'editar') {
-        labelText = prontuarios['nomePaciente'];
-        _paciente = prontuarios['nomePaciente'];
-        uidProntuario = prontuarios['uidProntuario'];
-        txtNome.text = prontuarios['nomePaciente'];
-        txtData.text = prontuarios['dataProntuario'];
-        txtTime.text = prontuarios['horarioProntuario'];
-        txtObjetivosProntuarios.text = prontuarios['objetivosProntuario'];
-        txtMateriaisProntuarios.text = prontuarios['materiaisProntuario'];
-        txtResultadosProntuarios.text = prontuarios['resultadosProntuario'];
-      }
+      labelText = appointment['nomeConsulta'];
+      _paciente = appointment['nomeConsulta'];
+      txtNome.text = appointment['nomeConsulta'];
+      txtData.text = dataFormatada;
+      txtTime.text = appointment['horarioConsulta'];
+      txtObjetivosProntuarios.text = prontuarios['objetivosProntuario'];
+      txtMateriaisProntuarios.text = prontuarios['materiaisProntuario'];
+      txtResultadosProntuarios.text = prontuarios['resultadosProntuario'];
     });
   }
 
@@ -154,8 +144,8 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
                             ],
                           );
                         });
-                  }
-                ) : Container(),
+                  })
+              : Container(),
         ],
         iconTheme: IconThemeData(color: cores('corTexto')),
         leading: IconButton(
@@ -220,6 +210,16 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
                         Icons.calendar_month_outlined,
                         formato: DataInputFormatter(),
                         numeros: true,
+                        onchaged: (value) async {
+                          DateTime data = DateFormat('dd/MM/yyyy').parse(txtData.text);
+                          DateTime dataSeteDiasAtras = data.subtract(Duration(days: 7));
+                          String dataFormatada = DateFormat('dd/MM/yyyy').format(dataSeteDiasAtras);
+                          prontuarios = await recuperarProntuarioData(context, uidPaciente, dataFormatada);
+                          setState(() {
+                            txtObjetivosProntuarios.text = prontuarios['objetivosProntuario'];
+                            txtMateriaisProntuarios.text = prontuarios['materiaisProntuario'];
+                          });
+                        },
                         iconPressed: () async {
                           pickedDate = await showDatePicker(
                             context: context,

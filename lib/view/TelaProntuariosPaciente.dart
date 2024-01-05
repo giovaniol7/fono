@@ -107,14 +107,16 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
           ),
         ),
       ),
-      /*floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
-        onPressed: () {
+        onPressed: () async {
           String tipo = 'adicionar';
+          var appointment = await appointmentsPorUIDPaciente(widget.uidPaciente);
+          DateTime dataProntuario = DateTime.now();
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => TelaAdicionarPaciente(tipo, idUsuario()),
+                builder: (context) => TelaAdicionarProntuarios(tipo, appointment, dataProntuario),
               ));
         },
         child: Icon(
@@ -123,7 +125,7 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
           size: 35,
         ),
         backgroundColor: cores('corBotao'),
-      ),*/
+      ),
     );
   }
 }

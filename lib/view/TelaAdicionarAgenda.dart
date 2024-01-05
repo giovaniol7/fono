@@ -42,13 +42,14 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
   var uidPaciente;
   var appointment;
   var consulta;
+  var varAtivo = '1';
 
   Future<void> atualizarDados() async {
     await carregarDados();
   }
 
   carregarDados() async {
-    List<String> lista = await fazerListaPacientes();
+    List<String> lista = await fazerListaPacientes(varAtivo);
     widget.tipo == 'editar' ? appointment = await carregarAppointment(widget.appointment) : null;
     nome = widget.appointment.subject;
     horario = widget.appointment.startTime;

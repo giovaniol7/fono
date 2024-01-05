@@ -57,6 +57,7 @@ adicionarContas(
     selecioneEstadoRecebido,
     selecioneEstadoPago,
     selecioneEstadoTipo,
+    selecioneQtdPagamentoPaciente,
     nomeConta,
     preco,
     selecioneFormaPagamento,
@@ -64,16 +65,16 @@ adicionarContas(
     dataCompra,
     horaCompra,
     descricaoConta) async {
-  if (selecioneTipoTransacao != null &&
-      selecioneEstadoTipo != null &&
-      nomeConta != null &&
-      preco != null &&
-      selecioneFormaPagamento != null &&
-      selecioneQntdParcelas != null &&
-      dataCompra != null &&
-      horaCompra != null) {
+  if (selecioneTipoTransacao.isNotEmpty &&
+      selecioneEstadoTipo.isNotEmpty &&
+      nomeConta.isNotEmpty &&
+      preco.isNotEmpty &&
+      selecioneFormaPagamento.isNotEmpty &&
+      selecioneQntdParcelas.isNotEmpty &&
+      dataCompra.isNotEmpty &&
+      horaCompra.isNotEmpty) {
     try {
-      if (selecioneEstadoRecebido == 'Pacientes') {
+      if (selecioneEstadoRecebido == 'Pacientes' && selecioneQtdPagamentoPaciente == false) {
         adicionarContasSemanais(
             context,
             listUid,
@@ -99,7 +100,8 @@ adicionarContas(
         int qntdParcelas = int.parse(selecioneQntdParcelas.split('x')[0]);
         final dataAtual = DateTime.now();
 
-        DocumentReference novoDocumento = contas.doc();
+        DocumentReference novoDocumento;
+        String uidConta = '';
 
         if (qntdParcelas != 1) {
           preco = preco.replaceAll('.', '');
@@ -119,7 +121,6 @@ adicionarContas(
             dataHora = '$dataFormatada $horaCompra';
           }
           Map<String, dynamic> data = {
-            'uidConta': novoDocumento.id,
             'uidFono': uidFono,
             'tipoTransacao': selecioneTipoTransacao,
             'tipo': selecioneEstadoTipo,
@@ -139,7 +140,15 @@ adicionarContas(
             data['estadoRecebido'] = selecioneEstadoRecebido;
           }
 
-          await novoDocumento.set(data);
+          novoDocumento = await contas.add(data);
+          await FirebaseFirestore.instance
+              .collection(nomeColecao)
+              .where('nomeConta', isEqualTo: nomeConta)
+              .get()
+              .then((us) {
+            uidConta = us.docs[0].id;
+          });
+          await novoDocumento.update({'uidConta': uidConta});
         }
       }
       sucesso(context, 'Conta adicionada com sucesso.');
@@ -177,10 +186,10 @@ adicionarContasSemanais(
     DateTime dataConta = dataAtual.add(Duration(days: i * 7));
     dataFormatada = DateFormat('dd/MM/yyyy').format(dataConta);
 
-    DocumentReference novoDocumento = contas.doc();
+    DocumentReference novoDocumento;
+    String uidConta = '';
 
     Map<String, dynamic> data = {
-      'uidConta': novoDocumento.id,
       'uidFono': uidFono,
       'tipoTransacao': selecioneTipoTransacao,
       'tipo': selecioneEstadoTipo,
@@ -200,7 +209,15 @@ adicionarContasSemanais(
       data['estadoRecebido'] = selecioneEstadoRecebido;
     }
 
-    await novoDocumento.set(data);
+    novoDocumento = await contas.add(data);
+    await FirebaseFirestore.instance
+        .collection(nomeColecao)
+        .where('nomeConta', isEqualTo: nomeConta)
+        .get()
+        .then((us) {
+      uidConta = us.docs[0].id;
+    });
+    await novoDocumento.update({'uidConta': uidConta});
 
     if (selecioneEstadoRecebido == 'Pacientes') {
       int indice = listNome.indexOf(nomeConta);

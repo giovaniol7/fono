@@ -21,13 +21,14 @@ class _TelaPacientesState extends State<TelaPacientes> {
   var pacientes;
   var nomePaciente;
   var tipoPaciente;
+  var varAtivo = '1';
   String _paciente = '';
   List<String> listaPaciente = [];
   String _outroPaciente = "";
   var user;
 
   carregarDados() async {
-    List<String> lista = await fazerListaPacientes();
+    List<String> lista = await fazerListaPacientes(varAtivo);
     pacientes = await recuperarTodosPacientes();
     setState(() {
       listaPaciente = lista;
@@ -59,6 +60,34 @@ class _TelaPacientesState extends State<TelaPacientes> {
           style: TextStyle(color: cores('corTexto'), fontSize: 24),
         ),
         backgroundColor: cores('corTerciaria'),
+        actions: [
+          PopupMenuButton<String>(
+            onSelected: (String result) {
+              if (result == 'opcao1') {
+                setState(() {
+                  varAtivo = '1';
+                  carregarDados();
+                });
+              }
+              if (result == 'opcao2') {
+                setState(() {
+                  varAtivo = '0';
+                  carregarDados();
+                });
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'opcao1',
+                child: Text('Pacientes Não Arquivados'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'opcao2',
+                child: Text('Pacientes Arquivados'),
+              ),
+            ],
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         physics: NeverScrollableScrollPhysics(),
@@ -85,7 +114,7 @@ class _TelaPacientesState extends State<TelaPacientes> {
                 child: StreamBuilder<QuerySnapshot>(
                     stream: pacientes != null
                         ? (_paciente.isEmpty
-                            ? pacientes.orderBy('nomePaciente').snapshots()
+                            ? pacientes.orderBy('nomePaciente').where('ativoPaciente', isEqualTo: varAtivo).snapshots()
                             : pacientes.where('nomePaciente', isEqualTo: _paciente).snapshots())
                         : null,
                     builder: (context, snapshot) {

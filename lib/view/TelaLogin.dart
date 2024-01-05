@@ -52,17 +52,26 @@ class _TelaLoginState extends State<TelaLogin> {
           const SizedBox(
             height: 20,
           ),
-          customButton(
-            text: "Entrar",
-            textStyle: TextStyle(color: cores('corSecundaria'), fontSize: 15, fontWeight: FontWeight.bold),
-            buttonColor: cores('corBotao'),
-            padding: ratio.screen(context) == 'grande'
-                ? const EdgeInsets.fromLTRB(32, 20, 32, 20)
-                : const EdgeInsets.fromLTRB(32, 10, 32, 10),
+          Container(
             margin: const EdgeInsets.only(top: 20, bottom: 10),
-            onPressed: () {
-              autenticarConta(context, txtEmail.text, txtSenha.text);
-            },
+            child: ElevatedButton(
+                style: ButtonStyle(
+                    elevation: MaterialStateProperty.all<double>(5),
+                    backgroundColor: MaterialStateProperty.all<Color>(cores('corBotao')),
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(ratio.screen(context) == 'grande'
+                        ? const EdgeInsets.fromLTRB(32, 20, 32, 20)
+                        : const EdgeInsets.fromLTRB(32, 10, 32, 10),),
+                    shape: MaterialStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)))
+                ),
+                onPressed:  () {
+                  autenticarConta(context, txtEmail.text, txtSenha.text);
+                },
+                child: Center(
+                  child: Text(
+                    "Entrar",
+                    style: TextStyle(color: cores('corSecundaria'), fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                )),
           ),
           Align(
             alignment: Alignment.center,

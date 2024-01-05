@@ -57,13 +57,13 @@ Future<Map<String, String>> buscarPorNomeHoraConsultas(context, nomePaciente, ti
 
 adicionarConsultas(context, nomePaciente, dataConsulta, horarioConsulta, duracaoConsulta, frequenciaConsulta,
     semanaConsulta, colorConsulta) async {
-  if (nomePaciente != null && dataConsulta != null && horarioConsulta != null && duracaoConsulta != null) {
+  if (nomePaciente.isNotEmpty && dataConsulta.isNotEmpty && horarioConsulta.isNotEmpty && duracaoConsulta.isNotEmpty) {
     try {
       CollectionReference consultas = FirebaseFirestore.instance.collection(nomeColecao);
       String uidPaciente = await buscarIdPaciente(context, nomePaciente);
-      DocumentReference novoDocumento = consultas.doc();
+      DocumentReference novoDocumento;
+      String uidConsulta = '';
       Map<String, dynamic> data = {
-        'uidConsulta': novoDocumento.id,
         'uidFono': idUsuario(),
         'uidPaciente': uidPaciente,
         'nomePaciente': nomePaciente,
@@ -74,7 +74,17 @@ adicionarConsultas(context, nomePaciente, dataConsulta, horarioConsulta, duracao
         'semanaConsulta': semanaConsulta,
         'colorConsulta': colorConsulta,
       };
-      await consultas.add(data);
+
+      novoDocumento = await consultas.add(data);
+      await FirebaseFirestore.instance
+          .collection(nomeColecao)
+          .where('nomePaciente', isEqualTo: nomePaciente)
+          .get()
+          .then((us) {
+        uidConsulta = us.docs[0].id;
+      });
+      await novoDocumento.update({'uidConsulta': uidConsulta});
+
       sucesso(context, 'O horário foi agendado com sucesso.');
       Navigator.pop(context);
     } catch (e) {
@@ -87,7 +97,7 @@ adicionarConsultas(context, nomePaciente, dataConsulta, horarioConsulta, duracao
 
 editarConsultas(context, uidConsulta, uidFono, uidPaciente, nomePaciente, dataConsulta, horarioConsulta,
     duracaoConsulta, frequenciaConsulta, semanaConsulta, colorConsulta) async {
-  if (nomePaciente != null && dataConsulta != null && horarioConsulta != null && duracaoConsulta != null) {
+  if (nomePaciente.isNotEmpty && dataConsulta.isNotEmpty && horarioConsulta.isNotEmpty && duracaoConsulta.isNotEmpty) {
     try {
       Map<String, dynamic> data = {
         'uidConsulta': uidConsulta,

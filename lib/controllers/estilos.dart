@@ -167,7 +167,7 @@ class TamanhoFonte {
 
   double letraPequena(BuildContext context) {
     if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
-      return MediaQuery.of(context).size.height * 0.04;
+      return MediaQuery.of(context).size.height * 0.02;
     } else {
       return MediaQuery.of(context).size.width * 0.04;
     }

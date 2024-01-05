@@ -29,7 +29,8 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
   double somaGanhos = 0;
   late double? saldo = 0.0;
   late TabController _tabController;
-  String selecioneMes = 'Jan.';
+  String? selecioneMes;
+  int? selecioneAno;
   NumberFormat numberFormat = NumberFormat("#,##0.00", "pt_BR");
 
   Future<void> atualizarDados() async {
@@ -44,7 +45,9 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
 
     setState(() {
       int mesAtual = DateTime.now().month;
+      int anoAtual = DateTime.now().year;
       selecioneMes = intMesToAbrev[mesAtual] ?? 'Desconhecido';
+      selecioneAno = anoAtual;
       saldo = financias['somaRenda'];
     });
   }
@@ -104,46 +107,85 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'Selecione o Mês: ',
+                    'Selecione o Mês e Ano: ',
                     style: TextStyle(
                         fontSize: tamanhoFonte.letraPequena(context),
                         color: cores('corTexto'),
                         fontWeight: FontWeight.bold),
                   ),
                   SizedBox(width: 10),
-                  DropdownButton(
-                    alignment: Alignment.center,
-                    menuMaxHeight: 300,
-                    hint: Text(
-                      'Selecione o Mês: ',
-                      style: TextStyle(color: cores('corTexto')),
-                    ),
-                    icon: Icon(
-                      Icons.arrow_drop_down,
-                      color: cores('corTexto'),
-                    ),
-                    iconSize: 30,
-                    iconEnabledColor: cores('corTexto'),
-                    style: TextStyle(
-                      color: cores('corTexto'),
-                      fontWeight: FontWeight.w400,
-                      fontSize: tamanhoFonte.letraPequena(context),
-                    ),
-                    underline: Container(
-                      height: 0,
-                    ),
-                    value: selecioneMes,
-                    onChanged: (newValue) {
-                      setState(() {
-                        selecioneMes = newValue!;
-                      });
-                    },
-                    items: nomeMesesAbrev.map((state) {
-                      return DropdownMenuItem(
-                        value: state,
-                        child: Text(state),
-                      );
-                    }).toList(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      DropdownButton<String>(
+                        alignment: Alignment.center,
+                        menuMaxHeight: 300,
+                        hint: Text(
+                          'Mês:',
+                          style: TextStyle(color: cores('corTexto')),
+                        ),
+                        icon: Icon(
+                          Icons.arrow_drop_down,
+                          color: cores('corTexto'),
+                        ),
+                        iconSize: 30,
+                        iconEnabledColor: cores('corTexto'),
+                        style: TextStyle(
+                          color: cores('corTexto'),
+                          fontWeight: FontWeight.w400,
+                          fontSize: tamanhoFonte.letraPequena(context),
+                        ),
+                        underline: Container(
+                          height: 0,
+                        ),
+                        value: selecioneMes,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selecioneMes = newValue!;
+                          });
+                        },
+                        items: nomeMesesAbrev.map((state) {
+                          return DropdownMenuItem(
+                            value: state,
+                            child: Text(state),
+                          );
+                        }).toList(),
+                      ),
+                      DropdownButton<int>(
+                        alignment: Alignment.center,
+                        menuMaxHeight: 300,
+                        hint: Text(
+                          'Ano:',
+                          style: TextStyle(color: cores('corTexto')),
+                        ),
+                        icon: Icon(
+                          Icons.arrow_drop_down,
+                          color: cores('corTexto'),
+                        ),
+                        iconSize: 30,
+                        iconEnabledColor: cores('corTexto'),
+                        style: TextStyle(
+                          color: cores('corTexto'),
+                          fontWeight: FontWeight.w400,
+                          fontSize: tamanhoFonte.letraPequena(context),
+                        ),
+                        underline: Container(
+                          height: 0,
+                        ),
+                        value: selecioneAno,
+                        onChanged: (int? newValue) {
+                          setState(() {
+                            selecioneAno = newValue!;
+                          });
+                        },
+                        items: getAnos().map((int ano) {
+                          return DropdownMenuItem<int>(
+                            value: ano,
+                            child: Text(ano.toString()),
+                          );
+                        }).toList(),
+                      ),
+                    ],
                   ),
                   Center(
                     child: Padding(
@@ -251,13 +293,15 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                   String dataString = doc['data'];
                   DateTime data = DateFormat('dd/MM/yyyy').parse(dataString);
                   String mesAno = DateFormat('MM/yyyy').format(data);
+                  String ano = DateFormat('yyyy').format(data);
 
                   String mesSelecionadoFormatado = intMesToAbrev.entries.firstWhere(
                         (entry) => entry.value == selecioneMes,
-                    orElse: () => MapEntry(0, ''), // Valor padrão se não encontrar
+                    orElse: () => MapEntry(0, ''),
                   ).key.toString().padLeft(2, '0');
 
-                  if (selecioneMes == 'Todos' || mesAno.startsWith(mesSelecionadoFormatado)) {
+                  if ((selecioneMes == 'Todos' || mesAno.startsWith(mesSelecionadoFormatado)) &&
+                      (selecioneAno == 0 || ano == selecioneAno.toString())) {
                     if (!contasPorMes.containsKey(mesAno)) {
                       contasPorMes[mesAno] = [];
                     }
@@ -301,6 +345,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
       ],
     );
   }
+
 
   Widget listarContas(doc) {
     var stiloPg = doc.data()['estadoPago'] == true ? cores('corTexto') : cores('corDespesas');

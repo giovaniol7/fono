@@ -18,12 +18,13 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
   var pacientes;
   var nomePaciente;
   var tipoPaciente;
+  var varAtivo = '1';
   String _paciente = '';
   List<String> listaPaciente = [];
   String _outroPaciente = "";
 
   carregarDados() async {
-    List<String> lista = await fazerListaPacientes();
+    List<String> lista = await fazerListaPacientes(varAtivo);
     pacientes = await recuperarTodosPacientes();
 
     setState(() {
@@ -78,7 +79,7 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
                 child: StreamBuilder<QuerySnapshot>(
                     stream: pacientes != null
                         ? (_paciente.isEmpty
-                        ? pacientes.orderBy('nomePaciente').snapshots()
+                        ? pacientes.orderBy('nomePaciente').where('ativoPaciente', isEqualTo: varAtivo).snapshots()
                         : pacientes.where('nomePaciente', isEqualTo: _paciente).snapshots())
                         : null,
                     builder: (context, snapshot) {
@@ -108,23 +109,6 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
           ),
         ),
       ),
-      /*floatingActionButton: FloatingActionButton(
-        shape: CircleBorder(),
-        onPressed: () {
-          String tipo = 'adicionar';
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TelaAdicionarPaciente(tipo, idUsuario()),
-              ));
-        },
-        child: Icon(
-          Icons.add,
-          color: cores('corTextoBotao'),
-          size: 35,
-        ),
-        backgroundColor: cores('corBotao'),
-      ),*/
     );
   }
 }

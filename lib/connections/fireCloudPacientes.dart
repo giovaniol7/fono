@@ -25,11 +25,11 @@ Future<String> buscarIdPaciente(context, nome) async {
   return id;
 }
 
-Future<List<String>> fazerListaPacientes() async {
+Future<List<String>> fazerListaPacientes(varAtivo) async {
   List<String> list = [];
 
   QuerySnapshot querySnapshot =
-      await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario()).get();
+      await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario()).where('ativoPaciente', isEqualTo: varAtivo).get();
   querySnapshot.docs.forEach((doc) {
     String nome = doc['nomePaciente'];
     list.add(nome);
@@ -82,14 +82,15 @@ adicionarPaciente(
     listRelacaoResponsavel,
     listEscolaridadeResponsavel,
     listProfissaoResponsavel,
-    fileDoc) async {
+    fileDoc,
+    varAtivo) async {
   try {
     String nomeSemEspacos = nomePaciente.trimRight();
     CollectionReference pacientes = FirebaseFirestore.instance.collection(nomeColecao);
     String? urlDocPaciente = fileDoc != null ? await uploadDocToFirebase(fileDoc) : '';
-    DocumentReference novoDocumento = pacientes.doc();
+    DocumentReference novoDocumento;
+    String uidPaciente = '';
     Map<String, dynamic> data = {
-      'uidPaciente': novoDocumento.id,
       'uidFono': uidFono,
       'urlImagePaciente': urlImagePaciente,
       'dataAnamnesePaciente': dataAnamnesePaciente,
@@ -112,7 +113,8 @@ adicionarPaciente(
       'tipoConsultaPaciente': tipoConsultaPaciente,
       'descricaoPaciente': descricaoPaciente,
       'qtdResponsavel': qtdResponsavel + 1,
-      'urlDocPaciente': urlDocPaciente
+      'urlDocPaciente': urlDocPaciente,
+      'ativoPaciente': varAtivo
     };
     for (int i = 0; i < listGeneroResponsavel.length; i++) {
       data['generoResponsavel$i'] = listGeneroResponsavel[i].toString();
@@ -123,7 +125,15 @@ adicionarPaciente(
       data['escolaridadeResponsavel$i'] = listEscolaridadeResponsavel[i].text;
       data['profissaoResponsavel$i'] = listProfissaoResponsavel[i].text;
     }
-    await pacientes.add(data);
+    novoDocumento = await pacientes.add(data);
+    await FirebaseFirestore.instance
+        .collection(nomeColecao)
+        .where('nomePaciente', isEqualTo: nomePaciente)
+        .get()
+        .then((us) {
+      uidPaciente = us.docs[0].id;
+    });
+    await novoDocumento.update({'uidPaciente': uidPaciente});
     sucesso(context, 'O paciente foi adicionado com sucesso.');
     Navigator.pop(context);
   } catch (e) {
@@ -163,8 +173,9 @@ editarPaciente(
     listRelacaoResponsavel,
     listEscolaridadeResponsavel,
     listProfissaoResponsavel,
-    fileDoc) async {
-  try{
+    fileDoc,
+    varAtivo) async {
+  try {
     String nomeSemEspacos = nomePaciente.trimRight();
     String? urlDocPaciente = fileDoc != null ? await uploadDocToFirebase(fileDoc) : '';
     Map<String, dynamic> data = {
@@ -190,7 +201,8 @@ editarPaciente(
       'tipoConsultaPaciente': tipoConsultaPaciente,
       'descricaoPaciente': descricaoPaciente,
       'qtdResponsavel': qtdResponsavel,
-      'urlDocPaciente': urlDocPaciente
+      'urlDocPaciente': urlDocPaciente,
+      'ativoPaciente': varAtivo
     };
     for (int i = 0; i < listGeneroResponsavel.length; i++) {
       data['generoResponsavel$i'] = listGeneroResponsavel[i].toString();
@@ -244,6 +256,7 @@ recuperarPaciente(context, uid) async {
   String descricaoPaciente = '';
   int qtdResponsavel = 0;
   String urlDocPaciente = '';
+  String varAtivo = '';
   List<Gender?> listGeneroResponsavel = [];
   List<String> listNomeResponsavel = [];
   List<String> listIdadeResponsavel = [];
@@ -280,6 +293,7 @@ recuperarPaciente(context, uid) async {
       descricaoPaciente = q.docs[0].data()['descricaoPaciente'];
       qtdResponsavel = q.docs[0].data()['qtdResponsavel'];
       urlDocPaciente = q.docs[0].data()['urlDocPaciente'];
+      varAtivo = q.docs[0].data()['ativoPaciente'];
       for (int i = 0; i < qtdResponsavel; i++) {
         listGeneroResponsavel.add(stringToGender(q.docs[0].data()['generoResponsavel$i']));
         listNomeResponsavel.add(q.docs[0].data()['nomeResponsavel$i']);
@@ -317,6 +331,7 @@ recuperarPaciente(context, uid) async {
     'descricaoPaciente': descricaoPaciente,
     'qtdResponsavel': qtdResponsavel,
     'urlDocPaciente': urlDocPaciente,
+    'varAtivo': varAtivo,
     'listGeneroResponsavel': listGeneroResponsavel,
     'listNomeResponsavel': listNomeResponsavel,
     'listIdadeResponsavel': listIdadeResponsavel,
@@ -354,6 +369,7 @@ recuperarPacientePorNome(context, nome) async {
   String descricaoPaciente = '';
   int qtdResponsavel = 0;
   String urlDocPaciente = '';
+  String varAtivo = '';
   List<Gender?> listGeneroResponsavel = [];
   List<String> listNomeResponsavel = [];
   List<String> listIdadeResponsavel = [];
@@ -390,6 +406,7 @@ recuperarPacientePorNome(context, nome) async {
       descricaoPaciente = q.docs[0].data()['descricaoPaciente'];
       qtdResponsavel = q.docs[0].data()['qtdResponsavel'];
       urlDocPaciente = q.docs[0].data()['urlDocPaciente'];
+      varAtivo = q.docs[0].data()['ativoPaciente'];
       for (int i = 0; i < qtdResponsavel; i++) {
         listGeneroResponsavel.add(stringToGender(q.docs[0].data()['generoResponsavel$i']));
         listNomeResponsavel.add(q.docs[0].data()['nomeResponsavel$i']);
@@ -427,6 +444,7 @@ recuperarPacientePorNome(context, nome) async {
     'descricaoPaciente': descricaoPaciente,
     'qtdResponsavel': qtdResponsavel,
     'urlDocPaciente': urlDocPaciente,
+    'varAtivo': varAtivo,
     'listGeneroResponsavel': listGeneroResponsavel,
     'listNomeResponsavel': listNomeResponsavel,
     'listIdadeResponsavel': listIdadeResponsavel,
@@ -438,35 +456,3 @@ recuperarPacientePorNome(context, nome) async {
 
   return paciente;
 }
-
-/*else {
-      //await fd.FirebaseAuth.initialize('AIzaSyAlG2glNY3njAvAyJ7eEMeMtLg4Wcfg8rI', fd.VolatileStore());
-      //await fd.Firestore.initialize('programafono-7be09');
-      var auth = fd.FirebaseAuth.instance;
-      final emailSave = await SharedPreferences.getInstance();
-      var email = emailSave.getString('email');
-      final senhaSave = await SharedPreferences.getInstance();
-      var senha = senhaSave.getString('senha');
-      await auth.signIn(email!, senha!);
-      var user = await auth.getUser();
-      windowsIdFono = user.id;
-
-      List<fd.Document> querySnapshot = await fd.Firestore.instance
-          .collection('pacientes')
-          .where('uidFono', isEqualTo: uidFono)
-          .orderBy('nomePaciente')
-          .get();
-      querySnapshot.forEach((doc) {
-        String nome = doc['nomePaciente'];
-        _list.add(nome);
-      });
-
-      pacientes = await fd.Firestore.instance.collection('pacientes').where('uidFono', isEqualTo: uidFono);
-
-      pacientesOrdem = await pacientes.orderBy('nomePaciente');
-
-      pacientesOrdem = await pacientesOrdem.get();
-
-      print(pacientes);
-      print(pacientesOrdem);
-    }*/

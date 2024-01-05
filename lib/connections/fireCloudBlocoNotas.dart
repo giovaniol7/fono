@@ -14,16 +14,25 @@ adicionarBlocoNota(context, uidFono, nomeBloco, dataBloco, nomeResponsavel, tele
   if (nomeBloco != null && dataBloco != null && nomeResponsavel != null && telefoneBloco != null) {
     try {
       CollectionReference blocoNot = FirebaseFirestore.instance.collection(nomeColecao);
-      DocumentReference novoDocumento = blocoNot.doc();
+      DocumentReference novoDocumento;
+      String uidBloco = '';
       Map<String, dynamic> data = {
-        'uidBloco': novoDocumento.id,
         'uidFono': uidFono,
         'nomeBloco': nomeBloco,
         'dataBloco': dataBloco,
         'nomeResponsavel': nomeResponsavel,
         'telefoneBloco': telefoneBloco,
       };
-      await novoDocumento.set(data);
+      novoDocumento = await blocoNot.add(data);
+      await FirebaseFirestore.instance
+          .collection(nomeColecao)
+          .where('nomeBloco', isEqualTo: nomeBloco)
+          .get()
+          .then((us) {
+        uidBloco = us.docs[0].id;
+      });
+      await novoDocumento.update({'uidBloco': uidBloco});
+
       sucesso(context, 'Notas foi adicionado com sucesso.');
       Navigator.pop(context);
     } catch (e) {

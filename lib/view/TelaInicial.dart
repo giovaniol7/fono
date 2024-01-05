@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fonocare/controllers/calcularFinanceiro.dart';
@@ -9,10 +10,12 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../connections/fireCloudConsultas.dart';
+import '../connections/fireCloudPacientes.dart';
 import '../connections/fireCloudUser.dart';
 import '../controllers/estilos.dart';
 import '../controllers/resolucoesTela.dart';
 import '../widgets/DrawerNavigation.dart';
+import '../widgets/cardPaciente.dart';
 
 class TelaInicial extends StatefulWidget {
   const TelaInicial({Key? key}) : super(key: key);
@@ -37,6 +40,8 @@ class _TelaInicialState extends State<TelaInicial> {
   late double? aReceber = 0.0;
   late double? aPagar = 0.0;
   bool _obscureText = false;
+  var pacientes;
+  var varAtivo = '1';
 
   void _toggle() {
     setState(() {
@@ -53,6 +58,7 @@ class _TelaInicialState extends State<TelaInicial> {
     var usuario = await listarUsuario();
     double rec = await calcularAReceber();
     double pag = await calcularAPagar();
+    pacientes = await recuperarTodosPacientes();
 
     setState(() {
       entradas = financias['somaGanhos'];
@@ -104,14 +110,10 @@ class _TelaInicialState extends State<TelaInicial> {
                             padding: EdgeInsets.all(10),
                             child: Row(
                               children: [
-                                Expanded(
-                                  child: calendarHome(context, tamanhoWidgets, tamanhoFonte),
-                                ),
+                                Expanded(child: calendarHome(context, tamanhoWidgets, tamanhoFonte)),
                                 const SizedBox(width: 10),
                                 Expanded(
-                                  child: contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, entradas,
-                                      saidas, saldo, aReceber, aPagar, _obscureText),
-                                ),
+                                    child: prontuariosHome(context, setState, tamanhoWidgets, tamanhoFonte, varAtivo, pacientes))
                               ],
                             ),
                           ),
@@ -121,7 +123,7 @@ class _TelaInicialState extends State<TelaInicial> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          kIsWeb || Platform.isWindows
+                          kIsWeb || Platform.isWindows || Platform.isIOS
                               ? IconButton(
                                   icon: Icon(
                                     Icons.refresh,
@@ -133,14 +135,16 @@ class _TelaInicialState extends State<TelaInicial> {
                                   },
                                 )
                               : Container(),
-                          IconButton(
-                            icon: Icon(
-                              _obscureText == false ? Icons.visibility_off : Icons.visibility,
-                              color: cores('corSimbolo'),
-                              size: tamanhoFonte.iconPequeno(context),
-                            ),
-                            onPressed: _toggle,
-                          ),
+                          kIsWeb || Platform.isWindows || Platform.isIOS
+                              ? Container()
+                              : IconButton(
+                                  icon: Icon(
+                                    _obscureText == false ? Icons.visibility_off : Icons.visibility,
+                                    color: cores('corSimbolo'),
+                                    size: tamanhoFonte.iconPequeno(context),
+                                  ),
+                                  onPressed: _toggle,
+                                ),
                           IconButton(
                             icon: Icon(
                               Icons.help,
@@ -211,9 +215,12 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                       );
                     } else {
                       DataSource dataSource = snapshot.data!;
+                      _calendarController.selectedDate = DateTime.now();
+                      _calendarController.displayDate = DateTime.now();
                       return SfCalendar(
                         //timeZone: 'America/Sao_Paulo',
-                        minDate: DateTime.now(),
+                        minDate: DateTime.now().subtract(Duration(days: 7)),
+                        initialDisplayDate: DateTime.now(),
                         initialSelectedDate: DateTime.now(),
                         showTodayButton: true,
                         controller: _calendarController,
@@ -241,32 +248,31 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                             backgroundColor: cores('corDetalhe')),
                         view: CalendarView.schedule,
                         scheduleViewSettings: ScheduleViewSettings(
-                            weekHeaderSettings: WeekHeaderSettings(
-                              height: 0,
-                            ),
-                            monthHeaderSettings: MonthHeaderSettings(
-                                monthFormat: 'MMM yyyy',
-                                height: 50,
-                                textAlign: TextAlign.center,
-                                backgroundColor: cores('corDetalhe'),
-                                monthTextStyle:
-                                    TextStyle(color: cores('corTexto'), fontSize: 15, fontWeight: FontWeight.w500)),
-                            hideEmptyScheduleWeek: true,
-                            dayHeaderSettings: DayHeaderSettings(
-                                dayFormat: 'EEE',
-                                width: 50,
-                                dayTextStyle: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: cores('corTexto'),
-                                ),
-                                dateTextStyle: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: cores('corSimbolo'),
-                                )),
-                            appointmentTextStyle:
-                                TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white)),
+                          hideEmptyScheduleWeek: true,
+                          appointmentTextStyle:
+                              TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
+                          weekHeaderSettings: WeekHeaderSettings(height: 0),
+                          monthHeaderSettings: MonthHeaderSettings(
+                              monthFormat: 'MMM yyyy',
+                              height: 50,
+                              textAlign: TextAlign.center,
+                              backgroundColor: cores('corDetalhe'),
+                              monthTextStyle:
+                                  TextStyle(color: cores('corTexto'), fontSize: 15, fontWeight: FontWeight.w500)),
+                          dayHeaderSettings: DayHeaderSettings(
+                              dayFormat: 'EEE',
+                              width: 50,
+                              dayTextStyle: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: cores('corTexto'),
+                              ),
+                              dateTextStyle: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: cores('corSimbolo'),
+                              )),
+                        ),
                       );
                     }
                 }
@@ -469,6 +475,61 @@ contaHome(
               ),
               SizedBox(height: 10),
             ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+prontuariosHome(context, setState, tamanhoWidgets, tamanhoFonte, varAtivo, pacientes) {
+  final ScrollController _scrollController = ScrollController();
+
+  return Container(
+    width: tamanhoWidgets.getWidth(context),
+    height: tamanhoWidgets.getHeight(context),
+    decoration: decoracaoContainer('decPadrao'),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text('Prontuários', style: textStyle(context, 'styleTitulo')),
+        SizedBox(height: 10),
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.85,
+          child: StreamBuilder<QuerySnapshot>(
+            stream: pacientes != null ? pacientes.orderBy('nomePaciente').where('ativoPaciente', isEqualTo: varAtivo).snapshots() : null,
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                  return const Center(
+                    child: Text('Não foi possível conectar'),
+                  );
+                case ConnectionState.waiting:
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                default:
+                  final dados = snapshot.requireData;
+                  return Scrollbar(
+                      controller: _scrollController,
+                      trackVisibility: true,
+                      thumbVisibility: true,
+                      interactive: true,
+                      thickness: 20.0,
+                      showTrackOnHover: true,
+                      child: ListView.separated(
+                        controller: _scrollController,
+                        padding: EdgeInsets.all(10),
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (context, index) => listarPaciente(context, dados.docs[index], 'prontuario'),
+                        separatorBuilder: (context, _) => SizedBox(
+                          width: 1,
+                        ),
+                        itemCount: dados.size,
+                      ));
+              }
+            },
           ),
         ),
       ],
