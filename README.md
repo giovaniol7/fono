@@ -22,16 +22,53 @@ Possui os recursos de:
 
 ## Capturas de Tela
 
-<figure>
-    <img src="prints/TelaLogin.png" height="600" alt="Tela de Login">
-    <figcaption>Tela de Login</figcaption>
-</figure>
+### Tela de Login
+<img src="prints/TelaLogin.png" height="600" alt="Tela de Login">
 
-<img src="prints/TelaCadastro.png" height="800" alt="Tela de Cadastro">
+### Tela de Cadastro
+<img src="prints/TelaCadastro.png" height="600" alt="Tela de Cadastro">
 
-![Tela 1 de Inicial](prints/TelaInicial1.png)
-![Tela 2 de Inicial](prints/TelaInicial2.png)
-![Tela 3 de Inicial](prints/TelaInicial3.png)
+### Tela Iniciais
+<img src="prints/TelaInicial1.png" height="600" alt="Tela 1 de Inicial">
+<img src="prints/TelaInicial2.png" height="600" alt="Tela 2 de Inicial">
+<img src="prints/TelaInicial3.png" height="600" alt="Tela 3 de Inicial">
 
-![Tela 1 de Adicionar Paciente](prints/TelaAdicionarPaciente1.png)
-![Tela 1 de Adicionar Paciente](prints/TelaAdicionarPaciente1.png)
+### Tela Lista de Pacientes
+<img src="prints/TelaListaPaciente.png" height="600" alt="Tela Lista de Pacientes">
+
+### Tela de Adicionar Pacientes
+<img src="prints/TelaAdicionarPaciente1.png" height="600" alt="Tela 1 de Adicionar Paciente">
+<img src="prints/TelaAdicionarPaciente2.png" height="600" alt="Tela 2 de Adicionar Paciente">
+<img src="prints/TelaAdicionarPaciente3.png" height="600" alt="Tela 3 de Adicionar Paciente">
+
+### Tela de Dados do Paciente
+<img src="prints/TelaDadosPaciente1.png" height="600" alt="Tela 1 de Dados do Paciente">
+<img src="prints/TelaDadosPaciente2.png" height="600" alt="Tela 2 de Dados do Paciente">
+
+### Tela Agenda
+<img src="prints/TelaAgenda.png" height="600" alt="Tela Agenda">
+
+### Tela de Adicionar Agenda
+<img src="prints/TelaAdiconarAgenda.png" height="600" alt="Tela Adicionar Agenda">
+
+### Tela Lista de Paciente Prontuário
+<img src="prints/TelaListaPacienteProntuario.png" height="600" alt="Tela Lista de Paciente Prontuário">
+
+### Tela Lista Prontuário por Paciente
+<img src="prints/TelaListaProntuarioPaciente.png" height="600" alt="Tela Lista Prontuário por Paciente">
+
+### Tela Prontuário
+<img src="prints/TelaProntuario.png" height="600" alt="Tela Prontuario">
+
+### Tela de Bloco de Notas
+<img src="prints/TelaBlocoNotas.png" height="600" alt="Tela de Bloco de Notas">
+
+<!-- ### Tela de Adicionar Bloco de Notas
+<img src="prints/TelaBlocoNotas.png" height="600" alt="Tela de Bloco de Notas"> -->
+
+### Tela de Contabilidade
+<img src="prints/TelaContabilidade1.png" height="600" alt="Tela 1 de Contabilidade">
+<img src="prints/TelaContabilidade2.png" height="600" alt="Tela 2 de Contabilidade">
+
+### Tela de Adicionar Contabilidade
+<img src="prints/TelaAdicionarContabilidade.png" height="600" alt="Tela de Adicionar Contabilidade">
