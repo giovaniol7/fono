@@ -20,4 +20,14 @@ Possui os recursos de:
     - Contabilidade;<br>
     - Agenda.<br>
 
-Telas:
+## Capturas de Tela
+
+![Tela de Login](prints/TelaLogin.png)
+![Tela de Cadastro](prints/TelaCadastro.png)
+
+![Tela 1 de Inicial](prints/TelaInicial1.png)
+![Tela 2 de Inicial](prints/TelaInicial2.png)
+![Tela 3 de Inicial](prints/TelaInicial3.png)
+
+![Tela 1 de Adicionar Paciente](prints/TelaAdicionarPaciente1.png)
+![Tela 1 de Adicionar Paciente](prints/TelaAdicionarPaciente1.png)
