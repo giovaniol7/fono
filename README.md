@@ -49,7 +49,7 @@ Possui os recursos de:
 <img src="prints/TelaAgenda.png" height="600" alt="Tela Agenda">
 
 ### Tela de Adicionar Agenda
-<img src="prints/TelaAdiconarAgenda.png" height="600" alt="Tela Adicionar Agenda">
+<img src="prints/TelaAdicionarAgenda.png" height="600" alt="Tela Adicionar Agenda">
 
 ### Tela Lista de Paciente Prontuário
 <img src="prints/TelaListaPacienteProntuario.png" height="600" alt="Tela Lista de Paciente Prontuário">
