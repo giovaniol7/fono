@@ -22,8 +22,9 @@ Possui os recursos de:
 
 ## Capturas de Tela
 
-![Tela de Login](prints/TelaLogin.png)
-![Tela de Cadastro](prints/TelaCadastro.png)
+<img src="prints/TelaLogin.png" height="200" alt="Tela de Login">
+
+<img src="prints/TelaCadastro.png" height="200" alt="Tela de Cadastro">
 
 ![Tela 1 de Inicial](prints/TelaInicial1.png)
 ![Tela 2 de Inicial](prints/TelaInicial2.png)
