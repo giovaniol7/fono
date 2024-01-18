@@ -11,7 +11,6 @@ import '../connections/fireCloudPacientes.dart';
 import '../controllers/estilos.dart';
 import '../widgets/TextFieldSuggestions.dart';
 import '../widgets/campoTexto.dart';
-import '../widgets/mensagem.dart';
 import '../widgets/toggleSwitch.dart';
 
 class TelaAdicionarProntuarios extends StatefulWidget {
@@ -60,14 +59,12 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
       var paciente = await recuperarPacientePorNome(context, nome);
       uidPaciente = paciente['uidPaciente'];
       DateTime dataSeteDiasAtras = widget.dataClicada.subtract(Duration(days: 7));
-      String dataFormatada = DateFormat('dd/MM/yyyy').format(dataSeteDiasAtras);
-      prontuarios = await recuperarProntuarioData(context, uidPaciente, dataFormatada);
+      prontuarios = await recuperarProntuarioData(context, uidPaciente, DateFormat('dd/MM/yyyy').format(dataSeteDiasAtras));
     } else if (widget.tipo == 'editar') {
       String nome = widget.appointments.subject;
       var paciente = await recuperarPacientePorNome(context, nome);
       String uidPaciente = paciente['uidPaciente'];
-      prontuarios =
-          await recuperarProntuarioData(context, uidPaciente, DateFormat('dd/MM/yyyy').format(widget.dataClicada));
+      prontuarios = await recuperarProntuarioData(context, uidPaciente, DateFormat('dd/MM/yyyy').format(widget.dataClicada));
     }
 
     setState(() {
@@ -79,6 +76,7 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
       txtNome.text = appointment['nomeConsulta'];
       txtData.text = dataFormatada;
       txtTime.text = appointment['horarioConsulta'];
+      uidProntuario = prontuarios['uidProntuario'];
       txtObjetivosProntuarios.text = prontuarios['objetivosProntuario'];
       txtMateriaisProntuarios.text = prontuarios['materiaisProntuario'];
       txtResultadosProntuarios.text = prontuarios['resultadosProntuario'];
@@ -133,12 +131,7 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
                                   style: TextStyle(color: Colors.red),
                                 ),
                                 onPressed: () async {
-                                  try {
-                                    await apagarProntuario(context, uidProntuario);
-                                  } catch (e) {
-                                    erro(context, 'Erro ao deletar Prontuário: $e');
-                                  }
-                                  Navigator.of(context).pop();
+                                  await apagarProntuario(context, uidProntuario);
                                 },
                               ),
                             ],

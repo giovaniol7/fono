@@ -23,6 +23,7 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
   List<String> listaPaciente = [];
   String _outroPaciente = "";
 
+
   carregarDados() async {
     List<String> lista = await fazerListaPacientes(varAtivo);
     pacientes = await recuperarTodosPacientes();

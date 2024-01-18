@@ -103,9 +103,7 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                               fontSize: tamanhoFonte.letraMedia(context)),
                         ),
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
+                      SizedBox(height: 5),
                       Row(
                         //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
@@ -116,15 +114,16 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                                 color: cores('corTexto'),
                                 fontSize: tamanhoFonte.letraPequena(context)),
                           ),
-                          Text(
-                            nomeProntuario,
-                            style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                          Expanded(
+                            child: Text(
+                              nomeProntuario,
+                              style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                              maxLines: 1,
+                            ),
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
+                      SizedBox(height: 5),
                       Row(
                         //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
@@ -141,9 +140,7 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
+                      SizedBox(height: 5),
                       Row(
                         //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
@@ -181,9 +178,7 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                               fontSize: tamanhoFonte.letraMedia(context)),
                         ),
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
+                      SizedBox(height: 5),
                       Text(
                         objetivosProntuario,
                         style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
@@ -209,9 +204,7 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                               fontSize: tamanhoFonte.letraMedia(context)),
                         ),
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
+                      SizedBox(height: 5),
                       Text(
                         materiaisProntuario,
                         style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
@@ -237,9 +230,7 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                               fontSize: tamanhoFonte.letraMedia(context)),
                         ),
                       ),
-                      SizedBox(
-                        height: 5,
-                      ),
+                      SizedBox(height: 5),
                       Text(
                         resultadosProntuario,
                         style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),

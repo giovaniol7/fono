@@ -59,10 +59,9 @@ adicionarConsultas(context, nomePaciente, dataConsulta, horarioConsulta, duracao
     semanaConsulta, colorConsulta) async {
   if (nomePaciente.isNotEmpty && dataConsulta.isNotEmpty && horarioConsulta.isNotEmpty && duracaoConsulta.isNotEmpty) {
     try {
+      String uidConsulta = '';
       CollectionReference consultas = FirebaseFirestore.instance.collection(nomeColecao);
       String uidPaciente = await buscarIdPaciente(context, nomePaciente);
-      DocumentReference novoDocumento;
-      String uidConsulta = '';
       Map<String, dynamic> data = {
         'uidFono': idUsuario(),
         'uidPaciente': uidPaciente,
@@ -74,17 +73,16 @@ adicionarConsultas(context, nomePaciente, dataConsulta, horarioConsulta, duracao
         'semanaConsulta': semanaConsulta,
         'colorConsulta': colorConsulta,
       };
-
-      novoDocumento = await consultas.add(data);
+      DocumentReference docRef = await consultas.add(data);
       await FirebaseFirestore.instance
           .collection(nomeColecao)
           .where('nomePaciente', isEqualTo: nomePaciente)
+          .where('dataConsulta', isEqualTo: dataConsulta)
           .get()
           .then((us) {
         uidConsulta = us.docs[0].id;
       });
-      await novoDocumento.update({'uidConsulta': uidConsulta});
-
+      await docRef.update({'uidConsulta': uidConsulta});
       sucesso(context, 'O horário foi agendado com sucesso.');
       Navigator.pop(context);
     } catch (e) {
