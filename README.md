@@ -22,7 +22,10 @@ Possui os recursos de:
 
 ## Capturas de Tela
 
-<img src="prints/TelaLogin.png" height="500" alt="Tela de Login">
+<figure>
+    <img src="prints/TelaLogin.png" height="600" alt="Tela de Login">
+    <figcaption>Tela de Login</figcaption>
+</figure>
 
 <img src="prints/TelaCadastro.png" height="800" alt="Tela de Cadastro">
 
