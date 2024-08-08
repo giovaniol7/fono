@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fonocare/view/TelaAdicionarBlocoNotas.dart';
+import 'package:fonocare/controllers/variaveis.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../connections/fireAuth.dart';
 import '../connections/fireCloudBlocoNotas.dart';
 import '../controllers/estilos.dart';
 import '../models/maps.dart';
@@ -16,14 +15,11 @@ class TelaBlocoDeNotas extends StatefulWidget {
 }
 
 class _TelaBlocoDeNotasState extends State<TelaBlocoDeNotas> {
-  var blNotas;
-  var nomeBloco;
-  var dataBloco;
 
   carregarDados() async {
     var notas = await recuperarBlocosNotas();
     setState(() {
-      blNotas = notas;
+      AppVariaveis().blocoNotas = notas;
     });
   }
 
@@ -44,6 +40,7 @@ class _TelaBlocoDeNotasState extends State<TelaBlocoDeNotas> {
             color: cores('corSimbolo'),
           ),
           onPressed: () {
+            AppVariaveis().reset();
             Navigator.pop(context);
           },
         ),
@@ -52,7 +49,7 @@ class _TelaBlocoDeNotasState extends State<TelaBlocoDeNotas> {
         child: Container(
           height: MediaQuery.of(context).size.height,
           child: StreamBuilder<QuerySnapshot>(
-              stream: blNotas != null ? blNotas.orderBy('dataBloco').snapshots() : null,
+              stream: AppVariaveis().blocoNotas != null ? AppVariaveis().blocoNotas.orderBy('dataBloco').snapshots() : null,
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
@@ -80,12 +77,7 @@ class _TelaBlocoDeNotasState extends State<TelaBlocoDeNotas> {
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
         onPressed: () {
-          String tipo = 'adicionar';
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TelaAdicionarBlocoNotas(tipo, idUsuario()),
-              ));
+          Navigator.pushNamed(context, '/adicionarBlocoNotas', arguments: {'tipo': 'adicionar'});
         },
         child: Icon(
           Icons.add,
@@ -116,7 +108,9 @@ Widget cardNotas(context, doc) {
         title: Text(
           doc.data()['nomeBloco'],
           style: TextStyle(
-              color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context), fontWeight: FontWeight.bold),
+              color: cores('corTexto'),
+              fontSize: tamanhoFonte.letraMedia(context),
+              fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
           doc.data()['dataBloco'],
@@ -128,12 +122,7 @@ Widget cardNotas(context, doc) {
             color: cores('corSimbolo'),
           ),
           onPressed: () async {
-            String tipo = 'editar';
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TelaAdicionarBlocoNotas(tipo, doc.data()['uidBloco']),
-                ));
+            Navigator.pushNamed(context, '/adicionarBlocoNotas', arguments: {'tipo': 'editar'});
           },
         ),
         onTap: () async {

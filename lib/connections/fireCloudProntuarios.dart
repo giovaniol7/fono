@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../controllers/variaveis.dart';
 import '../widgets/mensagem.dart';
 
 String nomeColecao = 'prontuarios';
@@ -45,6 +46,7 @@ adicionarProntuario(context, uidFono, uidPaciente, nomePaciente, dataProntuario,
       };
       await novoDocumento.set(data);
       sucesso(context, 'O prontuário foi adicionado com sucesso.');
+      AppVariaveis().reset();
       Navigator.pop(context);
     } catch (e) {
       erro(context, 'Erro ao adicionar prontuário.');
@@ -75,6 +77,7 @@ editarProntuario(context, uidProntuario, uidFono, uidPaciente, nomePaciente, dat
       String? idProntuario = await buscarIdProntuario(context, nomePaciente, dataProntuario);
       await FirebaseFirestore.instance.collection(nomeColecao).doc(idProntuario).update(data);
       sucesso(context, 'O prontuário foi atualizado com sucesso.');
+      AppVariaveis().reset();
       Navigator.pop(context);
     } catch (e) {
       erro(context, 'Erro ao editar prontuários.');
@@ -88,7 +91,7 @@ apagarProntuario(context, id) async {
   try {
     await FirebaseFirestore.instance.collection(nomeColecao).doc(id).delete();
     sucesso(context, 'Prontuário apagado com sucesso!');
-    Navigator.pop(context);
+    Navigator.of(context).pop();
   } catch (e) {
     erro(context, 'Erro ao remover a prontuário.');
   }

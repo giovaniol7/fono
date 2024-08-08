@@ -1,5 +1,6 @@
-import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
+import 'package:brasil_fields/brasil_fields.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../connections/fireAuth.dart';
@@ -9,70 +10,56 @@ import '../models/maps.dart';
 import '../widgets/TextFieldSuggestions.dart';
 import '../widgets/campoTexto.dart';
 import '../widgets/mensagem.dart';
-import '/controllers/estilos.dart';
+import '../controllers/estilos.dart';
+import '../controllers/variaveis.dart';
 
 class TelaAdicionarAgenda extends StatefulWidget {
-  final String tipo;
-  final Appointment appointment;
-
-  const TelaAdicionarAgenda(this.tipo, this.appointment, {super.key});
+  const TelaAdicionarAgenda({super.key});
 
   @override
   State<TelaAdicionarAgenda> createState() => _TelaAdicionarAgendaState();
 }
 
 class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
-  late DateTime selectedDate;
-  late TimeOfDay selectedTime;
-  DateTime? pickedDate;
-  var nomeConsulta = TextEditingController();
-  var dataConsulta = TextEditingController();
-  var horarioConsulta = TextEditingController();
-  var duracaoConsulta = TextEditingController();
-  var colorConsulta = TextEditingController();
-  String labelText = "Nome do Paciente";
-  Color selecioneCorConsulta = Colors.red;
-  String selecioneFrequenciaConsulta = 'DAILY';
-  String selecioneSemanaConsulta = 'SU';
-  String _paciente = '';
-  List<String> listaPaciente = [];
-  var nome;
-  var horario;
-  var id;
-  var uidPaciente;
-  var appointment;
-  var consulta;
-  var varAtivo = '1';
+  late String? tipo;
+  late Appointment? tappedAppointment;
 
   Future<void> atualizarDados() async {
     await carregarDados();
   }
 
   carregarDados() async {
-    List<String> lista = await fazerListaPacientes(varAtivo);
-    widget.tipo == 'editar' ? appointment = await carregarAppointment(widget.appointment) : null;
-    nome = widget.appointment.subject;
-    horario = widget.appointment.startTime;
-    consulta = await buscarPorNomeHoraConsultas(context, nome, horario);
-    //String uidPac = await buscarIdPaciente(context, nome);
+    List<String> lista = await fazerListaPacientes(AppVariaveis().varAtivoPaciente);
+    tipo == 'editar' ? AppVariaveis().appointment = (await carregarAppointment(tappedAppointment)) : null;
+    AppVariaveis().txtNomeConsulta.text = tappedAppointment!.subject;
+    AppVariaveis().txtDataConsulta.text = DateFormat('dd/MM/yyyy').format(tappedAppointment!.startTime);
+    AppVariaveis().txtHorarioConsulta.text = DateFormat('HH:mm').format(tappedAppointment!.startTime);
+    AppVariaveis().consulta = await buscarPorNomeHoraConsultas(
+        context, AppVariaveis().txtNomeConsulta.text, AppVariaveis().txtHorarioConsulta.text);
 
     setState(() {
-      listaPaciente = lista;
-      id = consulta['id'];
-      uidPaciente = consulta['uidPaciente'];
-      selecioneFrequenciaConsulta = 'WEEKLY';
-      duracaoConsulta.text = '00:50';
+      tipo == 'adicionar'
+          ? AppVariaveis().txtDataConsulta.text =
+              "${AppVariaveis().nowTimer.day.toString().padLeft(2, '0')}/${AppVariaveis().nowTimer.month.toString().padLeft(2, '0')}/${AppVariaveis().nowTimer.year.toString()}"
+          : null;
 
-      if (widget.tipo == 'editar') {
-        labelText = appointment['nomeConsulta'];
-        _paciente = appointment['nomeConsulta'];
-        nomeConsulta.text = appointment['nomeConsulta'];
-        dataConsulta.text = appointment['dataConsulta'];
-        horarioConsulta.text = appointment['horarioConsulta'];
-        duracaoConsulta.text = appointment['duracaoConsulta'];
-        selecioneCorConsulta = appointment['selecioneCorConsulta'];
-        selecioneSemanaConsulta = appointment['selecioneSemanaConsulta'];
-        selecioneFrequenciaConsulta = appointment['selecioneFrequenciaConsulta'];
+      AppVariaveis().listaPaciente = lista;
+      AppVariaveis().uidAgenda = AppVariaveis().consulta['uidAgenda'] ?? '';
+      AppVariaveis().uidPaciente = AppVariaveis().consulta['uidPaciente'] ?? '';
+      AppVariaveis().selecioneFrequenciaConsulta = 'WEEKLY';
+      AppVariaveis().txtDuracaoConsulta.text = '00:50';
+
+      if (tipo == 'editar') {
+        AppVariaveis().labelText = AppVariaveis().appointment['nomeConsulta']!;
+        AppVariaveis().paciente = AppVariaveis().appointment['nomeConsulta']!;
+        AppVariaveis().txtNomeConsulta.text = AppVariaveis().appointment['nomeConsulta']!;
+        AppVariaveis().txtDataConsulta.text = AppVariaveis().appointment['dataConsulta']!;
+        AppVariaveis().txtHorarioConsulta.text = AppVariaveis().appointment['horarioConsulta']!;
+        AppVariaveis().txtDuracaoConsulta.text = AppVariaveis().appointment['duracaoConsulta']!;
+        AppVariaveis().selecioneCorConsulta = AppVariaveis().appointment['selecioneCorConsulta'];
+        AppVariaveis().selecioneSemanaConsulta = AppVariaveis().appointment['selecioneSemanaConsulta'];
+        AppVariaveis().selecioneFrequenciaConsulta =
+            AppVariaveis().appointment['selecioneFrequenciaConsulta'];
       }
     });
   }
@@ -80,24 +67,21 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
   @override
   void initState() {
     super.initState();
-    DateTime now = DateTime.now();
-    widget.tipo == 'adicionar'
-        ? dataConsulta.text =
-            "${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year.toString()}"
-        : null;
-    selectedDate = DateTime.now();
-    selectedTime = TimeOfDay.now();
     carregarDados();
   }
 
   @override
   Widget build(BuildContext context) {
+    final arguments = ModalRoute.of(context)?.settings.arguments as Map?;
+    tipo = arguments?['tipo'] as String?;
+    tappedAppointment = arguments?['appointment'] as Appointment?;
+
     TamanhoFonte tamanhoFonte = TamanhoFonte();
 
     return Scaffold(
         appBar: AppBar(
           actions: [
-            widget.tipo == 'editar'
+            tipo == 'editar'
                 ? IconButton(
                     icon: Icon(
                       Icons.delete,
@@ -117,6 +101,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                                     style: TextStyle(color: Colors.blue),
                                   ),
                                   onPressed: () {
+                                    AppVariaveis().resetAgenda();
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -127,10 +112,11 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                                   ),
                                   onPressed: () async {
                                     try {
-                                      await apagarConsultas(context, id);
+                                      await apagarConsultas(context, AppVariaveis().uidAgenda);
                                     } catch (e) {
                                       erro(context, 'Erro ao deletar Horário: $e');
                                     }
+                                    AppVariaveis().resetAgenda();
                                     Navigator.of(context).pop();
                                   },
                                 ),
@@ -144,12 +130,13 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
+              AppVariaveis().resetAgenda();
               Navigator.pop(context);
             },
           ),
           iconTheme: IconThemeData(color: cores('corSimbolo')),
           title: Text(
-            widget.tipo == 'adicionar' ? "Adicionar Horário" : "Atualizar Horário",
+            tipo == 'adicionar' ? "Adicionar Horário" : "Atualizar Horário",
             style: TextStyle(color: cores('corTexto')),
           ),
           backgroundColor: cores('corFundo'),
@@ -161,16 +148,17 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextFieldSuggestions(
+                    tipo: 'paciente',
                     icone: Icons.label,
-                    list: listaPaciente,
-                    labelText: labelText,
+                    list: AppVariaveis().listaPaciente,
+                    labelText: AppVariaveis().labelText,
                     textSuggetionsColor: cores('corSimbolo'),
                     suggetionsBackgroundColor: cores('corCaixaPadrao'),
                     outlineInputBorderColor: cores('corSombra'),
                     returnedValue: (String value) {
                       setState(() {
-                        _paciente = value;
-                        nomeConsulta.text = _paciente;
+                        AppVariaveis().paciente = value;
+                        AppVariaveis().txtNomeConsulta.text = AppVariaveis().paciente;
                       });
                     },
                     onTap: () {},
@@ -181,22 +169,23 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                     Expanded(
                       child: campoTexto(
                         'Data de Início da Consulta',
-                        dataConsulta,
+                        AppVariaveis().txtDataConsulta,
                         Icons.calendar_month_outlined,
                         formato: DataInputFormatter(),
-                        numeros: true,
+                        boardType: 'numeros',
                         iconPressed: () async {
-                          pickedDate = await showDatePicker(
+                          AppVariaveis().pickedDate = await showDatePicker(
                             context: context,
-                            initialDate: selectedDate,
+                            initialDate: AppVariaveis().selectedDate,
                             firstDate: DateTime.now(),
                             lastDate: DateTime(2100),
                           );
-                          if (pickedDate != null && pickedDate != selectedDate) {
+                          if (AppVariaveis().pickedDate != null &&
+                              AppVariaveis().pickedDate != AppVariaveis().selectedDate) {
                             setState(() {
-                              selectedDate = pickedDate!;
-                              dataConsulta.text =
-                                  "${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year.toString()}";
+                              AppVariaveis().selectedDate = AppVariaveis().pickedDate!;
+                              AppVariaveis().txtDataConsulta.text =
+                                  "${AppVariaveis().selectedDate.day.toString().padLeft(2, '0')}/${AppVariaveis().selectedDate.month.toString().padLeft(2, '0')}/${AppVariaveis().selectedDate.year.toString()}";
                             });
                           }
                         },
@@ -206,19 +195,20 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                     Expanded(
                       child: campoTexto(
                         'Horário da Consulta',
-                        horarioConsulta,
+                        AppVariaveis().txtHorarioConsulta,
                         Icons.access_time,
                         formato: HoraInputFormatter(),
-                        numeros: true,
+                        boardType: 'numeros',
                         iconPressed: () async {
                           final TimeOfDay? pickedTime = await showTimePicker(
                             context: context,
-                            initialTime: selectedTime,
+                            initialTime: AppVariaveis().selectedTime,
                           );
-                          if (pickedTime != null && pickedTime != selectedTime) {
+                          if (pickedTime != null && pickedTime != AppVariaveis().selectedTime) {
                             setState(() {
-                              selectedTime = pickedTime;
-                              horarioConsulta.text = selectedTime.format(context);
+                              AppVariaveis().selectedTime = pickedTime;
+                              AppVariaveis().txtHorarioConsulta.text =
+                                  AppVariaveis().selectedTime.format(context);
                             });
                           }
                         },
@@ -232,19 +222,20 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                     Expanded(
                       child: campoTexto(
                         'Duração da Consulta',
-                        duracaoConsulta,
+                        AppVariaveis().txtDuracaoConsulta,
                         Icons.hourglass_top_sharp,
                         formato: HoraInputFormatter(),
-                        numeros: true,
+                        boardType: 'numeros',
                         iconPressed: () async {
                           final TimeOfDay? pickedTime = await showTimePicker(
                             context: context,
-                            initialTime: selectedTime,
+                            initialTime: AppVariaveis().selectedTime,
                           );
-                          if (pickedTime != null && pickedTime != selectedTime) {
+                          if (pickedTime != null && pickedTime != AppVariaveis().selectedTime) {
                             setState(() {
-                              selectedTime = pickedTime;
-                              duracaoConsulta.text = selectedTime.format(context);
+                              AppVariaveis().selectedTime = pickedTime;
+                              AppVariaveis().txtDuracaoConsulta.text =
+                                  AppVariaveis().selectedTime.format(context);
                             });
                           }
                         },
@@ -266,7 +257,8 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                               border: Border.all(color: cores('corBorda')),
                               color: Colors.white,
                               boxShadow: [
-                                BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
+                                BoxShadow(
+                                    offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
                                 // changes position of shadow
                               ]),
                           child: DropdownButton(
@@ -283,10 +275,10 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                               height: 0,
                             ),
                             isExpanded: true,
-                            value: selecioneFrequenciaConsulta,
+                            value: AppVariaveis().selecioneFrequenciaConsulta,
                             onChanged: (newValue) {
                               setState(() {
-                                selecioneFrequenciaConsulta = newValue!;
+                                AppVariaveis().selecioneFrequenciaConsulta = newValue!;
                               });
                             },
                             items: frequencyOptions.map((option) {
@@ -334,10 +326,10 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                           height: 0,
                         ),
                         isExpanded: true,
-                        value: selecioneSemanaConsulta,
+                        value: AppVariaveis().selecioneSemanaConsulta,
                         onChanged: (newValue) {
                           setState(() {
-                            selecioneSemanaConsulta = newValue!;
+                            AppVariaveis().selecioneSemanaConsulta = newValue!;
                           });
                         },
                         items: dayOptions.map((option) {
@@ -381,10 +373,10 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                       height: 0,
                     ),
                     isExpanded: true,
-                    value: selecioneCorConsulta,
+                    value: AppVariaveis().selecioneCorConsulta,
                     onChanged: (newValue) {
                       setState(() {
-                        selecioneCorConsulta = newValue!;
+                        AppVariaveis().selecioneCorConsulta = newValue!;
                       });
                     },
                     items: colors.map((color) {
@@ -412,34 +404,35 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                               borderRadius: BorderRadius.circular(32),
                             )),
                         child: Text(
-                          widget.tipo == 'adicionar' ? 'Adicionar' : 'Atualizar',
+                          tipo == 'adicionar' ? 'Adicionar' : 'Atualizar',
                           style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                         ),
                         onPressed: () async {
-                          String colorHex = selecioneCorConsulta.value.toRadixString(16).padLeft(8, '0');
-                          if (widget.tipo == 'adicionar') {
+                          String colorHex =
+                              AppVariaveis().selecioneCorConsulta.value.toRadixString(16).padLeft(8, '0');
+                          if (tipo == 'adicionar') {
                             adicionarConsultas(
                               context,
-                              nomeConsulta.text,
-                              dataConsulta.text,
-                              horarioConsulta.text,
-                              duracaoConsulta.text,
-                              selecioneFrequenciaConsulta,
-                              selecioneSemanaConsulta,
+                              AppVariaveis().txtNomeConsulta.text,
+                              AppVariaveis().txtDataConsulta.text,
+                              AppVariaveis().txtHorarioConsulta.text,
+                              AppVariaveis().txtDuracaoConsulta.text,
+                              AppVariaveis().selecioneFrequenciaConsulta,
+                              AppVariaveis().selecioneSemanaConsulta,
                               colorHex,
                             );
                           } else {
                             editarConsultas(
                               context,
-                              id,
-                              idUsuario(),
-                              uidPaciente,
-                              nomeConsulta.text,
-                              dataConsulta.text,
-                              horarioConsulta.text,
-                              duracaoConsulta.text,
-                              selecioneFrequenciaConsulta,
-                              selecioneSemanaConsulta,
+                              AppVariaveis().uidAgenda,
+                              idFonoAuth(),
+                              AppVariaveis().uidPaciente,
+                              AppVariaveis().txtNomeConsulta.text,
+                              AppVariaveis().txtDataConsulta.text,
+                              AppVariaveis().txtHorarioConsulta.text,
+                              AppVariaveis().txtDuracaoConsulta.text,
+                              AppVariaveis().selecioneFrequenciaConsulta,
+                              AppVariaveis().selecioneSemanaConsulta,
                               colorHex,
                             );
                           }
@@ -458,6 +451,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                         style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                       ),
                       onPressed: () {
+                        AppVariaveis().resetAgenda();
                         Navigator.pop(context);
                       },
                     ),

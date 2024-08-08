@@ -2,21 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../controllers/uploadDoc.dart';
+import '../controllers/variaveis.dart';
 import '../models/maps.dart';
-
 import '../connections/fireAuth.dart';
 import '../widgets/mensagem.dart';
+import 'fireCloudEscolas.dart';
 
 String nomeColecao = 'pacientes';
 
 recuperarTodosPacientes() async {
-  return await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario());
+  return await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idFonoAuth());
 }
 
 Future<String> buscarIdPaciente(context, nome) async {
   String id = '';
 
-  await FirebaseFirestore.instance.collection(nomeColecao).where('nomePaciente', isEqualTo: nome).get().then((q) {
+  await FirebaseFirestore.instance
+      .collection(nomeColecao)
+      .where('nomePaciente', isEqualTo: nome)
+      .get()
+      .then((q) {
     if (q.docs.isNotEmpty) {
       id = q.docs[0].data()['uidPaciente'];
     }
@@ -28,8 +33,11 @@ Future<String> buscarIdPaciente(context, nome) async {
 Future<List<String>> fazerListaPacientes(varAtivo) async {
   List<String> list = [];
 
-  QuerySnapshot querySnapshot =
-      await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario()).where('ativoPaciente', isEqualTo: varAtivo).get();
+  QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+      .collection(nomeColecao)
+      .where('uidFono', isEqualTo: idFonoAuth())
+      .where('ativoPaciente', isEqualTo: varAtivo)
+      .get();
   querySnapshot.docs.forEach((doc) {
     String nome = doc['nomePaciente'];
     list.add(nome);
@@ -42,7 +50,7 @@ Future<List<String>> fazerListaUIDPacientes() async {
   List<String> list = [];
 
   QuerySnapshot querySnapshot =
-      await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario()).get();
+      await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idFonoAuth()).get();
   querySnapshot.docs.forEach((doc) {
     String id = doc.id;
     list.add(id);
@@ -85,6 +93,9 @@ adicionarPaciente(
     fileDoc,
     varAtivo) async {
   try {
+    print(escolaPaciente);
+    var confEscola = await confirmarEscola(context, escolaPaciente);
+    confEscola == false ? await adicionarEscola(context, uidFono, escolaPaciente) : null;
     String nomeSemEspacos = nomePaciente.trimRight();
     CollectionReference pacientes = FirebaseFirestore.instance.collection(nomeColecao);
     String? urlDocPaciente = fileDoc != null ? await uploadDocToFirebase(fileDoc) : '';
@@ -122,7 +133,7 @@ adicionarPaciente(
       data['idadeResponsavel$i'] = listIdadeResponsavel[i].text;
       data['telefoneResponsavel$i'] = listTelefoneResponsavel[i].text;
       data['relacaoResponsavel$i'] = listRelacaoResponsavel[i];
-      data['escolaridadeResponsavel$i'] = listEscolaridadeResponsavel[i].text;
+      data['escolaridadeResponsavel$i'] = listEscolaridadeResponsavel[i];
       data['profissaoResponsavel$i'] = listProfissaoResponsavel[i].text;
     }
     novoDocumento = await pacientes.add(data);
@@ -135,6 +146,7 @@ adicionarPaciente(
     });
     await novoDocumento.update({'uidPaciente': uidPaciente});
     sucesso(context, 'O paciente foi adicionado com sucesso.');
+    AppVariaveis().reset();
     Navigator.pop(context);
   } catch (e) {
     erro(context, 'Erro ao adicionar paciente.');
@@ -176,6 +188,8 @@ editarPaciente(
     fileDoc,
     varAtivo) async {
   try {
+    var confEscola = await confirmarEscola(context, escolaridadePaciente);
+    confEscola == false ? await adicionarEscola(context, uidFono, escolaridadePaciente) : null;
     String nomeSemEspacos = nomePaciente.trimRight();
     String? urlDocPaciente = fileDoc != null ? await uploadDocToFirebase(fileDoc) : '';
     Map<String, dynamic> data = {
@@ -210,11 +224,12 @@ editarPaciente(
       data['idadeResponsavel$i'] = listIdadeResponsavel[i].text;
       data['telefoneResponsavel$i'] = listTelefoneResponsavel[i].text;
       data['relacaoResponsavel$i'] = listRelacaoResponsavel[i];
-      data['escolaridadeResponsavel$i'] = listEscolaridadeResponsavel[i].text;
+      data['escolaridadeResponsavel$i'] = listEscolaridadeResponsavel[i];
       data['profissaoResponsavel$i'] = listProfissaoResponsavel[i].text;
     }
     await FirebaseFirestore.instance.collection(nomeColecao).doc(uidPaciente).update(data);
     sucesso(context, 'O paciente foi atualizado com sucesso.');
+    AppVariaveis().reset();
     Navigator.pop(context);
   } catch (e) {
     erro(context, 'Erro ao editar paciente.');
@@ -225,6 +240,7 @@ apagarPaciente(context, id) async {
   try {
     await FirebaseFirestore.instance.collection(nomeColecao).doc(id).delete();
     sucesso(context, 'Paciente apagado com sucesso!');
+    AppVariaveis().reset();
     Navigator.pop(context);
   } catch (e) {
     erro(context, 'Erro ao remover a paciente.');
@@ -267,7 +283,11 @@ recuperarPaciente(context, uid) async {
 
   Map<String, dynamic> paciente = {};
 
-  await FirebaseFirestore.instance.collection(nomeColecao).where('uidPaciente', isEqualTo: uid).get().then((q) {
+  await FirebaseFirestore.instance
+      .collection(nomeColecao)
+      .where('uidPaciente', isEqualTo: uid)
+      .get()
+      .then((q) {
     if (q.docs.isNotEmpty) {
       uidPaciente = q.docs[0].id;
       uidFono = q.docs[0].data()['uidFono'];
@@ -380,7 +400,11 @@ recuperarPacientePorNome(context, nome) async {
 
   Map<String, dynamic> paciente = {};
 
-  await FirebaseFirestore.instance.collection(nomeColecao).where('nomePaciente', isEqualTo: nome).get().then((q) {
+  await FirebaseFirestore.instance
+      .collection(nomeColecao)
+      .where('nomePaciente', isEqualTo: nome)
+      .get()
+      .then((q) {
     if (q.docs.isNotEmpty) {
       uidPaciente = q.docs[0].id;
       uidFono = q.docs[0].data()['uidFono'];

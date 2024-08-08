@@ -9,7 +9,7 @@ Future<Map<String, double>> calcularFinanceiro() async {
 
   QuerySnapshot usersSnapshot = await FirebaseFirestore.instance
       .collection('contas')
-      .where('uidFono', isEqualTo: idUsuario())
+      .where('uidFono', isEqualTo: idFonoAuth())
       .where('tipoTransacao', isEqualTo: 'Recebido')
       .where('estadoPago', isEqualTo: true)
       .get();
@@ -27,7 +27,7 @@ Future<Map<String, double>> calcularFinanceiro() async {
 
   QuerySnapshot recebidosSnapshot = await FirebaseFirestore.instance
       .collection('contas')
-      .where('uidFono', isEqualTo: idUsuario())
+      .where('uidFono', isEqualTo: idFonoAuth())
       .where('tipoTransacao', isEqualTo: 'Gasto')
       .where('estadoPago', isEqualTo: true)
       .get();
@@ -60,7 +60,7 @@ Future<double> calcularAReceber() async {
 
   QuerySnapshot usersSnapshot = await FirebaseFirestore.instance
       .collection('contas')
-      .where('uidFono', isEqualTo: idUsuario())
+      .where('uidFono', isEqualTo: idFonoAuth())
       .where('tipoTransacao', isEqualTo: 'Recebido')
       .where('estadoPago', isEqualTo: false)
       .get();
@@ -84,7 +84,7 @@ Future<double> calcularAPagar() async {
 
   QuerySnapshot recebidosSnapshot = await FirebaseFirestore.instance
       .collection('contas')
-      .where('uidFono', isEqualTo: idUsuario())
+      .where('uidFono', isEqualTo: idFonoAuth())
       .where('tipoTransacao', isEqualTo: 'Gasto')
       .where('estadoPago', isEqualTo: false)
       .get();

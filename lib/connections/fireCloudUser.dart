@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,7 +10,7 @@ String nomeColecao = 'users';
 Future<String> retornarIDUser() async {
   String id = '';
 
-  await FirebaseFirestore.instance.collection(nomeColecao).where('uid', isEqualTo: idUsuario()).get().then((q) {
+  await FirebaseFirestore.instance.collection(nomeColecao).where('uid', isEqualTo: idFonoAuth()).get().then((q) {
     if (q.docs.isNotEmpty) {
       id = q.docs[0].id;
     }
@@ -66,7 +65,7 @@ Future<Map<String, String>> listarUsuario() async {
   String telefone = '';
   Map<String, String> usuario = {};
 
-  await FirebaseFirestore.instance.collection(nomeColecao).where('uid', isEqualTo: idUsuario()).get().then((q) {
+  await FirebaseFirestore.instance.collection(nomeColecao).where('uid', isEqualTo: idFonoAuth()).get().then((q) {
     if (q.docs.isNotEmpty) {
       id = q.docs[0].id;
       uid = q.docs[0].data()['uid'];
@@ -93,5 +92,49 @@ Future<Map<String, String>> listarUsuario() async {
     'cpf': cpf,
     'crfa': crfa,
   };
+  return usuario;
+}
+
+recuperarPorFonoID() async {
+  String id = '';
+  String uid = '';
+  String urlImage = '';
+  String nome = '';
+  String dtNascimento = '';
+  String genero = '';
+  String email = '';
+  String cpf = '';
+  String crfa = '';
+  String telefone = '';
+  Map<String, String> usuario = {};
+
+  await FirebaseFirestore.instance.collection(nomeColecao).where('uid', isEqualTo: idFonoAuth()).get().then((q) {
+    if (q.docs.isNotEmpty) {
+      id = q.docs[0].id;
+      uid = q.docs[0].data()['uid'];
+      urlImage = q.docs[0].data()['urlImage'];
+      nome = q.docs[0].data()['nome'];
+      dtNascimento = q.docs[0].data()['dtNascimento'];
+      genero = q.docs[0].data()['genero'];
+      email = q.docs[0].data()['email'];
+      cpf = q.docs[0].data()['cpf'];
+      crfa = q.docs[0].data()['crfa'];
+      telefone = q.docs[0].data()['telefone'];
+    }
+  });
+
+  usuario = {
+    'id': id,
+    'uid': uid,
+    'urlImage': urlImage,
+    'nome': nome,
+    'dtNascimento': dtNascimento,
+    'genero': genero,
+    'email': email,
+    'telefone': telefone,
+    'cpf': cpf,
+    'crfa': crfa,
+  };
+
   return usuario;
 }

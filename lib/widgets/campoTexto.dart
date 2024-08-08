@@ -3,7 +3,17 @@ import 'package:flutter/services.dart';
 import '../controllers/estilos.dart';
 
 campoTexto(texto, controller, icone,
-    {key, senha, sufIcon, numeros, formato, maxPalavras, maxLinhas, tamanho, validator, onchaged, iconPressed}) {
+    {key,
+    senha,
+    sufIcon,
+    boardType,
+    formato,
+    maxPalavras,
+    maxLinhas,
+    tamanho,
+    validator,
+    onchaged,
+    iconPressed}) {
   return Container(
     decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.0),
@@ -33,16 +43,25 @@ campoTexto(texto, controller, icone,
           prefixIconColor: cores('corSimbolo'),
           labelText: texto,
           labelStyle: TextStyle(color: cores('corDetalhe'), fontSize: 18, fontWeight: FontWeight.w500),
-          border: const OutlineInputBorder(),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: cores('corBorda'),
+              width: 5.0,
+            ),
+            gapPadding: 5.0,
+          ),
           focusColor: Colors.grey[100],
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
-              color: cores('corPrimaria'),
+              color: cores('corBorda'),
               width: 3.0,
             ),
           ),
         ),
-        keyboardType: numeros == true ? TextInputType.number : TextInputType.text,
+        keyboardType: boardType == 'numeros'
+            ? TextInputType.number
+            : (boardType == 'multiLinhas' ? TextInputType.multiline : TextInputType.text),
+        textInputAction: TextInputAction.newline,
         inputFormatters: formato != null
             ? [
                 FilteringTextInputFormatter.digitsOnly,

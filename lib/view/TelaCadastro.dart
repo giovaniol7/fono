@@ -1,18 +1,18 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
+
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:provider/provider.dart';
 
 import '../connections/fireAuth.dart';
+import '../controllers/variaveis.dart';
 import '../controllers/uploadImage.dart';
+import '../controllers/estilos.dart';
 import '../widgets/campoTexto.dart';
 import '../widgets/mensagem.dart';
-import '../controllers/estilos.dart';
-
-enum Gender { male, female }
 
 class TelaCadastro extends StatefulWidget {
   const TelaCadastro({Key? key}) : super(key: key);
@@ -22,49 +22,15 @@ class TelaCadastro extends StatefulWidget {
 }
 
 class _TelaCadastroState extends State<TelaCadastro> {
-  var urlImage;
-  var fileImage;
-  final keyNome = GlobalKey<FormState>();
-  final keyEmail = GlobalKey<FormState>();
-  final keyDtNascimento = GlobalKey<FormState>();
-  final keyCPF = GlobalKey<FormState>();
-  final keyCRFa = GlobalKey<FormState>();
-  final keyTelefone = GlobalKey<FormState>();
-  final keySenha = GlobalKey<FormState>();
-  final keySenhaConfirmar = GlobalKey<FormState>();
-  var txtNome = TextEditingController();
-  var txtEmail = TextEditingController();
-  var txtSenha = TextEditingController();
-  var txtDtNascimento = TextEditingController();
-  var txtCPF = TextEditingController();
-  var txtCRFa = TextEditingController();
-  var txtTelefone = TextEditingController();
-  var txtSenhaCofirmar = TextEditingController();
-  bool _obscureText = true;
-  bool _obscureText2 = true;
-  Gender? _selectedGeneroFono;
-
-  void _toggle() {
-    setState(() {
-      _obscureText = !_obscureText;
-    });
-  }
-
-  void _toggle2() {
-    setState(() {
-      _obscureText2 = !_obscureText2;
-    });
-  }
-
   bool validarCampos() {
-    return (keyNome.currentState!.validate() &&
-        keyDtNascimento.currentState!.validate() &&
-        keyEmail.currentState!.validate() &&
-        keyCPF.currentState!.validate() &&
-        keyCRFa.currentState!.validate() &&
-        keyTelefone.currentState!.validate() &&
-        keySenha.currentState!.validate() &&
-        keySenhaConfirmar.currentState!.validate());
+    return (AppVariaveis().keyNome.currentState!.validate() &&
+        AppVariaveis().keyDtNascimento.currentState!.validate() &&
+        AppVariaveis().keyEmail.currentState!.validate() &&
+        AppVariaveis().keyCPF.currentState!.validate() &&
+        AppVariaveis().keyCRFa.currentState!.validate() &&
+        AppVariaveis().keyTelefone.currentState!.validate() &&
+        AppVariaveis().keySenha.currentState!.validate() &&
+        AppVariaveis().keySenhaConfirmar.currentState!.validate());
   }
 
   @override
@@ -73,27 +39,39 @@ class _TelaCadastroState extends State<TelaCadastro> {
 
     void verificarSenhas() async {
       final DateFormat formatter = DateFormat('dd/MM/yyyy');
-      final DateTime dataNascimento = formatter.parse(txtDtNascimento.text);
+      final DateTime dataNascimento = formatter.parse(AppVariaveis().txtDtNascimento.text);
       final DateTime agora = DateTime.now();
       final int idade = agora.difference(dataNascimento).inDays ~/ 365;
-      if (txtCPF.text.isNotEmpty &&
-          txtEmail.text.isNotEmpty &&
-          txtNome.text.isNotEmpty &&
-          txtDtNascimento.text.isNotEmpty &&
-          txtCRFa.text.isNotEmpty &&
-          txtTelefone.text.isNotEmpty &&
-          txtSenha.text.isNotEmpty &&
-          txtSenhaCofirmar.text.isNotEmpty &&
-          _selectedGeneroFono != null) {
+      if (AppVariaveis().txtCPF.text.isNotEmpty &&
+          AppVariaveis().txtEmail.text.isNotEmpty &&
+          AppVariaveis().txtNome.text.isNotEmpty &&
+          AppVariaveis().txtDtNascimento.text.isNotEmpty &&
+          AppVariaveis().txtCRFa.text.isNotEmpty &&
+          AppVariaveis().txtTelefone.text.isNotEmpty &&
+          AppVariaveis().txtSenha.text.isNotEmpty &&
+          AppVariaveis().txtSenhaConfirmar.text.isNotEmpty &&
+          AppVariaveis().selectedGeneroFono != null) {
         if (idade >= 18) {
-          if (txtEmail.text.contains('@')) {
-            if (txtSenha.text != txtSenhaCofirmar.text) {
+          if (AppVariaveis().txtEmail.text.contains('@')) {
+            if (AppVariaveis().txtSenha.text != AppVariaveis().txtSenhaConfirmar.text) {
               erro(context, 'Senhas não coincidem.');
             } else {
-              if (txtSenha.text.length >= 6) {
-                urlImage != null ? urlImage = await uploadImageUsers(fileImage, 'users') : urlImage = '';
-                criarConta(context, urlImage, _selectedGeneroFono.toString(), txtNome.text, txtDtNascimento.text,
-                    txtEmail.text, txtCPF.text, txtCRFa.text, txtTelefone.text, txtSenha.text);
+              if (AppVariaveis().txtSenha.text.length >= 6) {
+                AppVariaveis().urlImageFono != null
+                    ? AppVariaveis().urlImageFono =
+                        (await uploadImageUsers(AppVariaveis().fileImageFono, 'users'))!
+                    : AppVariaveis().urlImageFono = '';
+                criarConta(
+                    context,
+                    AppVariaveis().urlImageFono,
+                    AppVariaveis().selectedGeneroFono.toString(),
+                    AppVariaveis().txtNome.text,
+                    AppVariaveis().txtDtNascimento.text,
+                    AppVariaveis().txtEmail.text,
+                    AppVariaveis().txtCPF.text,
+                    AppVariaveis().txtCRFa.text,
+                    AppVariaveis().txtTelefone.text,
+                    AppVariaveis().txtSenha.text);
               } else {
                 erro(context, 'Senha deve possuir mais de 6 caracteres.');
               }
@@ -115,6 +93,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
+            AppVariaveis().reset();
             Navigator.pop(context);
           },
         ),
@@ -136,7 +115,8 @@ class _TelaCadastroState extends State<TelaCadastro> {
                     boxShadow: [
                       BoxShadow(offset: Offset(0, 3), color: cores('corSombra'), blurRadius: 5),
                     ],
-                    borderRadius: BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
+                    borderRadius:
+                        BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -150,23 +130,17 @@ class _TelaCadastroState extends State<TelaCadastro> {
                         ),
                         child: InkWell(
                           onTap: () async {
-                            fileImage = await pickedImage();
+                            AppVariaveis().fileImageFono = await pickedImage();
                             setState(() {
-                              fileImage = fileImage!;
+                              AppVariaveis().fileImageFono = AppVariaveis().fileImageFono!;
                             });
                           },
-                          child: fileImage == null
-                              ? Icon(
-                                  Icons.person_add_alt_rounded,
-                                  color: cores('corTextoBotao'),
-                                  size: 40.0,
-                                )
+                          child: AppVariaveis().fileImageFono == null
+                              ? Icon(Icons.person_add_alt_rounded, color: cores('corTextoBotao'), size: 40.0)
                               : CircleAvatar(
                                   maxRadius: 5,
                                   minRadius: 1,
-                                  backgroundImage: FileImage(
-                                    File(fileImage),
-                                  ),
+                                  backgroundImage: FileImage(File(AppVariaveis().fileImageFono)),
                                 ),
                         ),
                       ),
@@ -197,11 +171,11 @@ class _TelaCadastroState extends State<TelaCadastro> {
                             style: TextStyle(color: cores('corTexto')),
                           ),
                           value: Gender.male,
-                          groupValue: _selectedGeneroFono,
+                          groupValue: AppVariaveis().selectedGeneroFono,
                           activeColor: cores('corTexto'),
                           onChanged: (value) {
                             setState(() {
-                              _selectedGeneroFono = value;
+                              AppVariaveis().selectedGeneroFono = value;
                             });
                           },
                         ),
@@ -213,11 +187,11 @@ class _TelaCadastroState extends State<TelaCadastro> {
                             style: TextStyle(color: cores('corTexto')),
                           ),
                           value: Gender.female,
-                          groupValue: _selectedGeneroFono,
+                          groupValue: AppVariaveis().selectedGeneroFono,
                           activeColor: cores('corTexto'),
                           onChanged: (value) {
                             setState(() {
-                              _selectedGeneroFono = value;
+                              AppVariaveis().selectedGeneroFono = value;
                             });
                           },
                         ),
@@ -225,51 +199,74 @@ class _TelaCadastroState extends State<TelaCadastro> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  campoTexto('Nome Completo', txtNome, Icons.person, key: keyNome, validator: true),
+                  campoTexto('Nome Completo', AppVariaveis().txtNome, Icons.person,
+                      key: AppVariaveis().keyNome, validator: true),
                   const SizedBox(height: 20),
-                  campoTexto('Data de Nascimento', txtDtNascimento, Icons.date_range,
-                      formato: DataInputFormatter(), numeros: true, key: keyDtNascimento, validator: true),
+                  campoTexto('Data de Nascimento', AppVariaveis().txtDtNascimento, Icons.date_range,
+                      formato: DataInputFormatter(),
+                      boardType: 'numeros',
+                      key: AppVariaveis().keyDtNascimento,
+                      validator: true),
                   const SizedBox(height: 20),
-                  campoTexto('Email', txtEmail, Icons.email, key: keyEmail, validator: true),
+                  campoTexto('Email', AppVariaveis().txtEmail, Icons.email,
+                      key: AppVariaveis().keyEmail, validator: true),
                   const SizedBox(height: 20),
-                  campoTexto('CPF', txtCPF, Icons.credit_card,
-                      formato: CpfInputFormatter(), numeros: true, key: keyCPF, validator: true),
+                  campoTexto('CPF', AppVariaveis().txtCPF, Icons.credit_card,
+                      formato: CpfInputFormatter(),
+                      boardType: 'numeros',
+                      key: AppVariaveis().keyCPF,
+                      validator: true),
                   const SizedBox(height: 20),
-                  campoTexto('CRFa', txtCRFa, Icons.credit_card,
+                  campoTexto('CRFa', AppVariaveis().txtCRFa, Icons.credit_card,
                       formato: MaskTextInputFormatter(
                         mask: '#-#####',
                         filter: {"#": RegExp(r'[0-9]')},
                       ),
-                      numeros: true,
-                      key: keyCRFa,
+                      boardType: 'numeros',
+                      key: AppVariaveis().keyCRFa,
                       validator: true),
                   const SizedBox(height: 20),
-                  campoTexto('Telefone', txtTelefone, Icons.phone,
-                      formato: TelefoneInputFormatter(), numeros: true, key: keyTelefone, validator: true),
+                  campoTexto('Telefone', AppVariaveis().txtTelefone, Icons.phone,
+                      formato: TelefoneInputFormatter(),
+                      boardType: 'numeros',
+                      key: AppVariaveis().keyTelefone,
+                      validator: true),
                   const SizedBox(height: 20),
-                  campoTexto('Senha', txtSenha, Icons.lock,
-                      key: keySenha,
+                  Consumer<AppVariaveis>(builder: (context, appVariaveis, child) {
+                    return campoTexto(
+                      'Senha',
+                      AppVariaveis().txtSenha,
+                      Icons.lock,
+                      key: AppVariaveis().keySenha,
                       validator: true,
                       sufIcon: IconButton(
                         icon: Icon(
-                          _obscureText ? Icons.visibility_off : Icons.visibility,
+                          AppVariaveis().obscureText ? Icons.visibility_off : Icons.visibility,
                           color: cores('corTexto'),
                         ),
-                        onPressed: _toggle,
+                        onPressed: () {
+                          AppVariaveis().toggleObscureText();
+                        },
                       ),
-                      senha: _obscureText),
+                      senha: AppVariaveis().obscureText,
+                    );
+                  }),
                   const SizedBox(height: 20),
-                  campoTexto('Confirmar Senha', txtSenhaCofirmar, Icons.lock,
-                      key: keySenhaConfirmar,
-                      validator: true,
-                      sufIcon: IconButton(
-                        icon: Icon(
-                          _obscureText2 ? Icons.visibility_off : Icons.visibility,
-                          color: cores('corTexto'),
+                  Consumer<AppVariaveis>(builder: (context, appVariaveis, child) {
+                    return campoTexto('Confirmar Senha', AppVariaveis().txtSenhaConfirmar, Icons.lock,
+                        key: AppVariaveis().keySenhaConfirmar,
+                        validator: true,
+                        sufIcon: IconButton(
+                          icon: Icon(
+                            AppVariaveis().obscureText2 ? Icons.visibility_off : Icons.visibility,
+                            color: cores('corTexto'),
+                          ),
+                          onPressed: () {
+                            AppVariaveis().toggleObscureText2();
+                          },
                         ),
-                        onPressed: _toggle2,
-                      ),
-                      senha: _obscureText2),
+                        senha: AppVariaveis().obscureText2);
+                  }),
                   const SizedBox(height: 40),
                   Row(
                     mainAxisSize: MainAxisSize.min,

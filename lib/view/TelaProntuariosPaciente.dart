@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fonocare/controllers/variaveis.dart';
 import '../controllers/formatarMesAno.dart';
 import 'TelaAdicionarProntuarios.dart';
 import 'package:fonocare/connections/fireCloudProntuarios.dart';
@@ -12,38 +13,39 @@ import '../controllers/estilos.dart';
 import '../models/maps.dart';
 
 class TelaProntuariosPaciente extends StatefulWidget {
-  final String uidPaciente;
-
-  const TelaProntuariosPaciente(this.uidPaciente, {super.key});
+  const TelaProntuariosPaciente({super.key});
 
   @override
   State<TelaProntuariosPaciente> createState() => _TelaProntuariosPacienteState();
 }
 
 class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
-  var prontuarios;
-  var paciente;
-  String nomePaciente = '';
-  String? selecioneMes;
-  int? selecioneAno;
-
-  carregarDados() async {
-    prontuarios = await recuperarTodosProntuario(widget.uidPaciente);
-    paciente = await recuperarPaciente(context, widget.uidPaciente);
-
-    setState(() {
-      int mesAtual = DateTime.now().month;
-      int anoAtual = DateTime.now().year;
-      selecioneMes = intMesToAbrev[mesAtual] ?? 'Desconhecido';
-      selecioneAno = anoAtual;
-      nomePaciente = paciente['nomePaciente'].split(' ')[0];
-    });
-  }
+  late String? uidPaciente;
 
   @override
   void initState() {
     super.initState();
-    carregarDados();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final arguments = ModalRoute.of(context)?.settings.arguments as Map?;
+      if (arguments != null && arguments['uidPaciente'] != null) {
+        setState(() {
+          uidPaciente = arguments['uidPaciente'] as String?;
+          AppVariaveis().uidPaciente = uidPaciente!;
+          AppVariaveis().selecioneMes = 'Todos';
+          AppVariaveis().selecioneAno = AppVariaveis().anoAtual;
+        });
+        carregarDados();
+      }
+    });
+  }
+
+  carregarDados() async {
+    AppVariaveis().prontuarios = await recuperarTodosProntuario(uidPaciente);
+    AppVariaveis().pacientePront = await recuperarPaciente(context, uidPaciente);
+
+    setState(() {
+      AppVariaveis().nomePacientePront = AppVariaveis().pacientePront['nomePaciente'].split(' ')[0];
+    });
   }
 
   Widget build(BuildContext context) {
@@ -58,11 +60,12 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
             size: 30,
           ),
           onPressed: () {
+            AppVariaveis().resetProntuarioPac();
             Navigator.pop(context);
           },
         ),
         title: Text(
-          "Prontuários de $nomePaciente",
+          "Prontuários de ${AppVariaveis().nomePacientePront}",
           style: TextStyle(color: cores('corTexto'), fontSize: 24),
         ),
         backgroundColor: cores('corTerciaria'),
@@ -113,14 +116,17 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
                           underline: Container(
                             height: 0,
                           ),
-                          value: selecioneMes,
+                          value: nomeMesesAbrev.contains(AppVariaveis().selecioneMes)
+                              ? AppVariaveis().selecioneMes
+                              : nomeMesesAbrev.first,
+                          // Valor padrão se não estiver na lista
                           onChanged: (String? newValue) {
                             setState(() {
-                              selecioneMes = newValue!;
+                              AppVariaveis().selecioneMes = newValue!;
                             });
                           },
-                          items: nomeMesesAbrev.map((state) {
-                            return DropdownMenuItem(
+                          items: nomeMesesAbrev.toSet().map((state) {
+                            return DropdownMenuItem<String>(
                               value: state,
                               child: Text(state),
                             );
@@ -147,10 +153,10 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
                           underline: Container(
                             height: 0,
                           ),
-                          value: selecioneAno,
+                          value: AppVariaveis().selecioneAno,
                           onChanged: (int? newValue) {
                             setState(() {
-                              selecioneAno = newValue!;
+                              AppVariaveis().selecioneAno = newValue!;
                             });
                           },
                           items: getAnos().map((int ano) {
@@ -167,78 +173,87 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
               ),
               SizedBox(height: 10),
               Container(
-                height: MediaQuery.of(context).size.height * 0.75,
-                child: StreamBuilder<QuerySnapshot>(
-                    stream: prontuarios != null ? prontuarios.orderBy('dataProntuario').snapshots() : null,
-                    builder: (context, snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.none:
-                          return const Center(
-                            child: Text('Não foi possível conectar'),
-                          );
-                        case ConnectionState.waiting:
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        default:
-                          final dados = snapshot.requireData;
-                          Map<String, List<QueryDocumentSnapshot>> prontuarioPorMes = {};
+                  height: MediaQuery.of(context).size.height * 0.75,
+                  child: ListView(
+                    children: [
+                      StreamBuilder<QuerySnapshot>(
+                          stream: AppVariaveis().prontuarios != null
+                              ? AppVariaveis().prontuarios.orderBy('dataProntuario').snapshots()
+                              : null,
+                          builder: (context, snapshot) {
+                            switch (snapshot.connectionState) {
+                              case ConnectionState.none:
+                                return const Center(
+                                  child: Text('Não foi possível conectar'),
+                                );
+                              case ConnectionState.waiting:
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              default:
+                                final dados = snapshot.requireData;
+                                Map<String, List<QueryDocumentSnapshot>> prontuarioPorMes = {};
 
-                          dados.docs.forEach((doc) {
-                            String dataString = doc['dataProntuario'];
-                            DateTime data = DateFormat('dd/MM/yyyy').parse(dataString);
-                            String mesAno = DateFormat('MM/yyyy').format(data);
-                            String ano = DateFormat('yyyy').format(data);
+                                dados.docs.forEach((doc) {
+                                  String dataString = doc['dataProntuario'];
+                                  DateTime data = DateFormat('dd/MM/yyyy').parse(dataString);
+                                  String mesAno = DateFormat('MM/yyyy').format(data);
+                                  String ano = DateFormat('yyyy').format(data);
 
-                            String mesSelecionadoFormatado = intMesToAbrev.entries
-                                .firstWhere((entry) => entry.value == selecioneMes, orElse: () => MapEntry(0, ''))
-                                .key
-                                .toString()
-                                .padLeft(2, '0');
+                                  String mesSelecionadoFormatado = intMesToAbrev.entries
+                                      .firstWhere((entry) => entry.value == AppVariaveis().selecioneMes,
+                                          orElse: () => MapEntry(0, ''))
+                                      .key
+                                      .toString()
+                                      .padLeft(2, '0');
 
-                            if ((selecioneMes == 'Todos' || mesAno.startsWith(mesSelecionadoFormatado)) &&
-                                (selecioneAno == 0 || ano == selecioneAno.toString())) {
-                              if (!prontuarioPorMes.containsKey(mesAno)) {
-                                prontuarioPorMes[mesAno] = [];
-                              }
-                              prontuarioPorMes[mesAno]!.add(doc);
+                                  if ((AppVariaveis().selecioneMes == 'Todos' ||
+                                          mesAno.startsWith(mesSelecionadoFormatado)) &&
+                                      (AppVariaveis().selecioneAno == 0 ||
+                                          ano == AppVariaveis().selecioneAno.toString())) {
+                                    if (!prontuarioPorMes.containsKey(mesAno)) {
+                                      prontuarioPorMes[mesAno] = [];
+                                    }
+                                    prontuarioPorMes[mesAno]!.add(doc);
+                                  }
+                                });
+
+                                List<DateTime> mesesOrdenados = prontuarioPorMes.keys.map((mesAno) {
+                                  return DateFormat('MM/yyyy').parse(mesAno);
+                                }).toList();
+
+                                mesesOrdenados.sort((a, b) => b.compareTo(a));
+
+                                return Column(
+                                  children: mesesOrdenados.map((mesAno) {
+                                    String mesAnoFormatado = DateFormat('MM/yyyy').format(mesAno);
+                                    List<QueryDocumentSnapshot> prontuarios =
+                                        prontuarioPorMes[mesAnoFormatado]!;
+                                    return Column(
+                                      children: [
+                                        Text(
+                                          formatarMesAno(mesAnoFormatado),
+                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                              fontWeight: FontWeight.w700, color: cores('corTexto')),
+                                        ),
+                                        ListView.separated(
+                                          physics: const NeverScrollableScrollPhysics(),
+                                          shrinkWrap: true,
+                                          padding: const EdgeInsets.all(10),
+                                          scrollDirection: Axis.vertical,
+                                          itemBuilder: (context, index) =>
+                                              cardProntuario(context, prontuarios[index]),
+                                          separatorBuilder: (context, _) => const SizedBox(width: 5),
+                                          itemCount: prontuarios.length,
+                                        ),
+                                      ],
+                                    );
+                                  }).toList(),
+                                );
                             }
-                          });
-
-                          List<DateTime> mesesOrdenados = prontuarioPorMes.keys.map((mesAno) {
-                            return DateFormat('MM/yyyy').parse(mesAno);
-                          }).toList();
-
-                          mesesOrdenados.sort((a, b) => b.compareTo(a));
-
-                          return Column(
-                            children: mesesOrdenados.map((mesAno) {
-                              String mesAnoFormatado = DateFormat('MM/yyyy').format(mesAno);
-                              List<QueryDocumentSnapshot> prontuarios = prontuarioPorMes[mesAnoFormatado]!;
-                              return Column(
-                                children: [
-                                  Text(
-                                    formatarMesAno(mesAnoFormatado),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleLarge
-                                        ?.copyWith(fontWeight: FontWeight.w700, color: cores('corTexto')),
-                                  ),
-                                  ListView.separated(
-                                    padding: const EdgeInsets.all(10),
-                                    scrollDirection: Axis.vertical,
-                                    itemBuilder: (context, index) => cardProntuario(context, prontuarios[index]),
-                                    separatorBuilder: (context, _) => const SizedBox(width: 5),
-                                    itemCount: prontuarios.length,
-                                    shrinkWrap: true,
-                                  ),
-                                ],
-                              );
-                            }).toList(),
-                          );
-                      }
-                    }),
-              ),
+                          }),
+                    ],
+                  )),
             ],
           ),
         ),
@@ -246,14 +261,13 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
         onPressed: () async {
-          String tipo = 'adicionar';
-          var appointment = await appointmentsPorUIDPaciente(widget.uidPaciente);
+          var tappedAppointment = await appointmentsPorUIDPaciente(uidPaciente);
           DateTime dataProntuario = DateTime.now();
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TelaAdicionarProntuarios(tipo, appointment, dataProntuario),
-              ));
+          Navigator.pushNamed(context, '/adicionarProntuarios', arguments: {
+            'tipo': 'adicionar',
+            'tappedAppointment': tappedAppointment,
+            'dataClicada': dataProntuario
+          });
         },
         child: Icon(
           Icons.add,
@@ -282,7 +296,9 @@ Widget cardProntuario(context, doc) {
         title: Text(
           doc.data()['dataProntuario'],
           style: TextStyle(
-              color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context), fontWeight: FontWeight.bold),
+              color: cores('corTexto'),
+              fontSize: tamanhoFonte.letraMedia(context),
+              fontWeight: FontWeight.bold),
         ),
         trailing: IconButton(
           icon: Icon(
@@ -290,24 +306,20 @@ Widget cardProntuario(context, doc) {
             color: cores('corSimbolo'),
           ),
           onPressed: () async {
-            String tipo = 'editar';
-            var appointment = await appointmentsPorUIDPaciente(doc.data()['uidPaciente']);
+            var tappedAppointment = await appointmentsPorUIDPaciente(doc.data()['uidPaciente']);
             String dataProntuarioString = doc.data()['dataProntuario'];
             DateTime dataProntuario = DateFormat('dd/MM/yyyy').parse(dataProntuarioString);
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TelaAdicionarProntuarios(tipo, appointment, dataProntuario),
-                ));
+            Navigator.pushNamed(context, '/adicionarProntuarios', arguments: {
+              'tipo': 'editar',
+              'tappedAppointment': tappedAppointment,
+              'dataClicada': dataProntuario
+            });
           },
         ),
         onTap: () {
           String dataProntuarioString = doc.data()['dataProntuario'];
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TelaDadosProntuarios(doc.data()['uidPaciente'], dataProntuarioString),
-              ));
+          Navigator.pushNamed(context, '/dadosProntuarios',
+              arguments: {'uidPaciente': doc.data()['uidPaciente'], 'dataClicada': dataProntuarioString});
         },
       ),
     ),

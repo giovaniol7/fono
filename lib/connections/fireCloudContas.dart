@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../controllers/variaveis.dart';
 import '../widgets/mensagem.dart';
 import 'fireAuth.dart';
 
@@ -27,26 +28,8 @@ retornarIDContas() async {
 }
 
 listarContas() async {
-  return FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario());
+  return FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idFonoAuth());
 }
-
-/*editarContas(context, id, uidFono, uidPaciente, nomePaciente, dataConsulta, horarioConsulta, duracaoConsulta,
-    frequenciaConsulta, semanaConsulta, colorConsulta) async {
-  Map<String, dynamic> data = {
-    'uidFono': uidFono,
-    'nomePaciente': nomePaciente,
-    'uidPaciente': uidPaciente,
-    'dataConsulta': dataConsulta,
-    'horarioConsulta': horarioConsulta,
-    'duracaoConsulta': duracaoConsulta,
-    'frequenciaConsulta': frequenciaConsulta,
-    'semanaConsulta': semanaConsulta,
-    'colorConsulta': colorConsulta,
-  };
-  await FirebaseFirestore.instance.collection('consulta').doc(retornarIDContas()).update(data);
-  sucesso(context, 'O horário foi alterado com sucesso.');
-  Navigator.pop(context);
-}*/
 
 adicionarContas(
     context,
@@ -152,6 +135,7 @@ adicionarContas(
         }
       }
       sucesso(context, 'Conta adicionada com sucesso.');
+      AppVariaveis().reset();
       Navigator.pop(context);
     } catch (e) {
       erro(context, 'Erro ao adicionar contas.');
@@ -233,7 +217,7 @@ adicionarContasSemanais(
 Stream<QuerySnapshot<Object?>> recuperarCredito() {
   return FirebaseFirestore.instance
       .collection('contas')
-      .where('uidFono', isEqualTo: idUsuario())
+      .where('uidFono', isEqualTo: idFonoAuth())
       .where('tipoTransacao', isEqualTo: 'Gasto')
       .orderBy('dataHora', descending: true)
       .snapshots();
@@ -242,12 +226,124 @@ Stream<QuerySnapshot<Object?>> recuperarCredito() {
 Stream<QuerySnapshot<Object?>> recuperarDebito() {
   return FirebaseFirestore.instance
       .collection('contas')
-      .where('uidFono', isEqualTo: idUsuario())
+      .where('uidFono', isEqualTo: idFonoAuth())
       .where('tipoTransacao', isEqualTo: 'Recebido')
       .orderBy('dataHora', descending: true)
       .snapshots();
 }
 
 Stream<QuerySnapshot<Object?>> recuperarGeral() {
-  return FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario()).snapshots();
+  return FirebaseFirestore.instance
+      .collection(nomeColecao)
+      .where('uidFono', isEqualTo: idFonoAuth())
+      .snapshots();
+}
+
+editarContas(
+    context,
+    uidConta,
+    uidFono,
+    selecioneTipoTransacao,
+    selecioneEstadoRecebido,
+    selecioneEstadoPago,
+    selecioneEstadoTipo,
+    nomeConta,
+    preco,
+    selecioneFormaPagamento,
+    selecioneQntdParcelas,
+    dataFormatada,
+    horaCompra,
+    dataHora,
+    descricaoConta) async {
+  Map<String, dynamic> data = {
+    'uidFono': uidFono,
+    'tipoTransacao': selecioneTipoTransacao,
+    'tipo': selecioneEstadoTipo,
+    'nomeConta': nomeConta,
+    'preco': preco,
+    'formaPagamento': selecioneFormaPagamento,
+    'qntdParcelas': selecioneQntdParcelas,
+    'data': dataFormatada,
+    'hora': horaCompra,
+    'dataHora': dataHora,
+    'descricaoConta': descricaoConta,
+  };
+  if (selecioneTipoTransacao == 'Gasto') {
+    data['estadoPago'] = selecioneEstadoPago;
+  }
+  if (selecioneTipoTransacao == 'Recebido') {
+    data['estadoRecebido'] = selecioneEstadoRecebido;
+  }
+
+  await FirebaseFirestore.instance.collection(nomeColecao).doc(uidConta).update(data);
+  sucesso(context, 'A Conta foi alterado com sucesso.');
+  AppVariaveis().reset();
+  Navigator.pop(context);
+}
+
+Future<Map<String, String>> recuperarConta(context, nomeContaProc) async {
+  Map<String, String> conta = {};
+
+  try {
+    String uidFono = '';
+    String tipoTransacao = '';
+    String estadoPago = '';
+    String estadoRecebido = '';
+    String tipo = '';
+    String nomeConta = '';
+    String preco = '';
+    String formaPagamento = '';
+    String qntdParcelas = '';
+    String data = '';
+    String hora = '';
+    String dataHora = '';
+    String descricaoConta = '';
+    String uidConta = '';
+
+    var querySnapshot = await FirebaseFirestore.instance
+        .collection(nomeColecao)
+        .where('nomeConta', isEqualTo: nomeContaProc)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      var docData = querySnapshot.docs[0].data();
+
+      uidConta = querySnapshot.docs[0].id;
+      uidFono = docData['uidFono'];
+      tipoTransacao = docData['tipoTransacao'];
+      estadoPago = docData['estadoPago'];
+      estadoRecebido = docData['estadoRecebido'] ?? '';
+      tipo = docData['tipo'];
+      nomeConta = docData['nomeConta'];
+      preco = docData['preco'];
+      formaPagamento = docData['formaPagamento'];
+      qntdParcelas = docData['qntdParcelas'];
+      data = docData['data'];
+      hora = docData['hora'];
+      dataHora = docData['dataHora'];
+      descricaoConta = docData['descricaoConta'];
+    }
+
+    conta = {
+      'uidConta': uidConta,
+      'uidFono': uidFono,
+      'tipoTransacao': tipoTransacao,
+      'estadoPago': estadoPago,
+      'estadoRecebido': estadoRecebido,
+      'tipo': tipo,
+      'nomeConta': nomeConta,
+      'preco': preco,
+      'formaPagamento': formaPagamento,
+      'qntdParcelas': qntdParcelas,
+      'data': data,
+      'hora': hora,
+      'dataHora': dataHora,
+      'descricaoConta': descricaoConta,
+    };
+  } catch (e) {
+    print("Erro: $e");
+    erro(context, 'Erro ao procurar conta.');
+  }
+
+  return conta;
 }

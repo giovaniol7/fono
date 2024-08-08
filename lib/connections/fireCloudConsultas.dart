@@ -1,11 +1,10 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
+import '../controllers/variaveis.dart';
 import '../models/maps.dart';
 import '../widgets/mensagem.dart';
 import 'fireAuth.dart';
@@ -20,17 +19,15 @@ retornarIDConsultas() async {
 }
 
 listarConsultas() async {
-  return FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario());
+  return FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idFonoAuth());
 }
 
-Future<Map<String, String>> buscarPorNomeHoraConsultas(context, nomePaciente, time) async {
+Future<Map<String, String>> buscarPorNomeHoraConsultas(context, nomePaciente, horarioConsulta) async {
   Map<String, String> consultas = {};
 
   try {
-    String id = '';
+    String uidAgenda = '';
     String uidPaciente = '';
-
-    String horarioConsulta = "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
 
     await FirebaseFirestore.instance
         .collection(nomeColecao)
@@ -39,17 +36,17 @@ Future<Map<String, String>> buscarPorNomeHoraConsultas(context, nomePaciente, ti
         .get()
         .then((q) {
       if (q.docs.isNotEmpty) {
-        id = q.docs[0].id;
+        uidAgenda = q.docs[0].id;
         uidPaciente = q.docs[0].data()['uidPaciente'];
       }
     });
 
     consultas = {
-      'id': id,
+      'uidAgenda': uidAgenda,
       'uidPaciente': uidPaciente,
     };
   } catch (e) {
-    erro(context, 'Erro ao adicionar consultas.');
+    erro(context, 'Erro ao procurar consultas.');
   }
 
   return consultas;
@@ -63,7 +60,7 @@ adicionarConsultas(context, nomePaciente, dataConsulta, horarioConsulta, duracao
       CollectionReference consultas = FirebaseFirestore.instance.collection(nomeColecao);
       String uidPaciente = await buscarIdPaciente(context, nomePaciente);
       Map<String, dynamic> data = {
-        'uidFono': idUsuario(),
+        'uidFono': idFonoAuth(),
         'uidPaciente': uidPaciente,
         'nomePaciente': nomePaciente,
         'dataConsulta': dataConsulta,
@@ -84,6 +81,7 @@ adicionarConsultas(context, nomePaciente, dataConsulta, horarioConsulta, duracao
       });
       await docRef.update({'uidConsulta': uidConsulta});
       sucesso(context, 'O horário foi agendado com sucesso.');
+      AppVariaveis().reset();
       Navigator.pop(context);
     } catch (e) {
       erro(context, 'Erro ao adicionar consultas.');
@@ -111,6 +109,7 @@ editarConsultas(context, uidConsulta, uidFono, uidPaciente, nomePaciente, dataCo
       };
       await FirebaseFirestore.instance.collection(nomeColecao).doc(uidConsulta).update(data);
       sucesso(context, 'O horário foi alterado com sucesso.');
+      AppVariaveis().reset();
       Navigator.pop(context);
     } catch (e) {
       erro(context, 'Erro ao editar consultas.');
@@ -124,6 +123,7 @@ apagarConsultas(context, uidConsulta) async {
   try {
     await FirebaseFirestore.instance.collection('consulta').doc(uidConsulta).delete();
     sucesso(context, 'Consulta apagada com sucesso!');
+    AppVariaveis().reset();
     Navigator.pop(context);
   } catch (e) {
     erro(context, 'Erro ao remover a consulta.');
@@ -233,7 +233,7 @@ Future<List<Appointment>> getAppointmentsFromFirestore() async {
 
   try {
     QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario()).get();
+        await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idFonoAuth()).get();
 
     querySnapshot.docs.forEach((doc) {
       var colorConsulta = doc['colorConsulta'];
@@ -286,7 +286,7 @@ Future<DataSource> getDataSource() async {
 
   try {
     QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario()).get();
+        await FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idFonoAuth()).get();
 
     querySnapshot.docs.forEach((doc) {
       var colorConsulta = doc['colorConsulta'];

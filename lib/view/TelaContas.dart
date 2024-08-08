@@ -253,12 +253,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
         onPressed: () {
-          String tipo = 'adicionar';
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TelaAdicionarContas(tipo),
-              ));
+          Navigator.pushNamed(context, '/adicionarContas', arguments: {'tipo': 'adicionar'});
         },
         backgroundColor: cores('corBotao'),
         child: Icon(
@@ -295,10 +290,14 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                   String mesAno = DateFormat('MM/yyyy').format(data);
                   String ano = DateFormat('yyyy').format(data);
 
-                  String mesSelecionadoFormatado = intMesToAbrev.entries.firstWhere(
+                  String mesSelecionadoFormatado = intMesToAbrev.entries
+                      .firstWhere(
                         (entry) => entry.value == selecioneMes,
-                    orElse: () => MapEntry(0, ''),
-                  ).key.toString().padLeft(2, '0');
+                        orElse: () => MapEntry(0, ''),
+                      )
+                      .key
+                      .toString()
+                      .padLeft(2, '0');
 
                   if ((selecioneMes == 'Todos' || mesAno.startsWith(mesSelecionadoFormatado)) &&
                       (selecioneAno == 0 || ano == selecioneAno.toString())) {
@@ -346,9 +345,8 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
     );
   }
 
-
   Widget listarContas(doc) {
-    var stiloPg = doc.data()['estadoPago'] == true ? cores('corTexto') : cores('corDespesas');
+    var stiloPg = doc.data()['estadoPago'] == 'Pago' ? cores('corTexto') : cores('corDespesas');
     return InkWell(
         onDoubleTap: () async {
           showDialog(
@@ -374,7 +372,10 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                       ),
                       onPressed: () async {
                         try {
-                          await FirebaseFirestore.instance.collection('contas').doc(doc.data()['uidConta']).delete();
+                          await FirebaseFirestore.instance
+                              .collection('contas')
+                              .doc(doc.data()['uidConta'])
+                              .delete();
                         } catch (e) {
                           erro(context, 'Erro ao deletar contas: $e');
                         }
@@ -390,8 +391,9 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                             onPressed: () async {
                               try {
                                 CollectionReference colecao = FirebaseFirestore.instance.collection('contas');
-                                QuerySnapshot consulta =
-                                    await colecao.where('uidPaciente', isEqualTo: doc.data()['uidPaciente']).get();
+                                QuerySnapshot consulta = await colecao
+                                    .where('uidPaciente', isEqualTo: doc.data()['uidPaciente'])
+                                    .get();
                                 for (QueryDocumentSnapshot doc in consulta.docs) {
                                   await colecao.doc(doc.id).delete();
                                 }
@@ -409,21 +411,27 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
           carregarDados();
           //sucesso(context, 'Atualizado com sucesso!');
         },
-        /*onTap: () {
+        onTap: () {
           showDialog(
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: Text('Descrição da Transição ${doc.data()['nomeConta']}'),
-                  content: Text(doc.data()['descricaoConta'] +
-                      '\n' +
-                      doc.data()['uidPaciente'] +
-                      '\n' +
-                      doc.data()['estadoRecebido']),
+                  content: Text(doc.data()['descricaoConta']),
                   actions: <Widget>[
                     TextButton(
                       child: const Text(
-                        'Ok',
+                        'Editar',
+                        style: TextStyle(color: Colors.blue),
+                      ),
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/adicionarContas',
+                            arguments: {'tipo': 'editar', 'nomeConta': doc.data()['nomeConta']});
+                      },
+                    ),
+                    TextButton(
+                      child: const Text(
+                        'Cancelar',
                         style: TextStyle(color: Colors.blue),
                       ),
                       onPressed: () {
@@ -433,16 +441,17 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                   ],
                 );
               });
-        },*/
+        },
         onLongPress: () async {
-          DocumentReference docRef = FirebaseFirestore.instance.collection('contas').doc(doc.data()['uidConta']);
-          if (doc.data()['estadoPago'] == true) {
+          DocumentReference docRef =
+              FirebaseFirestore.instance.collection('contas').doc(doc.data()['uidConta']);
+          if (doc.data()['estadoPago'] == 'Pago') {
             await docRef.update({
-              'estadoPago': false,
+              'estadoPago': 'Não Pago',
             });
           } else {
             await docRef.update({
-              'estadoPago': true,
+              'estadoPago': 'Pago',
             });
           }
           atualizarDados();
@@ -494,7 +503,10 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                               ),
                               Text(
                                 converterData(doc.data()['data']),
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 15, color: stiloPg),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(fontSize: 15, color: stiloPg),
                               ),
                             ],
                           ),

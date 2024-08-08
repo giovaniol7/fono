@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../controllers/estilos.dart';
 import '../controllers/resolucoesTela.dart';
 import '../connections/fireAuth.dart';
+import '../controllers/variaveis.dart';
 import '../widgets/campoTexto.dart';
 import '../widgets/customButton.dart';
 import '../widgets/logoCapa.dart';
@@ -40,15 +42,17 @@ class _TelaLoginState extends State<TelaLogin> {
           const SizedBox(
             height: 10,
           ),
-          campoTexto('Senha', txtSenha, Icons.lock,
-              sufIcon: IconButton(
-                icon: Icon(
-                  _obscureText ? Icons.visibility_off : Icons.visibility,
-                  color: cores('corTexto'),
+          Consumer<AppVariaveis>(builder: (context, appVariaveis, child) {
+            return campoTexto('Senha', txtSenha, Icons.lock,
+                sufIcon: IconButton(
+                  icon: Icon(
+                    _obscureText ? Icons.visibility_off : Icons.visibility,
+                    color: cores('corTexto'),
+                  ),
+                  onPressed: _toggle,
                 ),
-                onPressed: _toggle,
-              ),
-              senha: _obscureText),
+                senha: _obscureText);
+          }),
           const SizedBox(
             height: 20,
           ),
@@ -56,12 +60,12 @@ class _TelaLoginState extends State<TelaLogin> {
             margin: const EdgeInsets.only(top: 20, bottom: 10),
             child: ElevatedButton(
                 style: ButtonStyle(
-                    elevation: MaterialStateProperty.all<double>(5),
-                    backgroundColor: MaterialStateProperty.all<Color>(cores('corBotao')),
-                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(ratio.screen(context) == 'grande'
+                    elevation: WidgetStateProperty.all<double>(5),
+                    backgroundColor: WidgetStateProperty.all<Color>(cores('corBotao')),
+                    padding: WidgetStateProperty.all<EdgeInsetsGeometry>(ratio.screen(context) == 'grande'
                         ? const EdgeInsets.fromLTRB(32, 20, 32, 20)
                         : const EdgeInsets.fromLTRB(32, 10, 32, 10),),
-                    shape: MaterialStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)))
+                    shape: WidgetStateProperty.all<OutlinedBorder>(RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)))
                 ),
                 onPressed:  () {
                   autenticarConta(context, txtEmail.text, txtSenha.text);

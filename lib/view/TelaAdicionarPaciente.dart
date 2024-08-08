@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
-import 'package:fonocare/connections/fireAuth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'package:brasil_fields/brasil_fields.dart';
@@ -10,99 +9,44 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:search_cep/search_cep.dart';
 import 'package:path/path.dart' as ph;
 
+import '../connections/fireAuth.dart';
+import '../connections/fireCloudEscolas.dart';
 import '../connections/fireCloudPacientes.dart';
 import '../controllers/uploadDoc.dart';
 import '../controllers/uploadImage.dart';
-import '../models/maps.dart';
-import '../widgets/campoTexto.dart';
+import '../controllers/variaveis.dart';
 import '../controllers/estilos.dart';
+import '../models/maps.dart';
+import '../widgets/TextFieldSuggestions.dart';
+import '../widgets/campoTexto.dart';
 import '../widgets/mensagem.dart';
 
 class TelaAdicionarPaciente extends StatefulWidget {
-  final String tipo;
-  final String uid;
-
-  const TelaAdicionarPaciente(this.tipo, this.uid, {super.key});
+  const TelaAdicionarPaciente();
 
   @override
   State<TelaAdicionarPaciente> createState() => _TelaAdicionarPacienteState();
 }
 
 class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
-  final keyDataAnamnese = GlobalKey<FormState>();
-  final keyNomePaciente = GlobalKey<FormState>();
-  final keyDtNascimentoPaciente = GlobalKey<FormState>();
-  final keyCPFPaciente = GlobalKey<FormState>();
-  final keyEscolaPaciente = GlobalKey<FormState>();
-  final keyProfessoraPaciente = GlobalKey<FormState>();
-  final keyLougradouroPaciente = GlobalKey<FormState>();
-  final keyNumeroPaciente = GlobalKey<FormState>();
-  final keyBairroPaciente = GlobalKey<FormState>();
-  final keyCidadePaciente = GlobalKey<FormState>();
-  final keyCEPPaciente = GlobalKey<FormState>();
-  final keyDescricaoPaciente = GlobalKey<FormState>();
-  final keyNomeResponsavelPaciente = GlobalKey<FormState>();
-  final keyIdadeResponsavelPaciente = GlobalKey<FormState>();
-  final keyTelefoneResponsavelPaciente = GlobalKey<FormState>();
-  final keyEscolaridadeResponsavelPaciente = GlobalKey<FormState>();
-  final keyProfissaoResponsavelPaciente = GlobalKey<FormState>();
-  var paciente;
-  var fileImage;
-  File? fileDoc;
-  String nomeArquivo = '';
-  var apagarImagem;
-  var uidPaciente = '';
-  var uidFono = '';
-  var urlImagePaciente = '';
-  var txtDataAnamnesePaciente = TextEditingController();
-  var txtNomePaciente = TextEditingController();
-  var txtDataNascimentoPaciente = TextEditingController();
-  var txtCPFPaciente = TextEditingController();
-  var txtRGPaciente = TextEditingController();
-  var txtEscolaPaciente = TextEditingController();
-  var txtProfessoraPaciente = TextEditingController();
-  var txtTelefoneProfessoraPaciente = TextEditingController();
-  var txtLogradouroPaciente = TextEditingController();
-  var txtNumeroPaciente = TextEditingController();
-  var txtBairroPaciente = TextEditingController();
-  var txtCidadePaciente = TextEditingController();
-  var txtCEPPaciente = TextEditingController();
-  var txtDescricaoPaciente = TextEditingController();
-  String selecioneEscolaridadePaciente = 'Berçário';
-  String selecioneTipoConsultaPaciente = 'Convênio';
-  String selecionePeriodoEscolaPaciente = 'Manhã';
-  String selecioneEstadoPaciente = 'AC';
-  Gender? _selectedGeneroPaciente;
-  bool _switchValue = true;
-  String varAtivo = '1';
-
-  List<Gender?> ListGeneroResponsavelPaciente = [null];
-  List<TextEditingController> ListNomeResponsavelPaciente = [TextEditingController()];
-  List<TextEditingController> ListIdadeResponsavelPaciente = [TextEditingController()];
-  List<TextEditingController> ListTelefoneResponsavelPaciente = [TextEditingController()];
-  List<String> ListRelacaoResponsavelPaciente = ['Mãe'];
-  List<TextEditingController> ListEscolaridadeResponsavelPaciente = [TextEditingController()];
-  List<TextEditingController> ListProfissaoResponsavelPaciente = [TextEditingController()];
-  int indexResponsavel = 0;
-  int qtdResponsavel = 0;
+  late String? tipo;
+  late String? uidPaciente;
 
   bool validarCampos() {
-    return (keyDataAnamnese.currentState!.validate() &&
-        keyNomePaciente.currentState!.validate() &&
-        keyDtNascimentoPaciente.currentState!.validate() &&
-        keyCPFPaciente.currentState!.validate() &&
-        keyEscolaPaciente.currentState!.validate() &&
-        keyProfessoraPaciente.currentState!.validate() &&
-        keyCEPPaciente.currentState!.validate() &&
-        keyLougradouroPaciente.currentState!.validate() &&
-        keyNumeroPaciente.currentState!.validate() &&
-        keyBairroPaciente.currentState!.validate() &&
-        keyCidadePaciente.currentState!.validate() &&
-        keyNomeResponsavelPaciente.currentState!.validate() &&
-        keyIdadeResponsavelPaciente.currentState!.validate() &&
-        keyTelefoneResponsavelPaciente.currentState!.validate() &&
-        keyEscolaridadeResponsavelPaciente.currentState!.validate() &&
-        keyProfissaoResponsavelPaciente.currentState!.validate());
+    return (AppVariaveis().keyDataAnamnese.currentState!.validate() &&
+        AppVariaveis().keyNomePaciente.currentState!.validate() &&
+        AppVariaveis().keyDtNascimentoPaciente.currentState!.validate() &&
+        AppVariaveis().keyCPFPaciente.currentState!.validate() &&
+        AppVariaveis().keyProfessoraPaciente.currentState!.validate() &&
+        AppVariaveis().keyCEPPaciente.currentState!.validate() &&
+        AppVariaveis().keyLougradouroPaciente.currentState!.validate() &&
+        AppVariaveis().keyNumeroPaciente.currentState!.validate() &&
+        AppVariaveis().keyBairroPaciente.currentState!.validate() &&
+        AppVariaveis().keyCidadePaciente.currentState!.validate() &&
+        AppVariaveis().keyNomeResponsavelPaciente.currentState!.validate() &&
+        AppVariaveis().keyIdadeResponsavelPaciente.currentState!.validate() &&
+        AppVariaveis().keyTelefoneResponsavelPaciente.currentState!.validate() &&
+        AppVariaveis().keyProfissaoResponsavelPaciente.currentState!.validate());
   }
 
   Future<void> atualizarDados() async {
@@ -110,52 +54,68 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   }
 
   carregarDados() async {
-    widget.tipo == 'editar' ? paciente = await recuperarPaciente(context, widget.uid) : null;
+    List<String> lista = await fazerListaEscolas();
+    setState(() {
+      AppVariaveis().listaEscolaPaciente = lista;
+    });
+
+    tipo == 'editar' ? AppVariaveis().pacienteEdit = await recuperarPaciente(context, uidPaciente) : null;
 
     setState(() {
-      if (widget.tipo == 'editar') {
-        uidPaciente = paciente['uidPaciente'];
-        uidFono = paciente['uidFono'];
-        txtDataAnamnesePaciente.text = paciente['dataAnamnesePaciente'];
-        urlImagePaciente = paciente['urlImagePaciente'];
-        txtNomePaciente.text = paciente['nomePaciente'];
-        txtDataNascimentoPaciente.text = paciente['dtNascimentoPaciente'];
-        txtCPFPaciente.text = paciente['CPFPaciente'];
-        txtRGPaciente.text = paciente['RGPaciente'];
-        _selectedGeneroPaciente = paciente['generoPaciente'];
-        txtEscolaPaciente.text = paciente['escolaPaciente'];
-        selecioneEscolaridadePaciente = paciente['escolaridadePaciente'];
-        selecionePeriodoEscolaPaciente = paciente['periodoEscolaPaciente'];
-        txtProfessoraPaciente.text = paciente['professoraPaciente'];
-        txtTelefoneProfessoraPaciente.text = paciente['telefoneProfessoraPaciente'];
-        txtLogradouroPaciente.text = paciente['lougradouroPaciente'];
-        txtNumeroPaciente.text = paciente['numeroPaciente'];
-        txtBairroPaciente.text = paciente['bairroPaciente'];
-        txtCidadePaciente.text = paciente['cidadePaciente'];
-        selecioneEstadoPaciente = paciente['estadoPaciente'];
-        txtCEPPaciente.text = paciente['cepPaciente'];
-        selecioneTipoConsultaPaciente = paciente['tipoConsultaPaciente'];
-        txtDescricaoPaciente.text = paciente['descricaoPaciente'];
-        qtdResponsavel = paciente['qtdResponsavel'];
-        nomeArquivo = paciente['urlDocPaciente'] == '' ? '' : urlToString(paciente['urlDocPaciente']);
-        varAtivo = paciente['varAtivo'];
-        _switchValue = varAtivo == '1';
-        ListGeneroResponsavelPaciente = paciente['listGeneroResponsavel'];
-        ListNomeResponsavelPaciente =
-            (paciente['listNomeResponsavel'] as List<String>).map((nome) => TextEditingController(text: nome)).toList();
-        ListIdadeResponsavelPaciente = (paciente['listIdadeResponsavel'] as List<String>)
-            .map((nome) => TextEditingController(text: nome))
-            .toList();
-        ListTelefoneResponsavelPaciente = (paciente['listTelefoneResponsavel'] as List<String>)
-            .map((nome) => TextEditingController(text: nome))
-            .toList();
-        ListRelacaoResponsavelPaciente = paciente['listRelacaoResponsavel'];
-        ListEscolaridadeResponsavelPaciente = (paciente['listEscolaridadeResponsavel'] as List<String>)
-            .map((nome) => TextEditingController(text: nome))
-            .toList();
-        ListProfissaoResponsavelPaciente = (paciente['listProfissaoResponsavel'] as List<String>)
-            .map((nome) => TextEditingController(text: nome))
-            .toList();
+      if (tipo == 'editar') {
+        AppVariaveis().uidPaciente = AppVariaveis().pacienteEdit['uidPaciente']!;
+        AppVariaveis().uidFono = AppVariaveis().pacienteEdit['uidFono']!;
+        AppVariaveis().urlImagePaciente =
+            AppVariaveis().pacienteEdit['urlImagePaciente'] ?? '';
+        AppVariaveis().txtDataAnamnesePaciente.text = AppVariaveis().pacienteEdit['dataAnamnesePaciente']!;
+        AppVariaveis().txtNomePaciente.text = AppVariaveis().pacienteEdit['nomePaciente']!;
+        AppVariaveis().txtDataNascimentoPaciente.text = AppVariaveis().pacienteEdit['dtNascimentoPaciente']!;
+        AppVariaveis().txtCPFPaciente.text = AppVariaveis().pacienteEdit['CPFPaciente']!;
+        AppVariaveis().txtRGPaciente.text = AppVariaveis().pacienteEdit['RGPaciente']!;
+        AppVariaveis().selectedGeneroPaciente = AppVariaveis().pacienteEdit['generoPaciente'] as Gender?;
+        AppVariaveis().outraEscolaPaciente = AppVariaveis().pacienteEdit['escolaPaciente']!;
+        AppVariaveis().txtEscolaPaciente = AppVariaveis().pacienteEdit['escolaPaciente']!;
+        AppVariaveis().selecioneEscolaridadePaciente = AppVariaveis().pacienteEdit['escolaridadePaciente']!;
+        AppVariaveis().selecionePeriodoEscolaPaciente = AppVariaveis().pacienteEdit['periodoEscolaPaciente']!;
+        AppVariaveis().txtProfessoraPaciente.text = AppVariaveis().pacienteEdit['professoraPaciente']!;
+        AppVariaveis().txtTelefoneProfessoraPaciente.text =
+            AppVariaveis().pacienteEdit['telefoneProfessoraPaciente']!;
+        AppVariaveis().txtLogradouroPaciente.text = AppVariaveis().pacienteEdit['lougradouroPaciente']!;
+        AppVariaveis().txtNumeroPaciente.text = AppVariaveis().pacienteEdit['numeroPaciente']!;
+        AppVariaveis().txtBairroPaciente.text = AppVariaveis().pacienteEdit['bairroPaciente']!;
+        AppVariaveis().txtCidadePaciente.text = AppVariaveis().pacienteEdit['cidadePaciente']!;
+        AppVariaveis().selecioneEstadoPaciente = AppVariaveis().pacienteEdit['estadoPaciente']!;
+        AppVariaveis().txtCEPPaciente.text = AppVariaveis().pacienteEdit['cepPaciente']!;
+        AppVariaveis().selecioneTipoConsultaPaciente = AppVariaveis().pacienteEdit['tipoConsultaPaciente']!;
+        AppVariaveis().txtDescricaoPaciente.text = AppVariaveis().pacienteEdit['descricaoPaciente']!;
+        AppVariaveis().qtdResponsavelPaciente = AppVariaveis().pacienteEdit['qtdResponsavel'];
+        AppVariaveis().nomeArquivoPaciente = AppVariaveis().pacienteEdit['urlDocPaciente'] == ''
+            ? ''
+            : urlToString(AppVariaveis().pacienteEdit['urlDocPaciente']);
+        AppVariaveis().varAtivoPaciente = AppVariaveis().pacienteEdit['varAtivo'];
+        AppVariaveis().switchValuePaciente = AppVariaveis().varAtivoPaciente == '1';
+        AppVariaveis().ListGeneroResponsavelPaciente =
+            AppVariaveis().pacienteEdit['listGeneroResponsavel'] as List<Gender?>;
+        AppVariaveis().ListNomeResponsavelPaciente =
+            (AppVariaveis().pacienteEdit['listNomeResponsavel'] as List<String>)
+                .map((nome) => TextEditingController(text: nome))
+                .toList();
+        AppVariaveis().ListIdadeResponsavelPaciente =
+            (AppVariaveis().pacienteEdit['listIdadeResponsavel'] as List<String>)
+                .map((nome) => TextEditingController(text: nome))
+                .toList();
+        AppVariaveis().ListTelefoneResponsavelPaciente =
+            (AppVariaveis().pacienteEdit['listTelefoneResponsavel'] as List<String>)
+                .map((nome) => TextEditingController(text: nome))
+                .toList();
+        AppVariaveis().ListRelacaoResponsavelPaciente =
+            AppVariaveis().pacienteEdit['listRelacaoResponsavel'] as List<String>;
+        AppVariaveis().ListEscolaridadeResponsavelPaciente =
+            AppVariaveis().pacienteEdit['listEscolaridadeResponsavel'] as List<String>;
+        AppVariaveis().ListProfissaoResponsavelPaciente =
+            (AppVariaveis().pacienteEdit['listProfissaoResponsavel'] as List<String>)
+                .map((nome) => TextEditingController(text: nome))
+                .toList();
       }
     });
   }
@@ -167,10 +127,14 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   }
 
   Widget build(BuildContext context) {
+    final arguments = ModalRoute.of(context)?.settings.arguments as Map?;
+    tipo = arguments?['tipo'] as String?;
+    uidPaciente = arguments?['uidPaciente'] as String?;
+
     return Scaffold(
       appBar: AppBar(
         actions: [
-          widget.tipo == 'editar'
+          tipo == 'editar'
               ? IconButton(
                   icon: Icon(
                     Icons.delete,
@@ -190,6 +154,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                                   style: TextStyle(color: Colors.blue),
                                 ),
                                 onPressed: () {
+                                  AppVariaveis().resetPaciente();
                                   Navigator.of(context).pop();
                                 },
                               ),
@@ -200,10 +165,11 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                                 ),
                                 onPressed: () async {
                                   try {
-                                    await apagarPaciente(context, widget.uid);
+                                    await apagarPaciente(context, uidPaciente);
                                   } catch (e) {
                                     erro(context, 'Erro ao deletar Prontuário: $e');
                                   }
+                                  AppVariaveis().resetPaciente();
                                   Navigator.of(context).pop();
                                 },
                               ),
@@ -218,11 +184,12 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
+            AppVariaveis().resetPaciente();
             Navigator.pop(context);
           },
         ),
         title: Text(
-          widget.tipo == 'editar' ? 'Editar Paciente' : "Adicionar Paciente",
+          tipo == 'editar' ? 'Editar Paciente' : "Adicionar Paciente",
           style: TextStyle(color: cores('corTexto')),
         ),
         backgroundColor: cores('corFundo'),
@@ -250,7 +217,8 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
               boxShadow: [
                 BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5),
               ],
-              borderRadius: const BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
+              borderRadius:
+                  const BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -262,15 +230,15 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     shape: BoxShape.circle,
                     color: cores('corBotao'),
                   ),
-                  child: urlImagePaciente == ''
+                  child: AppVariaveis().urlImagePaciente.isEmpty
                       ? InkWell(
                           onTap: () async {
-                            fileImage = await pickedImage();
+                            AppVariaveis().fileImagePaciente = await pickedImage();
                             setState(() {
-                              fileImage = fileImage!;
+                              AppVariaveis().fileImagePaciente = AppVariaveis().fileImagePaciente!;
                             });
                           },
-                          child: fileImage == null
+                          child: AppVariaveis().fileImagePaciente == null
                               ? Icon(
                                   Icons.person_add_alt_rounded,
                                   color: cores('corTextoBotao'),
@@ -279,19 +247,17 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                               : CircleAvatar(
                                   maxRadius: 5,
                                   minRadius: 1,
-                                  backgroundImage: FileImage(
-                                    File(fileImage.path),
-                                  ),
+                                  backgroundImage: FileImage(File(AppVariaveis().fileImagePaciente.path)),
                                 ),
                         )
                       : Stack(children: [
                           CircleAvatar(
                             radius: 80,
-                            backgroundImage: NetworkImage(urlImagePaciente),
+                            backgroundImage: NetworkImage(AppVariaveis().urlImagePaciente),
                           ),
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.5),
+                              color: cores('branco').withOpacity(0.5),
                               shape: BoxShape.circle,
                             ),
                             child: Center(
@@ -303,8 +269,8 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    apagarImagem == true;
-                                    urlImagePaciente = '';
+                                    AppVariaveis().apagarImagemPaciente == true;
+                                    AppVariaveis().urlImagePaciente = '';
                                   });
                                 },
                               ),
@@ -332,14 +298,16 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
           Text(
             'Selecione o tipo de Consulta:',
             style: TextStyle(
-                fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold),
+                fontSize: tamanhoFonte.letraPequena(context),
+                color: cores('corTexto'),
+                fontWeight: FontWeight.bold),
           ),
           Container(
             padding: const EdgeInsets.only(left: 10),
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8.0),
                 border: Border.all(color: cores('corBorda')),
-                color: Colors.white,
+                color: cores('branco'),
                 boxShadow: [
                   BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
                   // changes position of shadow
@@ -358,33 +326,18 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
               ),
               isExpanded: true,
               hint: const Text('Selecione uma Opção'),
-              value: selecioneTipoConsultaPaciente,
-              items: [
-                DropdownMenuItem(
-                  value: 'Convênio',
-                  child: Text(
-                    'Convênio',
-                    style: TextStyle(color: cores('corTexto')),
-                  ),
-                ),
-                DropdownMenuItem(
-                  value: 'Particular',
-                  child: Text(
-                    'Particular',
-                    style: TextStyle(color: cores('corTexto')),
-                  ),
-                ),
-              ],
+              value: AppVariaveis().selecioneTipoConsultaPaciente,
+              items: consulta.map(buildMenuItem).toList(),
               onChanged: (value) {
                 setState(() {
-                  selecioneTipoConsultaPaciente = value!;
+                  AppVariaveis().selecioneTipoConsultaPaciente = value!;
                 });
               },
             ),
           ),
           const SizedBox(height: 20),
-          campoTexto('Descrição/Queixa', txtDescricaoPaciente, Icons.description,
-              maxPalavras: 200, maxLinhas: 5, tamanho: 20.0),
+          campoTexto('Descrição/Queixa', AppVariaveis().txtDescricaoPaciente, Icons.description,
+              maxPalavras: 200, maxLinhas: 5, tamanho: 20.0, boardType: 'multiLinhas'),
           containerResponsavel(),
           containerAnexo(),
           containerAtivo(),
@@ -400,28 +353,39 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
 
     return Column(
       children: [
-        campoTexto('Data Anamnese', txtDataAnamnesePaciente, Icons.calendar_today,
-            formato: DataInputFormatter(), numeros: true, key: keyDataAnamnese, validator: true),
+        campoTexto('Data Anamnese', AppVariaveis().txtDataAnamnesePaciente, Icons.calendar_today,
+            formato: DataInputFormatter(),
+            boardType: 'numeros',
+            key: AppVariaveis().keyDataAnamnese,
+            validator: true),
         const SizedBox(height: 20),
-        campoTexto('Nome', txtNomePaciente, Icons.label, key: keyNomePaciente, validator: true),
+        campoTexto('Nome', AppVariaveis().txtNomePaciente, Icons.label,
+            key: AppVariaveis().keyNomePaciente, validator: true),
         const SizedBox(height: 20),
-        campoTexto('Data de Nascimento', txtDataNascimentoPaciente, Icons.calendar_month_outlined,
-            formato: DataInputFormatter(), numeros: true, key: keyDtNascimentoPaciente, validator: true),
+        campoTexto(
+            'Data de Nascimento', AppVariaveis().txtDataNascimentoPaciente, Icons.calendar_month_outlined,
+            formato: DataInputFormatter(),
+            boardType: 'numeros',
+            key: AppVariaveis().keyDtNascimentoPaciente,
+            validator: true),
         const SizedBox(height: 20),
         Row(
           children: [
             Expanded(
-              child: campoTexto('CPF', txtCPFPaciente, Icons.credit_card,
-                  formato: CpfInputFormatter(), numeros: true, key: keyCPFPaciente, validator: true),
+              child: campoTexto('CPF', AppVariaveis().txtCPFPaciente, Icons.credit_card,
+                  formato: CpfInputFormatter(),
+                  boardType: 'numeros',
+                  key: AppVariaveis().keyCPFPaciente,
+                  validator: true),
             ),
             const SizedBox(width: 10),
             Expanded(
-              child: campoTexto('RG', txtRGPaciente, Icons.credit_card,
+              child: campoTexto('RG', AppVariaveis().txtRGPaciente, Icons.credit_card,
                   formato: MaskTextInputFormatter(
                     mask: '##.###.###-#',
                     filter: {"#": RegExp(r'[0-9]')},
                   ),
-                  numeros: true),
+                  boardType: 'numeros'),
             ),
           ],
         ),
@@ -429,7 +393,9 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         Text(
           'Sexo:',
           style: TextStyle(
-              fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold),
+              fontSize: tamanhoFonte.letraPequena(context),
+              color: cores('corTexto'),
+              fontWeight: FontWeight.bold),
         ),
         Row(
           children: [
@@ -440,11 +406,11 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                   style: TextStyle(color: cores('corTexto')),
                 ),
                 value: Gender.male,
-                groupValue: _selectedGeneroPaciente,
+                groupValue: AppVariaveis().selectedGeneroPaciente,
                 activeColor: cores('corSimbolo'),
                 onChanged: (value) {
                   setState(() {
-                    _selectedGeneroPaciente = value;
+                    AppVariaveis().selectedGeneroPaciente = value;
                   });
                 },
               ),
@@ -456,11 +422,11 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                   style: TextStyle(color: cores('corTexto')),
                 ),
                 value: Gender.female,
-                groupValue: _selectedGeneroPaciente,
+                groupValue: AppVariaveis().selectedGeneroPaciente,
                 activeColor: cores('corSimbolo'),
                 onChanged: (value) {
                   setState(() {
-                    _selectedGeneroPaciente = value;
+                    AppVariaveis().selectedGeneroPaciente = value;
                   });
                 },
               ),
@@ -468,7 +434,22 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
           ],
         ),
         const SizedBox(height: 10),
-        campoTexto('Escola', txtEscolaPaciente, Icons.school, key: keyEscolaPaciente, validator: true),
+        TextFieldSuggestions(
+            tipo: 'escola',
+            icone: Icons.school,
+            margem: EdgeInsets.zero,
+            list: AppVariaveis().listaEscolaPaciente,
+            labelText: AppVariaveis().outraEscolaPaciente,
+            textSuggetionsColor: cores('corTexto'),
+            suggetionsBackgroundColor: cores('branco'),
+            outlineInputBorderColor: cores('corTexto'),
+            returnedValue: (String value) {
+              setState(() {
+                AppVariaveis().txtEscolaPaciente = value;
+              });
+            },
+            onTap: () {},
+            height: 200),
         const SizedBox(height: 20),
         Row(
           children: [
@@ -487,43 +468,29 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8.0),
                         border: Border.all(color: cores('corBorda')),
-                        color: Colors.white,
+                        color: cores('branco'),
                         boxShadow: [
                           BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
                           // changes position of shadow
                         ]),
                     child: DropdownButton(
-                      hint: Text(
-                        'Escolaridade: ',
-                        style: TextStyle(color: cores('corTexto')),
-                      ),
-                      icon: Icon(
-                        Icons.arrow_drop_down,
-                        color: cores('corTexto'),
-                      ),
+                      hint: Text('Escolaridade: ', style: TextStyle(color: cores('corTexto'))),
+                      icon: Icon(Icons.arrow_drop_down, color: cores('corTexto')),
                       iconSize: 30,
                       iconEnabledColor: cores('corTexto'),
                       style: TextStyle(
-                        color: cores('corTexto'),
-                        fontWeight: FontWeight.w400,
-                        fontSize: tamanhoFonte.letraPequena(context),
-                      ),
-                      underline: Container(
-                        height: 0,
-                      ),
+                          color: cores('corTexto'),
+                          fontWeight: FontWeight.w400,
+                          fontSize: tamanhoFonte.letraPequena(context)),
+                      underline: Container(height: 0),
                       isExpanded: true,
-                      value: selecioneEscolaridadePaciente,
+                      value: AppVariaveis().selecioneEscolaridadePaciente,
+                      items: escolaridade.map(buildMenuItem).toList(),
                       onChanged: (newValue) {
                         setState(() {
-                          selecioneEscolaridadePaciente = newValue!;
+                          AppVariaveis().selecioneEscolaridadePaciente = newValue!;
                         });
                       },
-                      items: escolaridade.map((state) {
-                        return DropdownMenuItem(
-                          value: state,
-                          child: Text(state),
-                        );
-                      }).toList(),
                     ),
                   ),
                 ],
@@ -545,7 +512,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8.0),
                         border: Border.all(color: cores('corBorda')),
-                        color: Colors.white,
+                        color: cores('branco'),
                         boxShadow: [
                           BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5)
                           // changes position of shadow
@@ -564,33 +531,11 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                       ),
                       isExpanded: true,
                       hint: const Text('Selecione uma Opção'),
-                      value: selecionePeriodoEscolaPaciente,
-                      items: [
-                        DropdownMenuItem(
-                          value: 'Manhã',
-                          child: Text(
-                            'Manhã',
-                            style: TextStyle(color: cores('corTexto')),
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Tarde',
-                          child: Text(
-                            'Tarde',
-                            style: TextStyle(color: cores('corTexto')),
-                          ),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Integral',
-                          child: Text(
-                            'Integral',
-                            style: TextStyle(color: cores('corTexto')),
-                          ),
-                        ),
-                      ],
+                      value: AppVariaveis().selecionePeriodoEscolaPaciente,
+                      items: periodo.map(buildMenuItem).toList(),
                       onChanged: (value) {
                         setState(() {
-                          selecionePeriodoEscolaPaciente = value!;
+                          AppVariaveis().selecionePeriodoEscolaPaciente = value!;
                         });
                       },
                     ),
@@ -604,12 +549,14 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         Row(
           children: [
             Expanded(
-                child: campoTexto('Professora', txtProfessoraPaciente, FontAwesomeIcons.personChalkboard,
-                    key: keyProfessoraPaciente, validator: true)),
+                child: campoTexto(
+                    'Professora', AppVariaveis().txtProfessoraPaciente, FontAwesomeIcons.personChalkboard,
+                    key: AppVariaveis().keyProfessoraPaciente, validator: true)),
             const SizedBox(width: 10),
             Expanded(
-                child: campoTexto('Telefone Professora', txtTelefoneProfessoraPaciente, Icons.phone,
-                    formato: TelefoneInputFormatter(), numeros: true)),
+                child: campoTexto(
+                    'Telefone Professora', AppVariaveis().txtTelefoneProfessoraPaciente, Icons.phone,
+                    formato: TelefoneInputFormatter(), boardType: 'numeros')),
           ],
         ),
         const SizedBox(height: 20),
@@ -625,10 +572,10 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         Row(
           children: [
             Expanded(
-              child: campoTexto('CEP', txtCEPPaciente, Icons.mail,
+              child: campoTexto('CEP', AppVariaveis().txtCEPPaciente, Icons.mail,
                   formato: CepInputFormatter(),
-                  numeros: true,
-                  key: keyCEPPaciente,
+                  boardType: 'numeros',
+                  key: AppVariaveis().keyCEPPaciente,
                   validator: true, onchaged: (value) async {
                 var cepSemFormatacao = value.replaceAll(RegExp(r'[^0-9]'), '');
                 var viaCepSearchCep = ViaCepSearchCep();
@@ -641,8 +588,8 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     setState(() {
                       String? localidade = viaCepInfo.localidade;
                       String? estado = viaCepInfo.uf;
-                      txtCidadePaciente.text = localidade!;
-                      selecioneEstadoPaciente = estado!;
+                      AppVariaveis().txtCidadePaciente.text = localidade!;
+                      AppVariaveis().selecioneEstadoPaciente = estado!;
                     });
                   },
                 );
@@ -665,7 +612,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8.0),
                       border: Border.all(color: cores('corBorda')),
-                      color: Colors.white,
+                      color: cores('branco'),
                       boxShadow: [
                         BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 7)
                         // changes position of shadow
@@ -690,10 +637,10 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                       height: 0,
                     ),
                     isExpanded: true,
-                    value: selecioneEstadoPaciente,
+                    value: AppVariaveis().selecioneEstadoPaciente,
                     onChanged: (newValue) {
                       setState(() {
-                        selecioneEstadoPaciente = newValue!;
+                        AppVariaveis().selecioneEstadoPaciente = newValue!;
                       });
                     },
                     items: estados.map((state) {
@@ -709,22 +656,23 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
           ],
         ),
         const SizedBox(height: 20),
-        campoTexto('Logradouro', txtLogradouroPaciente, Icons.location_on,
-            key: keyLougradouroPaciente, validator: true),
+        campoTexto('Logradouro', AppVariaveis().txtLogradouroPaciente, Icons.location_on,
+            key: AppVariaveis().keyLougradouroPaciente, validator: true),
         const SizedBox(height: 20),
         Row(
           children: [
             Expanded(
-                child: campoTexto('Número', txtNumeroPaciente, Icons.home,
-                    numeros: true, key: keyNumeroPaciente, validator: true)),
+                child: campoTexto('Número', AppVariaveis().txtNumeroPaciente, Icons.home,
+                    boardType: 'numeros', key: AppVariaveis().keyNumeroPaciente, validator: true)),
             const Padding(padding: EdgeInsets.only(right: 10)),
             Expanded(
-                child: campoTexto('Bairro', txtBairroPaciente, Icons.maps_home_work,
-                    key: keyBairroPaciente, validator: true))
+                child: campoTexto('Bairro', AppVariaveis().txtBairroPaciente, Icons.maps_home_work,
+                    key: AppVariaveis().keyBairroPaciente, validator: true))
           ],
         ),
         const SizedBox(height: 20),
-        campoTexto('Cidade', txtCidadePaciente, Icons.location_city, key: keyCidadePaciente, validator: true),
+        campoTexto('Cidade', AppVariaveis().txtCidadePaciente, Icons.location_city,
+            key: AppVariaveis().keyCidadePaciente, validator: true),
         const SizedBox(height: 20),
       ],
     );
@@ -743,12 +691,14 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         Text(
           'Dados dos Responsáveis:',
           style: TextStyle(
-              fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold),
+              fontSize: tamanhoFonte.letraPequena(context),
+              color: cores('corTexto'),
+              fontWeight: FontWeight.bold),
         ),
         //------------------------------------------------------------------------------
         columnResponsavel(),
         const SizedBox(height: 20),
-        indexResponsavel < 1
+        AppVariaveis().indexResponsavelPaciente < 1
             ? SizedBox(
                 child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
@@ -761,25 +711,43 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                       )),
                   child: const Icon(Icons.add),
                   onPressed: () {
-                    if (ListGeneroResponsavelPaciente[indexResponsavel] != null &&
-                        ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                        ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                        ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                        ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                        ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty) {
-                      widget.tipo == 'adicionar'
+                    if (AppVariaveis()
+                                .ListGeneroResponsavelPaciente[AppVariaveis().indexResponsavelPaciente] !=
+                            null &&
+                        AppVariaveis()
+                            .ListNomeResponsavelPaciente[AppVariaveis().indexResponsavelPaciente]
+                            .text
+                            .isNotEmpty &&
+                        AppVariaveis()
+                            .ListIdadeResponsavelPaciente[AppVariaveis().indexResponsavelPaciente]
+                            .text
+                            .isNotEmpty &&
+                        AppVariaveis()
+                            .ListTelefoneResponsavelPaciente[AppVariaveis().indexResponsavelPaciente]
+                            .text
+                            .isNotEmpty &&
+                        AppVariaveis()
+                            .ListProfissaoResponsavelPaciente[AppVariaveis().indexResponsavelPaciente]
+                            .text
+                            .isNotEmpty) {
+                      tipo == 'adicionar'
                           ? setState(() {
-                              ListGeneroResponsavelPaciente.add(null);
-                              ListNomeResponsavelPaciente.add(TextEditingController());
-                              ListIdadeResponsavelPaciente.add(TextEditingController());
-                              ListTelefoneResponsavelPaciente.add(TextEditingController());
-                              ListRelacaoResponsavelPaciente.add('Mãe');
-                              ListEscolaridadeResponsavelPaciente.add(TextEditingController());
-                              ListProfissaoResponsavelPaciente.add(TextEditingController());
-                              indexResponsavel++;
+                              AppVariaveis().ListGeneroResponsavelPaciente.add(null);
+                              AppVariaveis().ListNomeResponsavelPaciente.add(TextEditingController());
+                              AppVariaveis().ListIdadeResponsavelPaciente.add(TextEditingController());
+                              AppVariaveis().ListTelefoneResponsavelPaciente.add(TextEditingController());
+                              AppVariaveis().ListRelacaoResponsavelPaciente.add('Mãe');
+                              AppVariaveis()
+                                  .ListEscolaridadeResponsavelPaciente
+                                  .add('Ensino Fundamental Incompleto');
+                              AppVariaveis().ListProfissaoResponsavelPaciente.add(TextEditingController());
+                              AppVariaveis().indexResponsavelPaciente++;
                             })
                           : setState(() {
-                              indexResponsavel + 1 < qtdResponsavel ? indexResponsavel++ : null;
+                              AppVariaveis().indexResponsavelPaciente + 1 <
+                                      AppVariaveis().qtdResponsavelPaciente
+                                  ? AppVariaveis().indexResponsavelPaciente++
+                                  : null;
                             });
                     } else {
                       erro(context, 'Preencha os campos obrigatórios!');
@@ -818,17 +786,19 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         Center(
           child: ElevatedButton(
             style: ButtonStyle(
-              shadowColor: MaterialStatePropertyAll(cores('corSombra')),
-              backgroundColor: MaterialStatePropertyAll(cores('corDetalhe')),
+              shadowColor: WidgetStateProperty.all<Color?>(cores('corSombra')),
+              backgroundColor: WidgetStateProperty.all<Color?>(cores('corDetalhe')),
             ),
             onPressed: () async {
-              fileDoc = await pickDocument();
+              AppVariaveis().fileDocPaciente = await pickDocument();
               setState(() {
-                nomeArquivo = ph.basename(fileDoc!.path);
+                AppVariaveis().nomeArquivoPaciente = ph.basename(AppVariaveis().fileDocPaciente!.path);
               });
             },
             child: Text(
-              nomeArquivo.isEmpty ? 'Anexar Documento' : nomeArquivo,
+              AppVariaveis().nomeArquivoPaciente.isEmpty
+                  ? 'Anexar Documento'
+                  : AppVariaveis().nomeArquivoPaciente,
               style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
             ),
           ),
@@ -845,7 +815,9 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         SizedBox(height: 20),
         Text("Arquivar Paciente?",
             style: TextStyle(
-                fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold)),
+                fontSize: tamanhoFonte.letraPequena(context),
+                color: cores('corTexto'),
+                fontWeight: FontWeight.bold)),
         SizedBox(height: 5),
         Center(
           child: FlutterSwitch(
@@ -855,18 +827,18 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
             inactiveText: "Arquivar",
             inactiveTextColor: cores('branco'),
             inactiveColor: Colors.red,
-            value: _switchValue,
+            value: AppVariaveis().switchValuePaciente,
             valueFontSize: 10.0,
             width: 110,
             borderRadius: 30.0,
             showOnOff: true,
             onToggle: (value) {
               setState(() {
-                _switchValue = value;
+                AppVariaveis().switchValuePaciente = value;
                 if (value == true) {
-                  varAtivo = '1';
+                  AppVariaveis().varAtivoPaciente = '1';
                 } else if (value == false) {
-                  varAtivo = '0';
+                  AppVariaveis().varAtivoPaciente = '0';
                 }
               });
             },
@@ -897,133 +869,160 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                   borderRadius: BorderRadius.circular(32),
                 )),
             child: Text(
-              widget.tipo == 'editar' ? 'Atualizar' : 'Criar',
+              tipo == 'editar' ? 'Atualizar' : 'Criar',
               style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
             ),
             onPressed: () async {
               if (validarCampos()) {
-                fileImage != null
-                    ? urlImagePaciente = (await uploadImageUsers(fileImage, 'pacientes'))!
-                    : urlImagePaciente = urlImagePaciente;
+                AppVariaveis().fileImagePaciente != null
+                    ? AppVariaveis().urlImagePaciente =
+                        (await uploadImageUsers(AppVariaveis().fileImagePaciente, 'pacientes'))!
+                    : AppVariaveis().urlImagePaciente = AppVariaveis().urlImagePaciente;
 
-                if (apagarImagem == true) {
-                  await deletarImagem(urlImagePaciente);
-                  await apagarImagemUser(uidPaciente);
+                if (AppVariaveis().apagarImagemPaciente == true) {
+                  await deletarImagem(AppVariaveis().urlImagePaciente);
+                  await apagarImagemUser(uidPaciente!);
                 }
 
-                widget.tipo == 'editar'
-                    ? (txtNomePaciente.text.isNotEmpty &&
-                            txtDataNascimentoPaciente.text.isNotEmpty &&
-                            txtCPFPaciente.text.isNotEmpty &&
-                            _selectedGeneroPaciente != null &&
-                            txtEscolaPaciente.text.isNotEmpty &&
-                            selecioneEscolaridadePaciente.isNotEmpty &&
-                            selecionePeriodoEscolaPaciente.isNotEmpty &&
-                            txtProfessoraPaciente.text.isNotEmpty &&
-                            txtLogradouroPaciente.text.isNotEmpty &&
-                            txtNumeroPaciente.text.isNotEmpty &&
-                            txtBairroPaciente.text.isNotEmpty &&
-                            txtCidadePaciente.text.isNotEmpty &&
-                            selecioneEstadoPaciente.isNotEmpty &&
-                            txtCEPPaciente.text.isNotEmpty &&
-                            selecioneTipoConsultaPaciente.isNotEmpty &&
-                            txtDescricaoPaciente.text.isNotEmpty &&
-                            ListGeneroResponsavelPaciente[indexResponsavel] != null &&
-                            ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                            ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                            ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                            ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                            ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty)
+                tipo == 'editar'
+                    ? (AppVariaveis().txtNomePaciente.text.isNotEmpty &&
+                            AppVariaveis().txtDataNascimentoPaciente.text.isNotEmpty &&
+                            AppVariaveis().txtCPFPaciente.text.isNotEmpty &&
+                            AppVariaveis().selectedGeneroPaciente != null &&
+                            AppVariaveis().txtEscolaPaciente.isNotEmpty &&
+                            AppVariaveis().selecioneEscolaridadePaciente.isNotEmpty &&
+                            AppVariaveis().selecionePeriodoEscolaPaciente.isNotEmpty &&
+                            AppVariaveis().txtProfessoraPaciente.text.isNotEmpty &&
+                            AppVariaveis().txtLogradouroPaciente.text.isNotEmpty &&
+                            AppVariaveis().txtNumeroPaciente.text.isNotEmpty &&
+                            AppVariaveis().txtBairroPaciente.text.isNotEmpty &&
+                            AppVariaveis().txtCidadePaciente.text.isNotEmpty &&
+                            AppVariaveis().selecioneEstadoPaciente.isNotEmpty &&
+                            AppVariaveis().txtCEPPaciente.text.isNotEmpty &&
+                            AppVariaveis().selecioneTipoConsultaPaciente.isNotEmpty &&
+                            AppVariaveis().txtDescricaoPaciente.text.isNotEmpty &&
+                            AppVariaveis()
+                                    .ListGeneroResponsavelPaciente[AppVariaveis().indexResponsavelPaciente] !=
+                                null &&
+                            AppVariaveis()
+                                .ListNomeResponsavelPaciente[AppVariaveis().indexResponsavelPaciente]
+                                .text
+                                .isNotEmpty &&
+                            AppVariaveis()
+                                .ListIdadeResponsavelPaciente[AppVariaveis().indexResponsavelPaciente]
+                                .text
+                                .isNotEmpty &&
+                            AppVariaveis()
+                                .ListTelefoneResponsavelPaciente[AppVariaveis().indexResponsavelPaciente]
+                                .text
+                                .isNotEmpty &&
+                            AppVariaveis()
+                                .ListProfissaoResponsavelPaciente[AppVariaveis().indexResponsavelPaciente]
+                                .text
+                                .isNotEmpty)
                         ? editarPaciente(
                             context,
-                            idUsuario(),
-                            widget.uid,
-                            urlImagePaciente,
-                            txtDataAnamnesePaciente.text,
-                            txtNomePaciente.text,
-                            txtDataNascimentoPaciente.text,
-                            txtCPFPaciente.text,
-                            txtRGPaciente.text,
-                            _selectedGeneroPaciente.toString(),
-                            txtEscolaPaciente.text,
-                            selecioneEscolaridadePaciente,
-                            selecionePeriodoEscolaPaciente,
-                            txtProfessoraPaciente.text,
-                            txtTelefoneProfessoraPaciente.text,
-                            txtLogradouroPaciente.text,
-                            txtNumeroPaciente.text,
-                            txtBairroPaciente.text,
-                            txtCidadePaciente.text,
-                            selecioneEstadoPaciente,
-                            txtCEPPaciente.text,
-                            selecioneTipoConsultaPaciente,
-                            txtDescricaoPaciente.text,
-                            qtdResponsavel,
-                            ListGeneroResponsavelPaciente,
-                            ListNomeResponsavelPaciente,
-                            ListIdadeResponsavelPaciente,
-                            ListTelefoneResponsavelPaciente,
-                            ListRelacaoResponsavelPaciente,
-                            ListEscolaridadeResponsavelPaciente,
-                            ListProfissaoResponsavelPaciente,
-                            fileDoc,
-                            varAtivo)
+                            idFonoAuth(),
+                            uidPaciente,
+                            AppVariaveis().urlImagePaciente,
+                            AppVariaveis().txtDataAnamnesePaciente.text,
+                            AppVariaveis().txtNomePaciente.text,
+                            AppVariaveis().txtDataNascimentoPaciente.text,
+                            AppVariaveis().txtCPFPaciente.text,
+                            AppVariaveis().txtRGPaciente.text,
+                            AppVariaveis().selectedGeneroPaciente.toString(),
+                            AppVariaveis().txtEscolaPaciente,
+                            AppVariaveis().selecioneEscolaridadePaciente,
+                            AppVariaveis().selecionePeriodoEscolaPaciente,
+                            AppVariaveis().txtProfessoraPaciente.text,
+                            AppVariaveis().txtTelefoneProfessoraPaciente.text,
+                            AppVariaveis().txtLogradouroPaciente.text,
+                            AppVariaveis().txtNumeroPaciente.text,
+                            AppVariaveis().txtBairroPaciente.text,
+                            AppVariaveis().txtCidadePaciente.text,
+                            AppVariaveis().selecioneEstadoPaciente,
+                            AppVariaveis().txtCEPPaciente.text,
+                            AppVariaveis().selecioneTipoConsultaPaciente,
+                            AppVariaveis().txtDescricaoPaciente.text,
+                            AppVariaveis().qtdResponsavelPaciente,
+                            AppVariaveis().ListGeneroResponsavelPaciente,
+                            AppVariaveis().ListNomeResponsavelPaciente,
+                            AppVariaveis().ListIdadeResponsavelPaciente,
+                            AppVariaveis().ListTelefoneResponsavelPaciente,
+                            AppVariaveis().ListRelacaoResponsavelPaciente,
+                            AppVariaveis().ListEscolaridadeResponsavelPaciente,
+                            AppVariaveis().ListProfissaoResponsavelPaciente,
+                            AppVariaveis().fileDocPaciente,
+                            AppVariaveis().varAtivoPaciente)
                         : erro(context, 'Preencha os campos obrigatórios!')
-                    : (txtNomePaciente.text.isNotEmpty &&
-                            txtDataNascimentoPaciente.text.isNotEmpty &&
-                            txtCPFPaciente.text.isNotEmpty &&
-                            _selectedGeneroPaciente != null &&
-                            txtEscolaPaciente.text.isNotEmpty &&
-                            selecioneEscolaridadePaciente.isNotEmpty &&
-                            selecionePeriodoEscolaPaciente.isNotEmpty &&
-                            txtProfessoraPaciente.text.isNotEmpty &&
-                            txtLogradouroPaciente.text.isNotEmpty &&
-                            txtNumeroPaciente.text.isNotEmpty &&
-                            txtBairroPaciente.text.isNotEmpty &&
-                            txtCidadePaciente.text.isNotEmpty &&
-                            selecioneEstadoPaciente.isNotEmpty &&
-                            txtCEPPaciente.text.isNotEmpty &&
-                            selecioneTipoConsultaPaciente.isNotEmpty &&
-                            txtDescricaoPaciente.text.isNotEmpty &&
-                            ListGeneroResponsavelPaciente[indexResponsavel] != null &&
-                            ListNomeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                            ListIdadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                            ListTelefoneResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                            ListEscolaridadeResponsavelPaciente[indexResponsavel].text.isNotEmpty &&
-                            ListProfissaoResponsavelPaciente[indexResponsavel].text.isNotEmpty)
+                    : (AppVariaveis().txtNomePaciente.text.isNotEmpty &&
+                            AppVariaveis().txtDataNascimentoPaciente.text.isNotEmpty &&
+                            AppVariaveis().txtCPFPaciente.text.isNotEmpty &&
+                            AppVariaveis().selectedGeneroPaciente != null &&
+                            AppVariaveis().txtEscolaPaciente.isNotEmpty &&
+                            AppVariaveis().selecioneEscolaridadePaciente.isNotEmpty &&
+                            AppVariaveis().selecionePeriodoEscolaPaciente.isNotEmpty &&
+                            AppVariaveis().txtProfessoraPaciente.text.isNotEmpty &&
+                            AppVariaveis().txtLogradouroPaciente.text.isNotEmpty &&
+                            AppVariaveis().txtNumeroPaciente.text.isNotEmpty &&
+                            AppVariaveis().txtBairroPaciente.text.isNotEmpty &&
+                            AppVariaveis().txtCidadePaciente.text.isNotEmpty &&
+                            AppVariaveis().selecioneEstadoPaciente.isNotEmpty &&
+                            AppVariaveis().txtCEPPaciente.text.isNotEmpty &&
+                            AppVariaveis().selecioneTipoConsultaPaciente.isNotEmpty &&
+                            AppVariaveis().txtDescricaoPaciente.text.isNotEmpty &&
+                            AppVariaveis()
+                                    .ListGeneroResponsavelPaciente[AppVariaveis().indexResponsavelPaciente] !=
+                                null &&
+                            AppVariaveis()
+                                .ListNomeResponsavelPaciente[AppVariaveis().indexResponsavelPaciente]
+                                .text
+                                .isNotEmpty &&
+                            AppVariaveis()
+                                .ListIdadeResponsavelPaciente[AppVariaveis().indexResponsavelPaciente]
+                                .text
+                                .isNotEmpty &&
+                            AppVariaveis()
+                                .ListTelefoneResponsavelPaciente[AppVariaveis().indexResponsavelPaciente]
+                                .text
+                                .isNotEmpty &&
+                            AppVariaveis()
+                                .ListProfissaoResponsavelPaciente[AppVariaveis().indexResponsavelPaciente]
+                                .text
+                                .isNotEmpty)
                         ? adicionarPaciente(
                             context,
-                            idUsuario(),
-                            urlImagePaciente,
-                            txtDataAnamnesePaciente.text,
-                            txtNomePaciente.text,
-                            txtDataNascimentoPaciente.text,
-                            txtCPFPaciente.text,
-                            txtRGPaciente.text,
-                            _selectedGeneroPaciente.toString(),
-                            txtEscolaPaciente.text,
-                            selecioneEscolaridadePaciente,
-                            selecionePeriodoEscolaPaciente,
-                            txtProfessoraPaciente.text,
-                            txtTelefoneProfessoraPaciente.text,
-                            txtLogradouroPaciente.text,
-                            txtNumeroPaciente.text,
-                            txtBairroPaciente.text,
-                            txtCidadePaciente.text,
-                            selecioneEstadoPaciente,
-                            txtCEPPaciente.text,
-                            selecioneTipoConsultaPaciente,
-                            txtDescricaoPaciente.text,
-                            indexResponsavel,
-                            ListGeneroResponsavelPaciente,
-                            ListNomeResponsavelPaciente,
-                            ListIdadeResponsavelPaciente,
-                            ListTelefoneResponsavelPaciente,
-                            ListRelacaoResponsavelPaciente,
-                            ListEscolaridadeResponsavelPaciente,
-                            ListProfissaoResponsavelPaciente,
-                            fileDoc,
-                            varAtivo)
+                            idFonoAuth(),
+                            AppVariaveis().urlImagePaciente,
+                            AppVariaveis().txtDataAnamnesePaciente.text,
+                            AppVariaveis().txtNomePaciente.text,
+                            AppVariaveis().txtDataNascimentoPaciente.text,
+                            AppVariaveis().txtCPFPaciente.text,
+                            AppVariaveis().txtRGPaciente.text,
+                            AppVariaveis().selectedGeneroPaciente.toString(),
+                            AppVariaveis().txtEscolaPaciente,
+                            AppVariaveis().selecioneEscolaridadePaciente,
+                            AppVariaveis().selecionePeriodoEscolaPaciente,
+                            AppVariaveis().txtProfessoraPaciente.text,
+                            AppVariaveis().txtTelefoneProfessoraPaciente.text,
+                            AppVariaveis().txtLogradouroPaciente.text,
+                            AppVariaveis().txtNumeroPaciente.text,
+                            AppVariaveis().txtBairroPaciente.text,
+                            AppVariaveis().txtCidadePaciente.text,
+                            AppVariaveis().selecioneEstadoPaciente,
+                            AppVariaveis().txtCEPPaciente.text,
+                            AppVariaveis().selecioneTipoConsultaPaciente,
+                            AppVariaveis().txtDescricaoPaciente.text,
+                            AppVariaveis().indexResponsavelPaciente,
+                            AppVariaveis().ListGeneroResponsavelPaciente,
+                            AppVariaveis().ListNomeResponsavelPaciente,
+                            AppVariaveis().ListIdadeResponsavelPaciente,
+                            AppVariaveis().ListTelefoneResponsavelPaciente,
+                            AppVariaveis().ListRelacaoResponsavelPaciente,
+                            AppVariaveis().ListEscolaridadeResponsavelPaciente,
+                            AppVariaveis().ListProfissaoResponsavelPaciente,
+                            AppVariaveis().fileDocPaciente,
+                            AppVariaveis().varAtivoPaciente)
                         : erro(context, 'Preencha os campos obrigatórios!');
               }
             }),
@@ -1041,6 +1040,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
             style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
           ),
           onPressed: () {
+            AppVariaveis().resetPaciente();
             Navigator.pop(context);
           },
         ),
@@ -1075,11 +1075,13 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                   style: TextStyle(color: cores('corTexto')),
                 ),
                 value: Gender.male,
-                groupValue: ListGeneroResponsavelPaciente[indexResponsavel],
+                groupValue:
+                    AppVariaveis().ListGeneroResponsavelPaciente[AppVariaveis().indexResponsavelPaciente],
                 activeColor: cores('corTexto'),
                 onChanged: (value) {
                   setState(() {
-                    ListGeneroResponsavelPaciente[indexResponsavel] = value!;
+                    AppVariaveis().ListGeneroResponsavelPaciente[AppVariaveis().indexResponsavelPaciente] =
+                        value!;
                   });
                 },
               ),
@@ -1091,33 +1093,43 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                   style: TextStyle(color: cores('corTexto')),
                 ),
                 value: Gender.female,
-                groupValue: ListGeneroResponsavelPaciente[indexResponsavel],
+                groupValue:
+                    AppVariaveis().ListGeneroResponsavelPaciente[AppVariaveis().indexResponsavelPaciente],
                 activeColor: cores('corTexto'),
                 onChanged: (value) {
                   setState(() {
-                    ListGeneroResponsavelPaciente[indexResponsavel] = value!;
+                    AppVariaveis().ListGeneroResponsavelPaciente[AppVariaveis().indexResponsavelPaciente] =
+                        value!;
                   });
                 },
               ),
             ),
           ],
         ),
-        campoTexto(
-            'Nome do Responsável ${indexResponsavel + 1}', ListNomeResponsavelPaciente[indexResponsavel], Icons.label,
-            key: keyNomeResponsavelPaciente, validator: true),
+        campoTexto('Nome do Responsável ${AppVariaveis().indexResponsavelPaciente + 1}',
+            AppVariaveis().ListNomeResponsavelPaciente[AppVariaveis().indexResponsavelPaciente], Icons.label,
+            key: AppVariaveis().keyNomeResponsavelPaciente, validator: true),
         const SizedBox(height: 20),
         Row(
           children: [
             Expanded(
-              child: campoTexto('Idade', ListIdadeResponsavelPaciente[indexResponsavel], Icons.calendar_month_outlined,
-                  numeros: true, key: keyIdadeResponsavelPaciente, validator: true),
+              child: campoTexto(
+                  'Idade',
+                  AppVariaveis().ListIdadeResponsavelPaciente[AppVariaveis().indexResponsavelPaciente],
+                  Icons.calendar_month_outlined,
+                  boardType: 'numeros',
+                  key: AppVariaveis().keyIdadeResponsavelPaciente,
+                  validator: true),
             ),
             const Padding(padding: EdgeInsets.only(right: 10)),
             Expanded(
-              child: campoTexto('Telefone', ListTelefoneResponsavelPaciente[indexResponsavel], Icons.phone,
+              child: campoTexto(
+                  'Telefone',
+                  AppVariaveis().ListTelefoneResponsavelPaciente[AppVariaveis().indexResponsavelPaciente],
+                  Icons.phone,
                   formato: TelefoneInputFormatter(),
-                  numeros: true,
-                  key: keyTelefoneResponsavelPaciente,
+                  boardType: 'numeros',
+                  key: AppVariaveis().keyTelefoneResponsavelPaciente,
                   validator: true),
             )
           ],
@@ -1126,14 +1138,16 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         Text(
           'Qual a relação do Responsável com Paciente?',
           style: TextStyle(
-              fontSize: tamanhoFonte.letraPequena(context), color: cores('corTexto'), fontWeight: FontWeight.bold),
+              fontSize: tamanhoFonte.letraPequena(context),
+              color: cores('corTexto'),
+              fontWeight: FontWeight.bold),
         ),
         Container(
           padding: const EdgeInsets.only(left: 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0),
             border: Border.all(color: cores('corBorda')),
-            color: Colors.white,
+            color: cores('branco'),
             boxShadow: [
               BoxShadow(
                 offset: const Offset(0, 3),
@@ -1156,47 +1170,69 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
             ),
             isExpanded: true,
             hint: const Text('Selecione uma Opção'),
-            value: ListRelacaoResponsavelPaciente[indexResponsavel],
-            items: [
-              DropdownMenuItem(
-                value: 'Mãe',
-                child: Text('Mãe', style: TextStyle(color: cores('corTexto'))),
-              ),
-              DropdownMenuItem(
-                value: 'Pai',
-                child: Text('Pai', style: TextStyle(color: cores('corTexto'))),
-              ),
-              DropdownMenuItem(
-                value: 'Avó',
-                child: Text('Avó', style: TextStyle(color: cores('corTexto'))),
-              ),
-              DropdownMenuItem(
-                value: 'Avô',
-                child: Text('Avô', style: TextStyle(color: cores('corTexto'))),
-              ),
-              DropdownMenuItem(
-                value: 'Tio',
-                child: Text('Tio', style: TextStyle(color: cores('corTexto'))),
-              ),
-              DropdownMenuItem(
-                value: 'Tia',
-                child: Text('Tia', style: TextStyle(color: cores('corTexto'))),
-              ),
-            ],
+            value: AppVariaveis().ListRelacaoResponsavelPaciente[AppVariaveis().indexResponsavelPaciente],
+            items: responsaveis.map(buildMenuItem).toList(),
             onChanged: (value) {
               setState(() {
-                ListRelacaoResponsavelPaciente[indexResponsavel] = value!;
+                AppVariaveis().ListRelacaoResponsavelPaciente[AppVariaveis().indexResponsavelPaciente] =
+                    value!;
               });
             },
           ),
         ),
         const SizedBox(height: 20),
-        campoTexto('Grau de Escolaridade', ListEscolaridadeResponsavelPaciente[indexResponsavel], Icons.school,
-            key: keyEscolaridadeResponsavelPaciente, validator: true),
+        Container(
+          padding: const EdgeInsets.only(left: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8.0),
+            border: Border.all(color: cores('corBorda')),
+            color: cores('branco'),
+            boxShadow: [
+              BoxShadow(
+                offset: const Offset(0, 3),
+                color: cores('corSombra'),
+                blurRadius: 5,
+              ), // changes position of shadow
+            ],
+          ),
+          child: DropdownButton<String>(
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 30,
+            iconEnabledColor: cores('corSimbolo'),
+            style: TextStyle(
+              color: cores('corTexto'),
+              fontWeight: FontWeight.w400,
+              fontSize: tamanhoFonte.letraPequena(context),
+            ),
+            underline: Container(
+              height: 0,
+            ),
+            isExpanded: true,
+            hint: const Text('Selecione uma Opção'),
+            value:
+                AppVariaveis().ListEscolaridadeResponsavelPaciente[AppVariaveis().indexResponsavelPaciente],
+            items: escolaridadeResp.map(buildMenuItem).toList(),
+            onChanged: (value) {
+              setState(() {
+                AppVariaveis().ListEscolaridadeResponsavelPaciente[AppVariaveis().indexResponsavelPaciente] =
+                    value!;
+              });
+            },
+          ),
+        ),
         const SizedBox(height: 20),
-        campoTexto('Profissão', ListProfissaoResponsavelPaciente[indexResponsavel], Icons.work,
-            key: keyProfissaoResponsavelPaciente, validator: true),
+        campoTexto(
+            'Profissão',
+            AppVariaveis().ListProfissaoResponsavelPaciente[AppVariaveis().indexResponsavelPaciente],
+            Icons.work,
+            key: AppVariaveis().keyProfissaoResponsavelPaciente,
+            validator: true),
       ],
     );
   }
+
+  DropdownMenuItem<String> buildMenuItem(String item) => DropdownMenuItem(
+        value: item,
+        child: Text(item),
+      );
 }

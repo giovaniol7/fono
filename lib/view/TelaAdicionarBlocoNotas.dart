@@ -3,49 +3,39 @@ import 'package:flutter/material.dart';
 
 import '../connections/fireAuth.dart';
 import '../connections/fireCloudBlocoNotas.dart';
+import '../controllers/variaveis.dart';
 import '../controllers/estilos.dart';
 import '../widgets/campoTexto.dart';
 import '../widgets/mensagem.dart';
 
 class TelaAdicionarBlocoNotas extends StatefulWidget {
-  final String tipo;
-  final String uid;
-
-  const TelaAdicionarBlocoNotas(this.tipo, this.uid, {super.key});
+  const TelaAdicionarBlocoNotas({super.key});
 
   @override
   State<TelaAdicionarBlocoNotas> createState() => _TelaAdicionarBlocoNotasState();
 }
 
 class _TelaAdicionarBlocoNotasState extends State<TelaAdicionarBlocoNotas> {
-  late DateTime selectedDate;
-  late TimeOfDay selectedTime;
-  DateTime? pickedDate;
-  String uidBloco = '';
-  var txtNomeBloco = TextEditingController();
-  var txtDataBloco = TextEditingController();
-  var txtNomeResponsavel = TextEditingController();
-  var txtTelefoneBloco = TextEditingController();
-  var blNotas;
+  late String? tipo;
+  late String? uidNota;
 
   carregarDados() async {
-    if (widget.tipo == 'editar') {
-      blNotas = await recuperarNota(context, widget.uid);
+    if (tipo == 'editar') {
+      AppVariaveis().blNotas = await recuperarNota(context, uidNota);
     }
 
     setState(() {
-      DateTime now = DateTime.now();
-      widget.tipo == 'adicionar'
-          ? txtDataBloco.text =
-              "${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year.toString()}"
+      tipo == 'adicionar'
+          ? AppVariaveis().txtDataBloco.text =
+              "${AppVariaveis().nowTimer.day.toString().padLeft(2, '0')}/${AppVariaveis().nowTimer.month.toString().padLeft(2, '0')}/${AppVariaveis().nowTimer.year.toString()}"
           : null;
 
-      if (widget.tipo == 'editar') {
-        uidBloco = blNotas['uidBloco'];
-        txtNomeBloco.text = blNotas['nomeBloco'];
-        txtDataBloco.text = blNotas['dataBloco'];
-        txtNomeResponsavel.text = blNotas['nomeResponsavel'];
-        txtTelefoneBloco.text = blNotas['telefoneBloco'];
+      if (tipo == 'editar') {
+        AppVariaveis().uidBloco = AppVariaveis().blNotas['AppVariaveis().uidBloco']!;
+        AppVariaveis().txtNomeBloco.text = AppVariaveis().blNotas['nomeBloco']!;
+        AppVariaveis().txtDataBloco.text = AppVariaveis().blNotas['dataBloco']!;
+        AppVariaveis().txtNomeResponsavel.text = AppVariaveis().blNotas['nomeResponsavel']!;
+        AppVariaveis().txtTelefoneBloco.text = AppVariaveis().blNotas['telefoneBloco']!;
       }
     });
   }
@@ -57,11 +47,15 @@ class _TelaAdicionarBlocoNotasState extends State<TelaAdicionarBlocoNotas> {
   }
 
   Widget build(BuildContext context) {
+    final arguments = ModalRoute.of(context)?.settings.arguments as Map?;
+    tipo = arguments?['tipo'] as String?;
+    uidNota = arguments?['appointment'] as String?;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: cores('corFundo'),
         actions: [
-          widget.tipo == 'editar'
+          tipo == 'editar'
               ? IconButton(
                   icon: Icon(
                     Icons.delete,
@@ -81,6 +75,7 @@ class _TelaAdicionarBlocoNotasState extends State<TelaAdicionarBlocoNotas> {
                                   style: TextStyle(color: Colors.blue),
                                 ),
                                 onPressed: () {
+                                  AppVariaveis().resetBlocoNotas();
                                   Navigator.of(context).pop();
                                 },
                               ),
@@ -91,10 +86,11 @@ class _TelaAdicionarBlocoNotasState extends State<TelaAdicionarBlocoNotas> {
                                 ),
                                 onPressed: () async {
                                   try {
-                                    await apagarBlocoNota(context, uidBloco);
+                                    await apagarBlocoNota(context, AppVariaveis().uidBloco);
                                   } catch (e) {
                                     erro(context, 'Erro ao deletar Nota: $e');
                                   }
+                                  AppVariaveis().resetBlocoNotas();
                                   Navigator.of(context).pop();
                                 },
                               ),
@@ -108,12 +104,13 @@ class _TelaAdicionarBlocoNotasState extends State<TelaAdicionarBlocoNotas> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
+            AppVariaveis().resetBlocoNotas();
             Navigator.pop(context);
           },
         ),
         iconTheme: IconThemeData(color: cores('corSimbolo')),
         title: Text(
-          widget.tipo == 'adicionar' ? "Adicionar Notas" : "Atualizar Notas",
+          tipo == 'adicionar' ? "Adicionar Notas" : "Atualizar Notas",
           style: TextStyle(color: cores('corTexto')),
         ),
       ),
@@ -124,33 +121,34 @@ class _TelaAdicionarBlocoNotasState extends State<TelaAdicionarBlocoNotas> {
             children: [
               campoTexto(
                 'Data de Contato',
-                txtDataBloco,
+                AppVariaveis().txtDataBloco,
                 Icons.calendar_month_outlined,
                 formato: DataInputFormatter(),
-                numeros: true,
+                boardType: 'numeros',
                 iconPressed: () async {
-                  pickedDate = await showDatePicker(
+                  AppVariaveis().pickedDate = await showDatePicker(
                     context: context,
-                    initialDate: selectedDate,
+                    initialDate: AppVariaveis().selectedDate,
                     firstDate: DateTime.now(),
                     lastDate: DateTime(2100),
                   );
-                  if (pickedDate != null && pickedDate != selectedDate) {
+                  if (AppVariaveis().pickedDate != null &&
+                      AppVariaveis().pickedDate != AppVariaveis().selectedDate) {
                     setState(() {
-                      selectedDate = pickedDate!;
-                      txtDataBloco.text =
-                          "${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year.toString()}";
+                      AppVariaveis().selectedDate = AppVariaveis().pickedDate!;
+                      AppVariaveis().txtDataBloco.text =
+                          "${AppVariaveis().selectedDate.day.toString().padLeft(2, '0')}/${AppVariaveis().selectedDate.month.toString().padLeft(2, '0')}/${AppVariaveis().selectedDate.year.toString()}";
                     });
                   }
                 },
               ),
               SizedBox(height: 20),
-              campoTexto('Nome Notas', txtNomeBloco, Icons.person),
+              campoTexto('Nome Notas', AppVariaveis().txtNomeBloco, Icons.person),
               SizedBox(height: 20),
-              campoTexto('Nome Responsável', txtNomeResponsavel, Icons.person_2),
+              campoTexto('Nome Responsável', AppVariaveis().txtNomeResponsavel, Icons.person_2),
               SizedBox(height: 20),
-              campoTexto('Telefone Responsável', txtTelefoneBloco, Icons.phone,
-                  formato: TelefoneInputFormatter(), numeros: true),
+              campoTexto('Telefone Responsável', AppVariaveis().txtTelefoneBloco, Icons.phone,
+                  formato: TelefoneInputFormatter(), boardType: 'numeros'),
               SizedBox(height: 20),
               rowBotao(),
             ],
@@ -176,15 +174,26 @@ class _TelaAdicionarBlocoNotasState extends State<TelaAdicionarBlocoNotas> {
                   borderRadius: BorderRadius.circular(32),
                 )),
             child: Text(
-              widget.tipo == 'editar' ? 'Atualizar' : 'Criar',
+              tipo == 'editar' ? 'Atualizar' : 'Criar',
               style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
             ),
             onPressed: () async {
-              widget.tipo == 'editar'
-                  ? editarBlocoNota(context, widget.uid, idUsuario(), txtNomeResponsavel.text, txtDataBloco.text,
-                      txtNomeResponsavel.text, txtTelefoneBloco.text)
-                  : adicionarBlocoNota(context, idUsuario(), txtNomeResponsavel.text, txtDataBloco.text,
-                      txtNomeResponsavel.text, txtTelefoneBloco.text);
+              tipo == 'editar'
+                  ? editarBlocoNota(
+                      context,
+                      uidNota,
+                      idFonoAuth(),
+                      AppVariaveis().txtNomeResponsavel.text,
+                      AppVariaveis().txtDataBloco.text,
+                      AppVariaveis().txtNomeResponsavel.text,
+                      AppVariaveis().txtTelefoneBloco.text)
+                  : adicionarBlocoNota(
+                      context,
+                      idFonoAuth(),
+                      AppVariaveis().txtNomeResponsavel.text,
+                      AppVariaveis().txtDataBloco.text,
+                      AppVariaveis().txtNomeResponsavel.text,
+                      AppVariaveis().txtTelefoneBloco.text);
             }),
         SizedBox(width: 10),
         OutlinedButton(
@@ -200,6 +209,7 @@ class _TelaAdicionarBlocoNotasState extends State<TelaAdicionarBlocoNotas> {
             style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
           ),
           onPressed: () {
+            AppVariaveis().resetBlocoNotas();
             Navigator.pop(context);
           },
         ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fonocare/connections/fireAuth.dart';
-
-import 'package:fonocare/view/TelaAdicionarPaciente.dart';
+import 'package:fonocare/controllers/variaveis.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -24,7 +23,7 @@ class _TelaPacientesState extends State<TelaPacientes> {
   var varAtivo = '1';
   String _paciente = '';
   List<String> listaPaciente = [];
-  String _outroPaciente = "";
+  String _outroPaciente = "Nome do Paciente";
   var user;
 
   carregarDados() async {
@@ -52,6 +51,7 @@ class _TelaPacientesState extends State<TelaPacientes> {
             size: 30,
           ),
           onPressed: () {
+            AppVariaveis().reset();
             Navigator.pop(context);
           },
         ),
@@ -96,7 +96,8 @@ class _TelaPacientesState extends State<TelaPacientes> {
             children: [
               Padding(padding: EdgeInsets.only(top: 20)),
               TextFieldSuggestions(
-                  margem: EdgeInsets.only(top: 5, left: 20, bottom: 5, right: 20),
+                  tipo: 'paciente',
+                  margem: EdgeInsets.only(left: 20, bottom: 5, right: 20),
                   list: listaPaciente,
                   labelText: _outroPaciente,
                   textSuggetionsColor: cores('corTexto'),
@@ -114,7 +115,10 @@ class _TelaPacientesState extends State<TelaPacientes> {
                 child: StreamBuilder<QuerySnapshot>(
                     stream: pacientes != null
                         ? (_paciente.isEmpty
-                            ? pacientes.orderBy('nomePaciente').where('ativoPaciente', isEqualTo: varAtivo).snapshots()
+                            ? pacientes
+                                .orderBy('nomePaciente')
+                                .where('ativoPaciente', isEqualTo: varAtivo)
+                                .snapshots()
                             : pacientes.where('nomePaciente', isEqualTo: _paciente).snapshots())
                         : null,
                     builder: (context, snapshot) {
@@ -130,11 +134,12 @@ class _TelaPacientesState extends State<TelaPacientes> {
                         default:
                           final dados = snapshot.requireData;
                           return ListView.separated(
-                              padding: EdgeInsets.all(10),
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (context, index) => listarPaciente(context, dados.docs[index], 'pacientes'),
-                              separatorBuilder: (context, _) => const SizedBox(height: 5),
-                              itemCount: dados.size);
+                                  padding: EdgeInsets.all(10),
+                                  scrollDirection: Axis.vertical,
+                                  itemBuilder: (context, index) =>
+                                      listarPaciente(context, dados.docs[index], 'pacientes'),
+                                  separatorBuilder: (context, _) => const SizedBox(height: 5),
+                                  itemCount: dados.size);
                       }
                     }),
               ),
@@ -145,12 +150,7 @@ class _TelaPacientesState extends State<TelaPacientes> {
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
         onPressed: () {
-          String tipo = 'adicionar';
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TelaAdicionarPaciente(tipo, idUsuario()),
-              ));
+          Navigator.pushNamed(context, '/adicionarPacientes', arguments: {'tipo': 'adicionar', 'uidFono': idFonoAuth()});
         },
         child: Icon(
           Icons.add,

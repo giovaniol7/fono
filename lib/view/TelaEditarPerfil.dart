@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:brasil_fields/brasil_fields.dart';
+import 'package:fonocare/controllers/variaveis.dart';
+import 'package:provider/provider.dart';
 
 import '../connections/fireCloudUser.dart';
 import '../controllers/uploadImage.dart';
@@ -17,48 +19,18 @@ class TelaEditarPerfil extends StatefulWidget {
 }
 
 class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
-  var uid;
-  var id;
-  var fileImage;
-  var apagarImagem;
-  String urlImage = '';
-  late var txtNome = TextEditingController();
-  late var txtEmail = TextEditingController();
-  late var txtSenha = TextEditingController();
-  late var txtDtNascimento = TextEditingController();
-  late var genero;
-  late var txtCPF = TextEditingController();
-  late var txtCRFa = TextEditingController();
-  late var txtTelefone = TextEditingController();
-  late var txtSenhaCofirmar = TextEditingController();
-  bool _obscureText = true;
-  bool _obscureText2 = true;
-
-  void _toggle() {
-    setState(() {
-      _obscureText = !_obscureText;
-    });
-  }
-
-  void _toggle2() {
-    setState(() {
-      _obscureText2 = !_obscureText2;
-    });
-  }
-
   carregarDados() async {
     var usuario = await listarUsuario();
     setState(() {
-      id = usuario['id'];
-      uid = usuario['uid'];
-      urlImage = usuario['urlImage']!;
-      txtNome.text = usuario['nome']!;
-      txtDtNascimento.text = usuario['dtNascimento']!;
-      genero = usuario['genero'];
-      txtEmail.text = usuario['email']!;
-      txtTelefone.text = usuario['telefone']!;
-      txtCPF.text = usuario['cpf']!;
-      txtCRFa.text = usuario['crfa']!;
+      AppVariaveis().idFono = usuario['id']!;
+      AppVariaveis().uidAuthFono = usuario['uid']!;
+      AppVariaveis().urlImageFono = usuario['urlImage']!;
+      AppVariaveis().txtNome.text = usuario['nome']!;
+      AppVariaveis().txtEmail.text = usuario['email']!;
+      AppVariaveis().txtDtNascimento.text = usuario['dtNascimento']!;
+      AppVariaveis().txtCPF.text = usuario['cpf']!;
+      AppVariaveis().txtCRFa.text = usuario['crfa']!;
+      AppVariaveis().txtTelefone.text = usuario['telefone']!;
     });
   }
 
@@ -79,6 +51,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
+            AppVariaveis().resetUser();
             Navigator.pop(context);
           },
         ),
@@ -98,7 +71,8 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                 boxShadow: [
                   BoxShadow(offset: Offset(0, 3), color: cores('corDetalhe'), blurRadius: 5),
                 ],
-                borderRadius: BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
+                borderRadius:
+                    BorderRadius.only(bottomRight: Radius.circular(16), bottomLeft: Radius.circular(16))),
             child: Center(
               child: Container(
                 width: 80.0,
@@ -107,15 +81,15 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                   shape: BoxShape.circle,
                   color: cores('corBotao'),
                 ),
-                child: urlImage.isEmpty
+                child: AppVariaveis().urlImageFono.isEmpty
                     ? InkWell(
                         onTap: () async {
-                          fileImage = await pickedImage();
+                          AppVariaveis().fileImageFono = await pickedImage();
                           setState(() {
-                            fileImage = fileImage!;
+                            AppVariaveis().fileImageFono = AppVariaveis().fileImageFono!;
                           });
                         },
-                        child: fileImage == null
+                        child: AppVariaveis().fileImageFono == null
                             ? Icon(
                                 Icons.person_add_alt_rounded,
                                 color: cores('corTextoBotao'),
@@ -125,14 +99,14 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                                 maxRadius: 5,
                                 minRadius: 1,
                                 backgroundImage: FileImage(
-                                  File(fileImage.path),
+                                  File(AppVariaveis().fileImageFono.path),
                                 ),
                               ),
                       )
                     : Stack(children: [
                         CircleAvatar(
                           radius: 80,
-                          backgroundImage: NetworkImage(urlImage),
+                          backgroundImage: NetworkImage(AppVariaveis().urlImageFono),
                         ),
                         Container(
                           decoration: BoxDecoration(
@@ -148,8 +122,8 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                               ),
                               onPressed: () {
                                 setState(() {
-                                  apagarImagem == true;
-                                  urlImage = '';
+                                  AppVariaveis().boolApagarImagem = true;
+                                  AppVariaveis().urlImageFono = '';
                                 });
                               },
                             ),
@@ -164,31 +138,44 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                campoTexto('Nome Completo', txtNome, Icons.person),
+                campoTexto('Nome Completo', AppVariaveis().txtNome, Icons.person),
                 const SizedBox(height: 20),
-                campoTexto('Email', txtEmail, Icons.email),
+                campoTexto('Email', AppVariaveis().txtEmail, Icons.email),
                 const SizedBox(height: 20),
-                campoTexto('Telefone', txtTelefone, Icons.phone, formato: TelefoneInputFormatter(), numeros: true),
+                campoTexto('Telefone', AppVariaveis().txtTelefone, Icons.phone,
+                    formato: TelefoneInputFormatter(), boardType: 'numeros'),
                 const SizedBox(height: 20),
-                campoTexto('Senha', txtSenha, Icons.lock,
+                Consumer<AppVariaveis>(builder: (context, appVariaveis, child) {
+                  return campoTexto('Senha', AppVariaveis().txtSenha, Icons.lock,
+                      sufIcon: IconButton(
+                        icon: Icon(
+                          AppVariaveis().obscureText ? Icons.visibility_off : Icons.visibility,
+                          color: cores('corSimbolo'),
+                        ),
+                        onPressed: () {
+                          AppVariaveis().toggleObscureText();
+                        },
+                      ),
+                      senha: AppVariaveis().obscureText);
+                }),
+                const SizedBox(height: 20),
+                Consumer<AppVariaveis>(builder: (context, appVariaveis, child) {
+                  return campoTexto(
+                    'Confirmar Senha',
+                    AppVariaveis().txtSenhaConfirmar,
+                    Icons.lock,
                     sufIcon: IconButton(
                       icon: Icon(
-                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                        appVariaveis.obscureText2 ? Icons.visibility_off : Icons.visibility,
                         color: cores('corSimbolo'),
                       ),
-                      onPressed: _toggle,
+                      onPressed: () {
+                        AppVariaveis().toggleObscureText2();
+                      },
                     ),
-                    senha: _obscureText),
-                const SizedBox(height: 20),
-                campoTexto('Confirmar Senha', txtSenhaCofirmar, Icons.lock,
-                    sufIcon: IconButton(
-                      icon: Icon(
-                        _obscureText2 ? Icons.visibility_off : Icons.visibility,
-                        color: cores('corSimbolo'),
-                      ),
-                      onPressed: _toggle2,
-                    ),
-                    senha: _obscureText2),
+                    senha: appVariaveis.obscureText2,
+                  );
+                }),
                 const SizedBox(height: 40),
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -207,15 +194,28 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                         style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                       ),
                       onPressed: () async {
-                        fileImage != null ? urlImage = (await uploadImageUsers(fileImage, 'users'))! : urlImage = '';
+                        AppVariaveis().fileImageFono != null
+                            ? AppVariaveis().urlImageFono =
+                                (await uploadImageUsers(AppVariaveis().fileImageFono, 'users'))!
+                            : AppVariaveis().urlImageFono = '';
 
-                        if (apagarImagem == true) {
-                          await deletarImagem(urlImage);
-                          await apagarImagemUser(id);
+                        if (AppVariaveis().boolApagarImagem == true) {
+                          await deletarImagem(AppVariaveis().urlImageFono);
+                          await apagarImagemUser(AppVariaveis().idFono);
                         }
 
-                        verificarDados(context, uid, urlImage, txtNome.text, txtDtNascimento.text, txtEmail.text,
-                            txtCPF.text, txtCRFa.text, txtTelefone.text, txtSenha.text, txtSenhaCofirmar.text);
+                        verificarDados(
+                            context,
+                            AppVariaveis().uidAuthFono,
+                            AppVariaveis().urlImageFono,
+                            AppVariaveis().txtNome.text,
+                            AppVariaveis().txtDtNascimento.text,
+                            AppVariaveis().txtEmail.text,
+                            AppVariaveis().txtCPF.text,
+                            AppVariaveis().txtCRFa.text,
+                            AppVariaveis().txtTelefone.text,
+                            AppVariaveis().txtSenha.text,
+                            AppVariaveis().txtSenhaConfirmar.text);
                       },
                     ),
                     SizedBox(width: 10),

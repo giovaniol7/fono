@@ -1,17 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fonocare/controllers/variaveis.dart';
 import 'sharedPreference.dart';
 import 'fireCloudUser.dart';
 import '../widgets/mensagem.dart';
 
-idUsuario() {
-  return FirebaseAuth.instance.currentUser?.uid;
+idFonoAuth() {
+  try {
+    return FirebaseAuth.instance.currentUser?.uid;
+  } catch (e) {
+    print("Erro ao obter o ID do usuário: $e");
+    return null;
+  }
 }
 
 criarConta(context, urlImage, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha) async {
   FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: senha).then((res) {
     adicionarUsuario(res.user!.uid.toString(), urlImage, genero, nome, dtNascimento, email, cpf, crfa, telefone, senha);
     sucesso(context, 'O usuário foi criado com sucesso!');
+    AppVariaveis().reset();
     Navigator.pop(context);
   }).catchError((e) {
     switch (e.code) {
@@ -32,6 +39,7 @@ autenticarConta(context, email, senha) async {
     await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: senha).then((res) {
       sucesso(context, 'Usuário autenticado com sucesso!');
       saveValor();
+      AppVariaveis().reset();
       Navigator.pushReplacementNamed(context, '/principal');
     }).catchError((e) {
       switch (e.code) {
@@ -88,6 +96,7 @@ signOut(context) async {
       await FirebaseAuth.instance.signOut();
       deleteValor();
       sucesso(context, 'O usuário deslogado!');
+      AppVariaveis().reset();
       Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
       print(e.toString());

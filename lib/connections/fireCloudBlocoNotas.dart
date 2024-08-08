@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../connections/fireAuth.dart';
+import '../controllers/variaveis.dart';
 import '../widgets/mensagem.dart';
 
 String nomeColecao = 'blocoNotas';
 
 recuperarBlocosNotas() {
-  return FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idUsuario());
+  return FirebaseFirestore.instance.collection(nomeColecao).where('uidFono', isEqualTo: idFonoAuth());
 }
 
 adicionarBlocoNota(context, uidFono, nomeBloco, dataBloco, nomeResponsavel, telefoneBloco) async {
@@ -34,6 +35,7 @@ adicionarBlocoNota(context, uidFono, nomeBloco, dataBloco, nomeResponsavel, tele
       await novoDocumento.update({'uidBloco': uidBloco});
 
       sucesso(context, 'Notas foi adicionado com sucesso.');
+      AppVariaveis().reset();
       Navigator.pop(context);
     } catch (e) {
       erro(context, 'Erro ao adicionar anotação.');
@@ -57,6 +59,7 @@ editarBlocoNota(context, uidBloco, uidFono, nomeBloco, dataBloco, nomeResponsave
 
       await FirebaseFirestore.instance.collection(nomeColecao).doc(uidBloco).update(data);
       sucesso(context, 'Notas foi atualizado com sucesso.');
+      AppVariaveis().reset();
       Navigator.pop(context);
     } catch (e) {
       erro(context, 'Erro ao editar anotação.');
@@ -70,6 +73,7 @@ apagarBlocoNota(context, id) async {
   try {
     await FirebaseFirestore.instance.collection(nomeColecao).doc(id).delete();
     sucesso(context, 'Notas apagado com sucesso!');
+    AppVariaveis().reset();
     Navigator.pop(context);
   } catch (e) {
     erro(context, 'Erro ao remover a anotação.');

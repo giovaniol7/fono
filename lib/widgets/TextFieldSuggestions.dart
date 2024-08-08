@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fonocare/controllers/estilos.dart';
 
 class TextFieldSuggestions extends StatefulWidget {
+  final String tipo;
   final List<String> list;
   final Function returnedValue;
   final Function onTap;
@@ -15,16 +16,17 @@ class TextFieldSuggestions extends StatefulWidget {
 
   const TextFieldSuggestions(
       {Key? key,
-      this.icone,
-      this.margem,
-      required this.list,
-      required this.labelText,
-      required this.textSuggetionsColor,
-      required this.suggetionsBackgroundColor,
-      required this.outlineInputBorderColor,
-      required this.returnedValue,
-      required this.onTap,
-      required this.height})
+        this.icone,
+        this.margem,
+        required this.tipo,
+        required this.list,
+        required this.labelText,
+        required this.textSuggetionsColor,
+        required this.suggetionsBackgroundColor,
+        required this.outlineInputBorderColor,
+        required this.returnedValue,
+        required this.onTap,
+        required this.height})
       : super(key: key);
 
   @override
@@ -45,7 +47,6 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
   @override
   void dispose() {
     super.dispose();
-    //widget.list.clear();
     flag = 0;
   }
 
@@ -55,138 +56,140 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
       height = widget.height;
     }
 
-    // double height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
     return Container(
       margin: widget.margem,
-      child: Autocomplete<String>(
-        optionsBuilder: (TextEditingValue value) {
-          widget.returnedValue(capitalizeWords(value.text));
-          // When the field is empty
-          if (value.text.isEmpty) {
-            return [];
-          }
-          // The logic to find out which ones should appear
-          return widget.list.where((suggestion) => suggestion.contains(value.text));
-        },
-        fieldViewBuilder:
-            (BuildContext context, textEditingController, FocusNode focusNode, VoidCallback onFieldSubmitted) {
-          return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(color: cores('corBorda')),
-              color: cores('branco'),
-              boxShadow: [
-                BoxShadow(
-                  color: cores('corSombra'),
-                  blurRadius: 5,
-                  offset: Offset(0, 3),
-                ),
-              ],
-            ),
-            child: TextField(
-              controller: textEditingController,
-              style: TextStyle(
-                color: cores('corTexto'),
-                fontWeight: FontWeight.w400,
-                fontSize: 18,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8.0),
+          border: Border.all(color: cores('corBorda')),
+          color: cores('branco'),
+          boxShadow: [BoxShadow(offset: Offset(0, 3), color: cores('corSombra'), blurRadius: 5)]),
+      child: LayoutBuilder(
+        builder: (context, constraints) => RawAutocomplete<String>(
+          optionsBuilder: (TextEditingValue value) {
+            widget.returnedValue(widget.tipo == 'paciente' ? capitalizeWords(value.text) : value.text);
+            if (value.text.isEmpty) {
+              return [];
+            }
+
+            // Filtrar sugestões
+            List<String> suggestions = widget.list.where((suggestion) {
+              return suggestion.toLowerCase().startsWith(value.text.toLowerCase());
+            }).toList();
+
+            // Ordenar sugestões por relevância
+            suggestions.sort((a, b) {
+              if (a.toLowerCase().startsWith(value.text.toLowerCase())) {
+                return -1;
+              } else if (b.toLowerCase().startsWith(value.text.toLowerCase())) {
+                return 1;
+              } else {
+                return 0;
+              }
+            });
+
+            return suggestions;
+          },
+          fieldViewBuilder: (BuildContext context, textEditingController, FocusNode focusNode,
+              VoidCallback onFieldSubmitted) {
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+                border: Border.all(color: cores('corBorda')),
+                color: cores('branco'),
+                boxShadow: [BoxShadow(color: cores('corSombra'), blurRadius: 5, offset: Offset(0, 3))],
               ),
-              focusNode: focusNode,
-              autofocus: true,
-              textCapitalization: TextCapitalization.sentences,
-              scrollPadding: const EdgeInsets.only(bottom: 200),
-              decoration: InputDecoration(
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: cores('corBorda'),
-                    width: 2.0,
+              child: Form(
+                child: TextFormField(
+                  controller: textEditingController,
+                  style: TextStyle(color: cores('corTexto'), fontWeight: FontWeight.w400, fontSize: 18),
+                  focusNode: focusNode,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: cores('corBorda'), width: 2.0),
+                    ),
+                    labelText: widget.labelText,
+                    labelStyle:
+                    TextStyle(color: cores('corDetalhe'), fontSize: 18, fontWeight: FontWeight.w500),
+                    fillColor: widget.outlineInputBorderColor,
+                    prefixIcon: Icon(widget.icone, color: cores('corSimbolo')),
+                  ),
+                  onFieldSubmitted: (String value) {
+                    if (value.isNotEmpty) {
+                      onFieldSubmitted();
+                      widget.returnedValue(widget.tipo == 'paciente'
+                          ? capitalizeWords(textEditingController.text)
+                          : textEditingController.text);
+                    }
+                    setState(() {
+                      flag = 1;
+                      height = 0;
+                    });
+                    FocusScope.of(context).unfocus();
+                  },
+                  onChanged: (text) {
+                    setState(() {
+                      flag = 0;
+                    });
+                  },
+                  onTap: () {
+                    widget.onTap();
+                  },
+                ),
+              ),
+            );
+          },
+          optionsViewBuilder:
+              (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
+            return Container(
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Material(
+                  elevation: 2,
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(15),
+                    bottomRight: Radius.circular(15),
+                  ),
+                  color: cores('corCaixaPadrao'),
+                  child: SizedBox(
+                    height: options.length == 1
+                        ? 100
+                        : options.length == 2
+                        ? 150
+                        : 200,
+                    width: constraints.biggest.width,
+                    child: ListView.builder(
+                        itemCount: options.length,
+                        shrinkWrap: true,
+                        itemBuilder: (BuildContext context, int index) {
+                          final String option = options.elementAt(index);
+                          return GestureDetector(
+                            onTap: () {
+                              onSelected(option);
+                              widget.returnedValue(
+                                  widget.tipo == 'paciente' ? capitalizeWords(option) : option);
+                              FocusScope.of(context).unfocus();
+                              setState(() {
+                                flag = 1;
+                                height = 0;
+                              });
+                            },
+                            child: ListTile(
+                              title: Text(option,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                      color: cores('corTexto'), fontSize: 16, fontWeight: FontWeight.normal)),
+                            ),
+                          );
+                        }),
                   ),
                 ),
-                hintText: widget.labelText,
-                hintStyle: TextStyle(
-                  color: cores('corTexto'),
-                  fontWeight: FontWeight.bold,
-                ),
-                fillColor: widget.outlineInputBorderColor,
-                prefixIcon: Icon(
-                  widget.icone,
-                  color: cores('corSimbolo'),
-                ),
               ),
-              onSubmitted: (String value) {
-                if (value.isNotEmpty) {
-                  onFieldSubmitted();
-                  widget.returnedValue(capitalizeWords(textEditingController.text));
-                }
-                setState(() {
-                  flag = 1;
-                  height = 0;
-                });
-                FocusScope.of(context).unfocus();
-              },
-              onChanged: (text) {
-                setState(() {
-                  flag = 0;
-                });
-              },
-              onTap: () {
-                widget.onTap();
-              },
-            ),
-          );
-        },
-        optionsViewBuilder:
-            (BuildContext context, AutocompleteOnSelected<String> onSelected, Iterable<String> options) {
-          return Container(
-            margin: const EdgeInsets.only(right: 93),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Material(
-                elevation: 2,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(15),
-                  bottomRight: Radius.circular(15),
-                ),
-                color: cores('corCaixaPadrao'),
-                child: SizedBox(
-                  height: options.length == 1
-                      ? 85
-                      : options.length == 2
-                          ? 150
-                          : 200,
-                  child: ListView.builder(
-                      // shrinkWrap: true,
-                      itemCount: options.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        final String option = options.elementAt(index);
-                        return GestureDetector(
-                          onTap: () {
-                            onSelected(option);
-                            widget.returnedValue(capitalizeWords(option));
-                            FocusScope.of(context).unfocus();
-                            setState(() {
-                              flag = 1;
-                              height = 0;
-                            });
-                          },
-                          child: ListTile(
-                            title: Text(
-                              option,
-                              maxLines: 3,
-                              style: TextStyle(
-                                  color: cores('corTexto'),
-                                  fontFamily: 'Quicksand',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.normal),
-                            ),
-                          ),
-                        );
-                      }),
-                ),
-              ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -214,7 +217,6 @@ class _TextFieldSuggestionsState extends State<TextFieldSuggestions> {
         }
       }
     }
-
     return capitalizedWords.join(' ');
   }
 }

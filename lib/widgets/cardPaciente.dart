@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fonocare/connections/fireAuth.dart';
 import 'package:fonocare/view/TelaAdicionarPaciente.dart';
 import 'package:fonocare/view/TelaDadosPacientes.dart';
 import '../controllers/estilos.dart';
@@ -16,7 +17,9 @@ Widget listarPaciente(context, doc, tipoTela) {
       margin: EdgeInsets.all(5),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundImage: doc.data()['urlImagePaciente'].toString().isNotEmpty
+          backgroundImage: doc.data()['urlImagePaciente']
+              .toString()
+              .isNotEmpty
               ? NetworkImage(doc.data()['urlImagePaciente'])
               : (doc.data()['generoPaciente'] == 'Gender.male'
               ? AssetImage('images/icons/profileBoy.png')
@@ -35,30 +38,24 @@ Widget listarPaciente(context, doc, tipoTela) {
             ),
           ],
         ),
-        trailing: tipoTela == 'pacientes' ? IconButton(
+        trailing: tipoTela == 'pacientes'
+            ? IconButton(
           icon: Icon(
             Icons.edit,
             color: cores('corSimbolo'),
           ),
           onPressed: () {
-            String tipo = 'editar';
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TelaAdicionarPaciente(tipo, doc.data()['uidPaciente']),
-                ));
+            Navigator.pushNamed(context, '/adicionarPacientes',
+                arguments: {'tipo': 'editar', 'uidPaciente': doc.data()['uidPaciente']});
           },
-        ) : null,
+        )
+            : null,
         onTap: () {
-          tipoTela == 'pacientes' ? Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TelaDadosPacientes(doc.data()['uidPaciente']),
-                )) : Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TelaProntuariosPaciente(doc.data()['uidPaciente']),
-              ));
+          tipoTela == 'pacientes'
+              ? Navigator.pushNamed(context, '/dadosPacientes',
+              arguments: {'uidPaciente': doc.data()['uidPaciente']})
+              : Navigator.pushNamed(context, '/pacienteProntuarios',
+              arguments: {'uidPaciente': doc.data()['uidPaciente']});
         },
       ),
     ),

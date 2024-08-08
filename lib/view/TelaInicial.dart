@@ -3,17 +3,18 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fonocare/controllers/calcularFinanceiro.dart';
-import 'package:fonocare/view/TelaAdicionarProntuarios.dart';
-import 'package:fonocare/widgets/helpDialog.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../connections/fireCloudConsultas.dart';
 import '../connections/fireCloudPacientes.dart';
 import '../connections/fireCloudUser.dart';
+import '../controllers/variaveis.dart';
+import '../controllers/calcularFinanceiro.dart';
 import '../controllers/estilos.dart';
 import '../controllers/resolucoesTela.dart';
+import '../widgets/helpDialog.dart';
 import '../widgets/DrawerNavigation.dart';
 import '../widgets/cardPaciente.dart';
 
@@ -30,25 +31,6 @@ class _TelaInicialState extends State<TelaInicial> {
 
   ratioScreen ratio = ratioScreen();
 
-  late var uidFono = '';
-  late String? nome = '';
-  late String? urlImage = '';
-  late String? genero = 'Gender.male';
-  late double? entradas = 0.0;
-  late double? saidas = 0.0;
-  late double? saldo = 0.0;
-  late double? aReceber = 0.0;
-  late double? aPagar = 0.0;
-  bool _obscureText = false;
-  var pacientes;
-  var varAtivo = '1';
-
-  void _toggle() {
-    setState(() {
-      _obscureText = !_obscureText;
-    });
-  }
-
   Future<void> atualizarDados() async {
     await carregarDados();
   }
@@ -58,19 +40,19 @@ class _TelaInicialState extends State<TelaInicial> {
     var usuario = await listarUsuario();
     double rec = await calcularAReceber();
     double pag = await calcularAPagar();
-    pacientes = await recuperarTodosPacientes();
+    AppVariaveis().pacientes = await recuperarTodosPacientes();
 
     setState(() {
-      entradas = financias['somaGanhos'];
-      saidas = financias['somaDespesas'];
-      saldo = financias['somaRenda'];
+      AppVariaveis().entradas = financias['somaGanhos']!;
+      AppVariaveis().saidas = financias['somaDespesas']!;
+      AppVariaveis().saldo = financias['somaRenda']!;
 
-      nome = usuario['nome'];
-      urlImage = usuario['urlImage'];
-      genero = usuario['genero'];
+      AppVariaveis().nome = usuario['nome']!;
+      AppVariaveis().urlImage = usuario['urlImage']!;
+      AppVariaveis().genero = usuario['genero']!;
 
-      aReceber = rec;
-      aPagar = pag;
+      AppVariaveis().aReceber = rec;
+      AppVariaveis().aPagar = pag;
     });
   }
 
@@ -86,11 +68,12 @@ class _TelaInicialState extends State<TelaInicial> {
 
     return Scaffold(
         key: _scaffoldKey,
-        drawer: DrawerNavigation(urlImage!, genero!, nome!),
+        drawer: DrawerNavigation(AppVariaveis().urlImage!, AppVariaveis().genero!, AppVariaveis().nome!),
         body: RefreshIndicator(
             color: cores('corSimbolo'),
             onRefresh: atualizarDados,
             child: ListView(
+              physics: AlwaysScrollableScrollPhysics(),
               children: [
                 Stack(
                   children: [
@@ -101,8 +84,19 @@ class _TelaInicialState extends State<TelaInicial> {
                                 const SizedBox(height: 60),
                                 calendarHome(context, tamanhoWidgets, tamanhoFonte),
                                 const SizedBox(height: 10),
-                                contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, entradas, saidas,
-                                    saldo, aReceber, aPagar, _obscureText),
+                                contaHome(
+                                    context,
+                                    setState,
+                                    tamanhoWidgets,
+                                    tamanhoFonte,
+                                    ratio,
+                                    AppVariaveis().entradas,
+                                    AppVariaveis().saidas,
+                                    AppVariaveis().saldo,
+                                    AppVariaveis().aReceber,
+                                    AppVariaveis().aPagar,
+                                    AppVariaveis().obscureNum),
+                                const SizedBox(height: 10),
                               ],
                             ),
                           )
@@ -113,7 +107,8 @@ class _TelaInicialState extends State<TelaInicial> {
                                 Expanded(child: calendarHome(context, tamanhoWidgets, tamanhoFonte)),
                                 const SizedBox(width: 10),
                                 Expanded(
-                                    child: prontuariosHome(context, setState, tamanhoWidgets, tamanhoFonte, varAtivo, pacientes))
+                                    child: prontuariosHome(context, setState, tamanhoWidgets, tamanhoFonte,
+                                        AppVariaveis().varAtivoPaciente, AppVariaveis().pacientes))
                               ],
                             ),
                           ),
@@ -137,14 +132,22 @@ class _TelaInicialState extends State<TelaInicial> {
                               : Container(),
                           kIsWeb || Platform.isWindows || Platform.isIOS
                               ? Container()
-                              : IconButton(
-                                  icon: Icon(
-                                    _obscureText == false ? Icons.visibility_off : Icons.visibility,
-                                    color: cores('corSimbolo'),
-                                    size: tamanhoFonte.iconPequeno(context),
-                                  ),
-                                  onPressed: _toggle,
-                                ),
+                              : Consumer<AppVariaveis>(builder: (context, appVariaveis, child) {
+                                  return IconButton(
+                                    icon: Icon(
+                                      AppVariaveis().obscureNum == false
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                      color: cores('corSimbolo'),
+                                      size: tamanhoFonte.iconPequeno(context),
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        AppVariaveis().toggleObscureNum();
+                                      });
+                                    },
+                                  );
+                                }),
                           IconButton(
                             icon: Icon(
                               Icons.help,
@@ -233,13 +236,11 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                           if (details.targetElement == CalendarElement.appointment) {
                             Appointment tappedAppointment = details.appointments!.first;
                             DateTime dataClicada = details.date!;
-                            String tipo = 'adicionar';
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TelaAdicionarProntuarios(tipo, tappedAppointment, dataClicada),
-                              ),
-                            );
+                            Navigator.pushNamed(context, '/adicionarProntuarios', arguments: {
+                              'tipo': 'adicionar',
+                              'tappedAppointment': tappedAppointment,
+                              'dataClicada': dataClicada
+                            });
                           }
                         },
                         headerStyle: CalendarHeaderStyle(
@@ -257,8 +258,8 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                               height: 50,
                               textAlign: TextAlign.center,
                               backgroundColor: cores('corDetalhe'),
-                              monthTextStyle:
-                                  TextStyle(color: cores('corTexto'), fontSize: 15, fontWeight: FontWeight.w500)),
+                              monthTextStyle: TextStyle(
+                                  color: cores('corTexto'), fontSize: 15, fontWeight: FontWeight.w500)),
                           dayHeaderSettings: DayHeaderSettings(
                               dayFormat: 'EEE',
                               width: 50,
@@ -286,13 +287,12 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
   );
 }
 
-contaHome(
-    context, setState, tamanhoWidgets, tamanhoFonte, ratio, entradas, saidas, saldo, aReceber, aPagar, _obscureText) {
+contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, entradas, saidas, saldo, aReceber, aPagar,
+    obscureNum) {
   NumberFormat numberFormat = NumberFormat("#,##0.00", "pt_BR");
 
   return Container(
     width: tamanhoWidgets.getWidth(context),
-    height: tamanhoWidgets.getHeight(context),
     decoration: decoracaoContainer('decPadrao'),
     child: Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -328,7 +328,7 @@ contaHome(
                     ),
                   ),
                   Text(
-                    _obscureText == true ? 'R\$ ${numberFormat.format(entradas)}' : '${"⬮" * 4}',
+                    obscureNum == true ? 'R\$ ${numberFormat.format(entradas)}' : '${"⬮" * 4}',
                     style: TextStyle(
                         color: cores('corReceitas'),
                         fontSize: tamanhoFonte.letraMedia(context),
@@ -363,7 +363,7 @@ contaHome(
                     ),
                   ),
                   Text(
-                    _obscureText == true ? 'R\$ ${numberFormat.format(saidas)}' : '${"⬮" * 4}',
+                    obscureNum == true ? 'R\$ ${numberFormat.format(saidas)}' : '${"⬮" * 4}',
                     style: TextStyle(
                         color: cores('corDespesas'),
                         fontSize: tamanhoFonte.letraMedia(context),
@@ -386,7 +386,7 @@ contaHome(
                   fontWeight: FontWeight.bold),
             ),
             Text(
-              _obscureText == true ? 'R\$ ${numberFormat.format(saldo)}' : '${"⬮" * 4}',
+              obscureNum == true ? 'R\$ ${numberFormat.format(saldo)}' : '${"⬮" * 4}',
               style: TextStyle(
                   color: cores('corTextoPadrao'),
                   fontSize: tamanhoFonte.letraMedia(context),
@@ -424,11 +424,11 @@ contaHome(
                         children: [
                           Text(
                             'A Receber',
-                            style:
-                                TextStyle(color: cores('corTextoPadrao'), fontSize: tamanhoFonte.letraPequena(context)),
+                            style: TextStyle(
+                                color: cores('corTextoPadrao'), fontSize: tamanhoFonte.letraPequena(context)),
                           ),
                           Text(
-                            _obscureText == true ? 'R\$ ${numberFormat.format(aReceber)}' : '${"⬮" * 4}',
+                            obscureNum == true ? 'R\$ ${numberFormat.format(aReceber)}' : '${"⬮" * 4}',
                             style: TextStyle(
                                 color: cores('corReceitas'),
                                 fontSize: tamanhoFonte.letraMedia(context),
@@ -459,10 +459,11 @@ contaHome(
                             Text(
                               'A Pagar',
                               style: TextStyle(
-                                  color: cores('corTextoPadrao'), fontSize: tamanhoFonte.letraPequena(context)),
+                                  color: cores('corTextoPadrao'),
+                                  fontSize: tamanhoFonte.letraPequena(context)),
                             ),
                             Text(
-                              _obscureText == true ? 'R\$ ${numberFormat.format(aPagar)}' : '${"⬮" * 4}',
+                              obscureNum == true ? 'R\$ ${numberFormat.format(aPagar)}' : '${"⬮" * 4}',
                               style: TextStyle(
                                   color: cores('corDespesas'),
                                   fontSize: tamanhoFonte.letraMedia(context),
@@ -498,7 +499,9 @@ prontuariosHome(context, setState, tamanhoWidgets, tamanhoFonte, varAtivo, pacie
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.85,
           child: StreamBuilder<QuerySnapshot>(
-            stream: pacientes != null ? pacientes.orderBy('nomePaciente').where('ativoPaciente', isEqualTo: varAtivo).snapshots() : null,
+            stream: pacientes != null
+                ? pacientes.orderBy('nomePaciente').where('ativoPaciente', isEqualTo: varAtivo).snapshots()
+                : null,
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
@@ -517,12 +520,12 @@ prontuariosHome(context, setState, tamanhoWidgets, tamanhoFonte, varAtivo, pacie
                       thumbVisibility: true,
                       interactive: true,
                       thickness: 20.0,
-                      showTrackOnHover: true,
                       child: ListView.separated(
                         controller: _scrollController,
                         padding: EdgeInsets.all(10),
                         scrollDirection: Axis.vertical,
-                        itemBuilder: (context, index) => listarPaciente(context, dados.docs[index], 'prontuario'),
+                        itemBuilder: (context, index) =>
+                            listarPaciente(context, dados.docs[index], 'prontuario'),
                         separatorBuilder: (context, _) => SizedBox(
                           width: 1,
                         ),

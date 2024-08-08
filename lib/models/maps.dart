@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../connections/fireCloudConsultas.dart';
-
-enum Gender { male, female }
+import '../controllers/variaveis.dart';
 
 String limparTelefone(String telefone) {
   RegExp regex = RegExp(r'\d+');
@@ -60,7 +61,8 @@ Map<int, String> intMesToAbrev = {
   9: 'Set.',
   10: 'Out.',
   11: 'Nov.',
-  12: 'Dez.'
+  12: 'Dez.',
+  13: 'Todos'
 };
 
 final List<String> nomeMesesAbrev = [
@@ -82,6 +84,18 @@ final List<String> nomeMesesAbrev = [
 List<int> getAnos() {
   int anoAtual = DateTime.now().year;
   return List.generate(23, (index) => anoAtual - 2 + index);
+}
+
+Future<List<String>> getCitiesByState(String stateCode) async {
+  final response = await http.get(Uri.parse('https://servicodados.ibge.gov.br/api/v1/localidades/estados/$stateCode/municipios'));
+
+  if (response.statusCode == 200) {
+    List<dynamic> data = json.decode(response.body);
+    List<String> cities = data.map<String>((city) => city['nome'] as String).toList();
+    return cities;
+  } else {
+    throw Exception('Failed to load cities');
+  }
 }
 
 final List<String> estados = [
@@ -126,19 +140,23 @@ final List<String> escolaridade = [
 ];
 
 final List<String> escolaridadeResp = [
-  "Ensino Fundamental - Incompleto",
-  "Ensino Fundamental - Completo",
-  "Ensino Médio - Incompleto",
-  "Ensino Médio - Completo",
-  "Ensino Superior - Incompleto",
-  "Ensino Superior - Completo",
-  "Pós-graduação - Incompleto",
-  "Pós-graduação - Completo",
-  "Pós-graduação - Incompleto",
-  "Pós-graduação - Completo",
-  "Pós-graduação - Incompleto",
-  "Pós-graduação - Completo"
+  "Ensino Fundamental Incompleto",
+  "Ensino Fundamental Completo",
+  "Ensino Médio Incompleto",
+  "Ensino Médio Completo",
+  "Ensino Técnico ou Profissionalizante",
+  "Ensino Superior Incompleto",
+  "Ensino Superior Completo",
+  "Pós-graduação Lato Sensu (Especialização)",
+  "Mestrado",
+  "Doutorado",
+  "Pós-doutorado",
+  "N.d.a."
 ];
+
+final List<String> consulta = ["Convênio", "Particular"];
+
+final List<String> periodo = ["Manhã", "Tarde", "Integral"];
 
 final List<Color> colors = [
   Colors.red,
@@ -209,6 +227,4 @@ String getColorName(Color color) {
   return color.toString();
 }
 
-final List<String> formaPagamento = ["Cartão Débito", "Cartão Crédito", "Pix", "Dinheiro", "Carnê"];
-
-final List<String> qntdParcelas = ["1x", "2x", "3x", "4x", "5x", "6x", "7x", "8x", "9x", "10x", "11x", "12x"];
+final List<String> responsaveis = ["Mãe", "Pai", "Avó", "Avô", "Tio", "Tia"];

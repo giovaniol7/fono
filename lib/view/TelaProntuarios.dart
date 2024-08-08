@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fonocare/controllers/variaveis.dart';
 
 import '../connections/fireCloudPacientes.dart';
 import '../widgets/TextFieldSuggestions.dart';
@@ -23,7 +24,6 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
   List<String> listaPaciente = [];
   String _outroPaciente = "";
 
-
   carregarDados() async {
     List<String> lista = await fazerListaPacientes(varAtivo);
     pacientes = await recuperarTodosPacientes();
@@ -44,8 +44,12 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
       appBar: AppBar(
         iconTheme: IconThemeData(color: cores('corSimbolo')),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, size: 30,),
+          icon: Icon(
+            Icons.arrow_back,
+            size: 30,
+          ),
           onPressed: () {
+            AppVariaveis().reset();
             Navigator.pop(context);
           },
         ),
@@ -62,6 +66,7 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
             children: [
               Padding(padding: EdgeInsets.only(top: 20)),
               TextFieldSuggestions(
+                  tipo: 'paciente',
                   margem: EdgeInsets.only(top: 5, left: 24, bottom: 20, right: 24),
                   list: listaPaciente,
                   labelText: _outroPaciente,
@@ -80,8 +85,11 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
                 child: StreamBuilder<QuerySnapshot>(
                     stream: pacientes != null
                         ? (_paciente.isEmpty
-                        ? pacientes.orderBy('nomePaciente').where('ativoPaciente', isEqualTo: varAtivo).snapshots()
-                        : pacientes.where('nomePaciente', isEqualTo: _paciente).snapshots())
+                            ? pacientes
+                                .orderBy('nomePaciente')
+                                .where('ativoPaciente', isEqualTo: varAtivo)
+                                .snapshots()
+                            : pacientes.where('nomePaciente', isEqualTo: _paciente).snapshots())
                         : null,
                     builder: (context, snapshot) {
                       switch (snapshot.connectionState) {
@@ -96,13 +104,14 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
                         default:
                           final dados = snapshot.requireData;
                           return ListView.separated(
-                              padding: EdgeInsets.all(10),
-                              scrollDirection: Axis.vertical,
-                              itemBuilder: (context, index) => listarPaciente(context, dados.docs[index], 'prontuario'),
-                              separatorBuilder: (context, _) => SizedBox(
-                                width: 1,
-                              ),
-                              itemCount: dados.size);
+                                  padding: EdgeInsets.all(10),
+                                  scrollDirection: Axis.vertical,
+                                  itemBuilder: (context, index) =>
+                                      listarPaciente(context, dados.docs[index], 'prontuario'),
+                                  separatorBuilder: (context, _) => SizedBox(
+                                        width: 1,
+                                      ),
+                                  itemCount: dados.size);
                       }
                     }),
               ),

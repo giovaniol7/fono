@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fonocare/view/TelaAdicionarAgenda.dart';
+import 'package:fonocare/controllers/variaveis.dart';
+import 'package:fonocare/controllers/variaveis.dart';
+import 'package:fonocare/controllers/variaveis.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../connections/fireCloudConsultas.dart';
@@ -15,12 +17,10 @@ class TelaAgenda extends StatefulWidget {
 }
 
 class _TelaAgendaState extends State<TelaAgenda> {
-  CalendarController _controller = CalendarController();
-  late Future<List<Appointment>> _futureAppointments;
 
   Future<void> atualizarDados() async {
     setState(() {
-      _futureAppointments = getAppointmentsFromFirestore();
+      AppVariaveis().futureAppointments = getAppointmentsFromFirestore();
     });
   }
 
@@ -64,7 +64,7 @@ class _TelaAgendaState extends State<TelaAgenda> {
         backgroundColor: cores('corFundo'),
       ),
       body: FutureBuilder<List<Appointment>>(
-        future: _futureAppointments,
+        future: AppVariaveis().futureAppointments,
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
@@ -107,25 +107,19 @@ class _TelaAgendaState extends State<TelaAgenda> {
                     border: Border.all(color: Colors.purpleAccent, width: 2),
                     borderRadius: const BorderRadius.all(Radius.circular(4)),
                     shape: BoxShape.rectangle),
-                controller: _controller,
+                controller: AppVariaveis().controller,
                 firstDayOfWeek: 7,
                 onTap: (CalendarTapDetails details) {
                   if (details.appointments != null &&
                       details.appointments!.isNotEmpty &&
-                      _controller.view != CalendarView.month) {
+                      AppVariaveis().controller.view != CalendarView.month) {
                     Appointment tappedAppointment = details.appointments!.first;
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TelaAdicionarAgenda(
-                          'editar',
-                          tappedAppointment,
-                        ),
-                      ),
-                    );
+                    Navigator.pushNamed(context, '/adicionarAgenda', arguments: {
+                      'tipo': 'editar',
+                      'appointment': tappedAppointment});
                   }
                 },
-                dataSource: MeetingDataSource(_futureAppointments),
+                dataSource: MeetingDataSource(AppVariaveis().futureAppointments),
                 monthViewSettings: MonthViewSettings(showAgenda: true),
               );
           }
@@ -138,12 +132,9 @@ class _TelaAgendaState extends State<TelaAgenda> {
             startTime: DateTime.now(),
             endTime: DateTime.now(),
           );
-          String adicionar = 'adicionar';
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => TelaAdicionarAgenda(adicionar, tappedAppointment),
-              ));
+          Navigator.pushNamed(context, '/adicionarAgenda', arguments: {
+            'tipo': 'adicionar',
+            'appointment': tappedAppointment});
         },
         child: Icon(
           Icons.add,

@@ -1,114 +1,79 @@
 import 'package:flutter/material.dart';
 import 'package:fonocare/controllers/uploadDoc.dart';
 
-import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../connections/fireCloudPacientes.dart';
 import '../controllers/calcularIdade.dart';
 import '../controllers/estilos.dart';
+import '../controllers/variaveis.dart';
 import '../models/maps.dart';
 
 class TelaDadosPacientes extends StatefulWidget {
-  final String uidPaciente;
-
-  const TelaDadosPacientes(this.uidPaciente, {super.key});
+  const TelaDadosPacientes({super.key});
 
   @override
   State<TelaDadosPacientes> createState() => _TelaDadosPacientesState();
 }
 
 class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
-  var paciente;
-  late String nomeArquivo = '';
-  late String urlDocPaciente = '';
-  late String uidPaciente = '';
-  late String uidFono = '';
-  late String dataAnamnesePaciente = '';
-  late String urlImagePaciente = '';
-  late String nomePaciente = '';
-  late String dtNascimentoPaciente = '';
-  late String CPFPaciente = '';
-  late String RGPaciente = '';
-  late String idadePaciente = '';
-  late String generoPaciente = '';
-  late String escolaPaciente = '';
-  late String escolaridadePaciente = '';
-  late String periodoEscolaPaciente = '';
-  late String professoraPaciente = '';
-  late String telefoneProfessoraPaciente = '';
-  late String lougradouroPaciente = '';
-  late String numeroPaciente = '';
-  late String bairroPaciente = '';
-  late String cidadePaciente = '';
-  late String estadoPaciente = '';
-  late String cepPaciente = '';
-  late String tipoConsultaPaciente = '';
-  late String descricaoPaciente = '';
-
-  late List<Gender?> ListGeneroResponsavelPaciente = [];
-  late List<String> ListNomeResponsavelPaciente = [];
-  late List<String> ListIdadeResponsavelPaciente = [];
-  late List<String> ListTelefoneResponsavelPaciente = [];
-  late List<String> ListRelacaoResponsavelPaciente = [];
-  late List<String> ListEscolaridadeResponsavelPaciente = [];
-  late List<String> ListProfissaoResponsavelPaciente = [];
-  late int qtdResponsavel = 0;
-
-  int index = 0;
-
-  DateTime dataAtual = DateTime.now();
+  String uidPaciente = '';
 
   Future<void> atualizarDados() async {
     await carregarDados();
   }
 
   carregarDados() async {
-    paciente = await recuperarPaciente(context, widget.uidPaciente);
+    AppVariaveis().pacienteEdit = await recuperarPaciente(context, uidPaciente);
 
     setState(() {
-      dataAnamnesePaciente = DateFormat('dd/MM/yyyy').format(dataAtual);
-
-      uidPaciente = paciente['uidPaciente'];
-      uidFono = paciente['uidFono'];
-      dataAnamnesePaciente = paciente['dataAnamnesePaciente'];
-      urlImagePaciente = paciente['urlImagePaciente'];
-      nomePaciente = paciente['nomePaciente'];
-      dtNascimentoPaciente = paciente['dtNascimentoPaciente'];
-      CPFPaciente = paciente['CPFPaciente'];
-      RGPaciente = paciente['RGPaciente'];
-      idadePaciente = calcularIdadeMeses(dtNascimentoPaciente);
-      generoPaciente = genderToString(paciente['generoPaciente']);
-      escolaPaciente = paciente['escolaPaciente'];
-      escolaridadePaciente = paciente['escolaridadePaciente'];
-      periodoEscolaPaciente = paciente['periodoEscolaPaciente'];
-      professoraPaciente = paciente['professoraPaciente'];
-      telefoneProfessoraPaciente = paciente['telefoneProfessoraPaciente'];
-      lougradouroPaciente = paciente['lougradouroPaciente'];
-      numeroPaciente = paciente['numeroPaciente'];
-      bairroPaciente = paciente['bairroPaciente'];
-      cidadePaciente = paciente['cidadePaciente'];
-      estadoPaciente = paciente['estadoPaciente'];
-      cepPaciente = paciente['cepPaciente'];
-      tipoConsultaPaciente = paciente['tipoConsultaPaciente'];
-      descricaoPaciente = paciente['descricaoPaciente'];
-      qtdResponsavel = paciente['qtdResponsavel'];
-      nomeArquivo = paciente['urlDocPaciente'] == '' ? '' : urlToString(paciente['urlDocPaciente']);
-      urlDocPaciente = paciente['urlDocPaciente'];
-      ListGeneroResponsavelPaciente = paciente['listGeneroResponsavel'];
-      ListNomeResponsavelPaciente = paciente['listNomeResponsavel'];
-      ListIdadeResponsavelPaciente = paciente['listIdadeResponsavel'];
-      ListTelefoneResponsavelPaciente = paciente['listTelefoneResponsavel'];
-      ListRelacaoResponsavelPaciente = paciente['listRelacaoResponsavel'];
-      ListEscolaridadeResponsavelPaciente = paciente['listEscolaridadeResponsavel'];
-      ListProfissaoResponsavelPaciente = paciente['listProfissaoResponsavel'];
+      AppVariaveis().dataAnamnesePaciente = AppVariaveis().pacienteEdit['dataAnamnesePaciente'];
+      AppVariaveis().urlImagePaciente = AppVariaveis().pacienteEdit['urlImagePaciente'];
+      AppVariaveis().nomePaciente = AppVariaveis().pacienteEdit['nomePaciente'];
+      AppVariaveis().dtNascimentoPaciente = AppVariaveis().pacienteEdit['dtNascimentoPaciente'];
+      AppVariaveis().idadePaciente = calcularIdadeMeses(AppVariaveis().pacienteEdit['dtNascimentoPaciente']);
+      AppVariaveis().CPFPaciente = AppVariaveis().pacienteEdit['CPFPaciente'];
+      AppVariaveis().RGPaciente = AppVariaveis().pacienteEdit['RGPaciente'];
+      AppVariaveis().generoPaciente = genderToString(AppVariaveis().pacienteEdit['generoPaciente']);
+      AppVariaveis().escolaPaciente = AppVariaveis().pacienteEdit['escolaPaciente'];
+      AppVariaveis().escolaridadePaciente = AppVariaveis().pacienteEdit['escolaridadePaciente'];
+      AppVariaveis().periodoEscolaPaciente = AppVariaveis().pacienteEdit['periodoEscolaPaciente'];
+      AppVariaveis().professoraPaciente = AppVariaveis().pacienteEdit['professoraPaciente'];
+      AppVariaveis().telefoneProfessoraPaciente = AppVariaveis().pacienteEdit['telefoneProfessoraPaciente'];
+      AppVariaveis().lougradouroPaciente = AppVariaveis().pacienteEdit['lougradouroPaciente'];
+      AppVariaveis().numeroPaciente = AppVariaveis().pacienteEdit['numeroPaciente'];
+      AppVariaveis().bairroPaciente = AppVariaveis().pacienteEdit['bairroPaciente'];
+      AppVariaveis().cidadePaciente = AppVariaveis().pacienteEdit['cidadePaciente'];
+      AppVariaveis().estadoPaciente = AppVariaveis().pacienteEdit['estadoPaciente'];
+      AppVariaveis().cepPaciente = AppVariaveis().pacienteEdit['cepPaciente'];
+      AppVariaveis().tipoConsultaPaciente = AppVariaveis().pacienteEdit['tipoConsultaPaciente'];
+      AppVariaveis().descricaoPaciente = AppVariaveis().pacienteEdit['descricaoPaciente'];
+      AppVariaveis().qtdResponsavelPaciente = AppVariaveis().pacienteEdit['qtdResponsavel'];
+      AppVariaveis().nomeArquivo = AppVariaveis().pacienteEdit['urlDocPaciente'] == ''
+          ? ''
+          : urlToString(AppVariaveis().pacienteEdit['urlDocPaciente']);
+      AppVariaveis().urlDocPaciente = AppVariaveis().pacienteEdit['urlDocPaciente'];
+      AppVariaveis().ListaGeneroResponsavelPaciente = AppVariaveis().pacienteEdit['listGeneroResponsavel'];
+      AppVariaveis().ListaNomeResponsavelPaciente = AppVariaveis().pacienteEdit['listNomeResponsavel'];
+      AppVariaveis().ListaIdadeResponsavelPaciente = AppVariaveis().pacienteEdit['listIdadeResponsavel'];
+      AppVariaveis().ListaTelefoneResponsavelPaciente =
+          AppVariaveis().pacienteEdit['listTelefoneResponsavel'];
+      AppVariaveis().ListRelacaoResponsavelPaciente = AppVariaveis().pacienteEdit['listRelacaoResponsavel'];
+      AppVariaveis().ListaEscolaridadeResponsavelPaciente =
+          AppVariaveis().pacienteEdit['listEscolaridadeResponsavel'];
+      AppVariaveis().ListaProfissaoResponsavelPaciente =
+          AppVariaveis().pacienteEdit['listProfissaoResponsavel'];
     });
   }
 
   @override
-  void initState() {
-    super.initState();
-    carregarDados();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final arguments = ModalRoute.of(context)?.settings.arguments as Map?;
+    if (arguments != null && arguments['uidPaciente'] != null) {
+      uidPaciente = arguments['uidPaciente'] as String;
+      carregarDados();
+    }
   }
 
   @override
@@ -123,6 +88,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
             color: cores('corSimbolo'),
           ),
           onPressed: () {
+            AppVariaveis().resetPaciente();
             Navigator.pop(context);
           },
         ),
@@ -179,9 +145,11 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
         children: <Widget>[
           Center(
             child: Text(
-              'Data de Anamnese: $dataAnamnesePaciente',
+              'Data de Anamnese: ${AppVariaveis().dataAnamnesePaciente}',
               style: TextStyle(
-                  fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  fontWeight: FontWeight.bold,
+                  color: cores('corTexto'),
+                  fontSize: tamanhoFonte.letraPequena(context)),
             ),
           ),
           SizedBox(height: 10),
@@ -199,7 +167,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                         fontSize: tamanhoFonte.letraPequena(context)),
                   ),
                   Text(
-                    idadePaciente,
+                    AppVariaveis().idadePaciente,
                     style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
                   ),
                 ],
@@ -212,9 +180,9 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                   color: cores('corBotao'),
                 ),
                 child: CircleAvatar(
-                  backgroundImage: urlImagePaciente.isNotEmpty
-                      ? NetworkImage(urlImagePaciente)
-                      : (generoPaciente == 'Masc.'
+                  backgroundImage: AppVariaveis().urlImagePaciente.isNotEmpty
+                      ? NetworkImage(AppVariaveis().urlImagePaciente)
+                      : (AppVariaveis().generoPaciente == 'Masc.'
                           ? AssetImage('images/icons/profileBoy.png')
                           : AssetImage('images/icons/profileGirl.png') as ImageProvider),
                 ),
@@ -230,7 +198,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                         fontSize: tamanhoFonte.letraPequena(context)),
                   ),
                   Text(
-                    dtNascimentoPaciente,
+                    AppVariaveis().dtNascimentoPaciente,
                     style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
                   ),
                 ],
@@ -241,12 +209,14 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
           Container(
             alignment: Alignment.center,
             child: Text(
-              nomePaciente.toString(),
+              AppVariaveis().nomePaciente.toString(),
               softWrap: true,
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
               style: TextStyle(
-                  color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context), fontWeight: FontWeight.bold),
+                  color: cores('corTexto'),
+                  fontSize: tamanhoFonte.letraMedia(context),
+                  fontWeight: FontWeight.bold),
             ),
           ),
           SizedBox(height: 20),
@@ -258,7 +228,9 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                   child: Column(
                     children: <Widget>[
                       Text(
-                        ListGeneroResponsavelPaciente.isEmpty ? '' : ListRelacaoResponsavelPaciente[index],
+                        AppVariaveis().ListaGeneroResponsavelPaciente.isEmpty
+                            ? ''
+                            : AppVariaveis().ListRelacaoResponsavelPaciente[AppVariaveis().indexPaciente],
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -269,11 +241,14 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                         ),
                       ),
                       Text(
-                        ListNomeResponsavelPaciente.isEmpty ? '' : ListNomeResponsavelPaciente[index],
+                        AppVariaveis().ListaNomeResponsavelPaciente.isEmpty
+                            ? ''
+                            : AppVariaveis().ListaNomeResponsavelPaciente[AppVariaveis().indexPaciente],
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                        style:
+                            TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
                       ),
                     ],
                   ),
@@ -281,7 +256,8 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 Expanded(
                   child: GestureDetector(
                     onTap: () async {
-                      String telRespLimp = limparTelefone(ListTelefoneResponsavelPaciente[index]);
+                      String telRespLimp = limparTelefone(
+                          AppVariaveis().ListaTelefoneResponsavelPaciente[AppVariaveis().indexPaciente]);
                       final Uri url = Uri.parse("https://wa.me/+55$telRespLimp");
                       if (!await launchUrl(url)) throw 'Could not launch $url';
                     },
@@ -293,11 +269,14 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                           size: tamanhoFonte.outroTamanho(context, 0.07),
                         ),
                         Text(
-                          ListTelefoneResponsavelPaciente.isEmpty ? '' : ListTelefoneResponsavelPaciente[index],
+                          AppVariaveis().ListaTelefoneResponsavelPaciente.isEmpty
+                              ? ''
+                              : AppVariaveis().ListaTelefoneResponsavelPaciente[AppVariaveis().indexPaciente],
                           softWrap: true,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
-                          style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                          style: TextStyle(
+                              color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
                         ),
                       ],
                     ),
@@ -325,7 +304,9 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               child: Text(
                 'Dados Paciente:',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context)),
+                    fontWeight: FontWeight.bold,
+                    color: cores('corTexto'),
+                    fontSize: tamanhoFonte.letraMedia(context)),
               ),
             ),
             SizedBox(height: 5),
@@ -340,7 +321,41 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                       fontSize: tamanhoFonte.letraPequena(context)),
                 ),
                 Text(
-                  generoPaciente,
+                  AppVariaveis().generoPaciente,
+                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+              ],
+            ),
+            SizedBox(height: 5),
+            Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text(
+                  'CPF: ',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: cores('corTexto'),
+                      fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+                Text(
+                  AppVariaveis().CPFPaciente,
+                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+              ],
+            ),
+            SizedBox(height: 5),
+            Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Text(
+                  'RG: ',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: cores('corTexto'),
+                      fontSize: tamanhoFonte.letraPequena(context)),
+                ),
+                Text(
+                  AppVariaveis().RGPaciente,
                   style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
                 ),
               ],
@@ -357,7 +372,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                       fontSize: tamanhoFonte.letraPequena(context)),
                 ),
                 Text(
-                  tipoConsultaPaciente,
+                  AppVariaveis().tipoConsultaPaciente,
                   style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
                 ),
               ],
@@ -375,7 +390,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
                 Expanded(
                   child: Text(
-                    escolaPaciente,
+                    AppVariaveis().escolaPaciente,
                     style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
                   ),
                 ),
@@ -393,7 +408,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                       fontSize: tamanhoFonte.letraPequena(context)),
                 ),
                 Text(
-                  escolaridadePaciente,
+                  AppVariaveis().escolaridadePaciente,
                   style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
                 ),
               ],
@@ -410,7 +425,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                       fontSize: tamanhoFonte.letraPequena(context)),
                 ),
                 Text(
-                  periodoEscolaPaciente,
+                  AppVariaveis().periodoEscolaPaciente,
                   style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
                 ),
               ],
@@ -427,7 +442,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                       fontSize: tamanhoFonte.letraPequena(context)),
                 ),
                 Text(
-                  professoraPaciente,
+                  AppVariaveis().professoraPaciente,
                   style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
                 ),
               ],
@@ -445,12 +460,12 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
                 InkWell(
                   onTap: () async {
-                    String telProfLimp = limparTelefone(telefoneProfessoraPaciente);
+                    String telProfLimp = limparTelefone(AppVariaveis().telefoneProfessoraPaciente);
                     final Uri url = Uri.parse("https://wa.me/+55$telProfLimp");
                     if (!await launchUrl(url)) throw 'Could not launch $url';
                   },
                   child: Text(
-                    telefoneProfessoraPaciente,
+                    AppVariaveis().telefoneProfessoraPaciente,
                     style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
                   ),
                 ),
@@ -474,12 +489,14 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               child: Text(
                 'Descrição/Queixa:',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context)),
+                    fontWeight: FontWeight.bold,
+                    color: cores('corTexto'),
+                    fontSize: tamanhoFonte.letraMedia(context)),
               ),
             ),
             SizedBox(height: 5),
             Text(
-              descricaoPaciente,
+              AppVariaveis().descricaoPaciente,
               style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
             ),
           ],
@@ -500,7 +517,9 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               child: Text(
                 'Dados Responsáveis:',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context)),
+                    fontWeight: FontWeight.bold,
+                    color: cores('corTexto'),
+                    fontSize: tamanhoFonte.letraMedia(context)),
               ),
             ),
             SizedBox(height: 5),
@@ -513,7 +532,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
     TamanhoFonte tamanhoFonte = TamanhoFonte();
     List<Widget> responsaveisWidgets = [];
 
-    for (int index = 0; index < qtdResponsavel; index++) {
+    for (int indexResp = 0; indexResp < AppVariaveis().qtdResponsavelPaciente; indexResp++) {
       responsaveisWidgets.add(
         Column(
           children: [
@@ -529,7 +548,9 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
                 Expanded(
                   child: Text(
-                    ListRelacaoResponsavelPaciente.isEmpty ? '' : ListRelacaoResponsavelPaciente[index],
+                    AppVariaveis().ListRelacaoResponsavelPaciente.isEmpty
+                        ? ''
+                        : AppVariaveis().ListRelacaoResponsavelPaciente[indexResp],
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -543,7 +564,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 Text(
-                  'Nome Responsável ${index + 1}: ',
+                  'Nome Responsável ${indexResp + 1}: ',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: cores('corTexto'),
@@ -551,7 +572,9 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
                 Expanded(
                   child: Text(
-                    ListNomeResponsavelPaciente.isEmpty ? '' : ListNomeResponsavelPaciente[index],
+                    AppVariaveis().ListaNomeResponsavelPaciente.isEmpty
+                        ? ''
+                        : AppVariaveis().ListaNomeResponsavelPaciente[indexResp],
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -572,7 +595,9 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                       fontSize: tamanhoFonte.letraPequena(context)),
                 ),
                 Text(
-                  ListGeneroResponsavelPaciente.isEmpty ? '' : genderToString(ListGeneroResponsavelPaciente[index]!),
+                  AppVariaveis().ListaGeneroResponsavelPaciente.isEmpty
+                      ? ''
+                      : genderToString(AppVariaveis().ListaGeneroResponsavelPaciente[indexResp]!),
                   softWrap: true,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -592,7 +617,9 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                       fontSize: tamanhoFonte.letraPequena(context)),
                 ),
                 Text(
-                  ListIdadeResponsavelPaciente.isEmpty ? '' : ListIdadeResponsavelPaciente[index],
+                  AppVariaveis().ListaIdadeResponsavelPaciente.isEmpty
+                      ? ''
+                      : AppVariaveis().ListaIdadeResponsavelPaciente[indexResp],
                   softWrap: true,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
@@ -613,7 +640,9 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
                 Expanded(
                   child: Text(
-                    ListTelefoneResponsavelPaciente.isEmpty ? '' : ListTelefoneResponsavelPaciente[index],
+                    AppVariaveis().ListaTelefoneResponsavelPaciente.isEmpty
+                        ? ''
+                        : AppVariaveis().ListaTelefoneResponsavelPaciente[indexResp],
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -635,7 +664,9 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
                 Expanded(
                   child: Text(
-                    ListEscolaridadeResponsavelPaciente.isEmpty ? '' : ListEscolaridadeResponsavelPaciente[index],
+                    AppVariaveis().ListaEscolaridadeResponsavelPaciente.isEmpty
+                        ? ''
+                        : AppVariaveis().ListaEscolaridadeResponsavelPaciente[indexResp],
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -657,7 +688,9 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 ),
                 Expanded(
                   child: Text(
-                    ListProfissaoResponsavelPaciente.isEmpty ? '' : ListProfissaoResponsavelPaciente[index],
+                    AppVariaveis().ListaProfissaoResponsavelPaciente.isEmpty
+                        ? ''
+                        : AppVariaveis().ListaProfissaoResponsavelPaciente[indexResp],
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -689,12 +722,14 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               child: Text(
                 'Endereço: ',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context)),
+                    fontWeight: FontWeight.bold,
+                    color: cores('corTexto'),
+                    fontSize: tamanhoFonte.letraMedia(context)),
               ),
             ),
             SizedBox(height: 5),
             Text(
-              "$lougradouroPaciente, $numeroPaciente - $bairroPaciente, $cidadePaciente - $estadoPaciente, $cepPaciente",
+              "${AppVariaveis().lougradouroPaciente}, ${AppVariaveis().numeroPaciente} - ${AppVariaveis().bairroPaciente}, ${AppVariaveis().cidadePaciente} - ${AppVariaveis().estadoPaciente}, ${AppVariaveis().cepPaciente}",
               style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
             ),
           ],
@@ -715,24 +750,26 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               child: Text(
                 'Anexo:',
                 style: TextStyle(
-                    fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: tamanhoFonte.letraMedia(context)),
+                    fontWeight: FontWeight.bold,
+                    color: cores('corTexto'),
+                    fontSize: tamanhoFonte.letraMedia(context)),
               ),
             ),
             SizedBox(height: 5),
             Center(
               child: ElevatedButton(
                 style: ButtonStyle(
-                  shadowColor: MaterialStatePropertyAll(cores('corSombra')),
-                  backgroundColor: MaterialStatePropertyAll(cores('corDetalhe')),
+                  shadowColor: WidgetStateProperty.all<Color?>(cores('corSombra')),
+                  backgroundColor: WidgetStateProperty.all<Color?>(cores('corDetalhe')),
                 ),
                 onPressed: () async {
-                  if (nomeArquivo.isNotEmpty) {
-                    //await downloadDoc(context, nomeArquivo);
-                    await launchUrl(Uri.parse(urlDocPaciente));
+                  if (AppVariaveis().nomeArquivo.isNotEmpty) {
+                    //await downloadDoc(context, AppVariaveis().nomeArquivo);
+                    await launchUrl(Uri.parse(AppVariaveis().urlDocPaciente));
                   }
                 },
                 child: Text(
-                  nomeArquivo.isEmpty ? 'Anexar Documento' : nomeArquivo,
+                  AppVariaveis().nomeArquivo.isEmpty ? 'Anexar Documento' : AppVariaveis().nomeArquivo,
                   style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
                 ),
               ),
