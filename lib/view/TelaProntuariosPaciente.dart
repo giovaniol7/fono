@@ -1,14 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fonocare/controllers/variaveis.dart';
-import '../controllers/formatarMesAno.dart';
-import 'TelaAdicionarProntuarios.dart';
-import 'package:fonocare/connections/fireCloudProntuarios.dart';
-import 'package:fonocare/view/TelaDadosProntuarios.dart';
 import 'package:intl/intl.dart';
 
+import '../connections/fireCloudProntuarios.dart';
 import '../connections/fireCloudConsultas.dart';
 import '../connections/fireCloudPacientes.dart';
+import '../controllers/formatarMesAno.dart';
+import '../controllers/variaveis.dart';
 import '../controllers/estilos.dart';
 import '../models/maps.dart';
 

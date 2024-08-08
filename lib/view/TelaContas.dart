@@ -1,17 +1,15 @@
-import 'package:fonocare/connections/fireCloudContas.dart';
-import 'package:fonocare/models/maps.dart';
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:fonocare/view/TelaAdicionarContas.dart';
+import '../models/maps.dart';
+import '../connections/fireCloudContas.dart';
 import '../controllers/calcularFinanceiro.dart';
 import '../controllers/converterData.dart';
 import '../controllers/estilos.dart';
-import 'package:fonocare/widgets/mensagem.dart';
-
 import '../controllers/formatarMesAno.dart';
+import '../widgets/mensagem.dart';
 
 class TelaContas extends StatefulWidget {
   const TelaContas({super.key});
@@ -68,7 +66,6 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    TamanhoWidgets tamanhoWidgets = TamanhoWidgets();
     TamanhoFonte tamanhoFonte = TamanhoFonte();
 
     return Scaffold(

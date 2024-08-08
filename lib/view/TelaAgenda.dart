@@ -1,12 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:fonocare/controllers/variaveis.dart';
-import 'package:fonocare/controllers/variaveis.dart';
-import 'package:fonocare/controllers/variaveis.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../connections/fireCloudConsultas.dart';
+import '../controllers/variaveis.dart';
 import '../controllers/estilos.dart';
 
 class TelaAgenda extends StatefulWidget {

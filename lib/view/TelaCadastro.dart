@@ -57,7 +57,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
               erro(context, 'Senhas não coincidem.');
             } else {
               if (AppVariaveis().txtSenha.text.length >= 6) {
-                AppVariaveis().urlImageFono != null
+                AppVariaveis().urlImageFono.isNotEmpty
                     ? AppVariaveis().urlImageFono =
                         (await uploadImageUsers(AppVariaveis().fileImageFono, 'users'))!
                     : AppVariaveis().urlImageFono = '';

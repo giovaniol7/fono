@@ -68,7 +68,7 @@ class _TelaInicialState extends State<TelaInicial> {
 
     return Scaffold(
         key: _scaffoldKey,
-        drawer: DrawerNavigation(AppVariaveis().urlImage!, AppVariaveis().genero!, AppVariaveis().nome!),
+        drawer: DrawerNavigation(AppVariaveis().urlImage, AppVariaveis().genero, AppVariaveis().nome),
         body: RefreshIndicator(
             color: cores('corSimbolo'),
             onRefresh: atualizarDados,
