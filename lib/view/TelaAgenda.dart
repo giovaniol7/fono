@@ -15,7 +15,6 @@ class TelaAgenda extends StatefulWidget {
 }
 
 class _TelaAgendaState extends State<TelaAgenda> {
-
   Future<void> atualizarDados() async {
     setState(() {
       AppVariaveis().futureAppointments = getAppointmentsFromFirestore();
@@ -23,8 +22,8 @@ class _TelaAgendaState extends State<TelaAgenda> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     atualizarDados();
   }
 
@@ -112,9 +111,8 @@ class _TelaAgendaState extends State<TelaAgenda> {
                       details.appointments!.isNotEmpty &&
                       AppVariaveis().controller.view != CalendarView.month) {
                     Appointment tappedAppointment = details.appointments!.first;
-                    Navigator.pushNamed(context, '/adicionarAgenda', arguments: {
-                      'tipo': 'editar',
-                      'appointment': tappedAppointment});
+                    Navigator.pushNamed(context, '/adicionarAgenda',
+                        arguments: {'tipo': 'editar', 'tappedAppointment': tappedAppointment});
                   }
                 },
                 dataSource: MeetingDataSource(AppVariaveis().futureAppointments),
@@ -130,9 +128,8 @@ class _TelaAgendaState extends State<TelaAgenda> {
             startTime: DateTime.now(),
             endTime: DateTime.now(),
           );
-          Navigator.pushNamed(context, '/adicionarAgenda', arguments: {
-            'tipo': 'adicionar',
-            'appointment': tappedAppointment});
+          Navigator.pushNamed(context, '/adicionarAgenda',
+              arguments: {'tipo': 'adicionar', 'tappedAppointment': tappedAppointment});
         },
         child: Icon(
           Icons.add,

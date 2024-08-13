@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../models/maps.dart';
 import '../connections/fireCloudContas.dart';
+import '../controllers/variaveis.dart';
 import '../controllers/calcularFinanceiro.dart';
 import '../controllers/converterData.dart';
 import '../controllers/estilos.dart';
@@ -12,56 +13,37 @@ import '../controllers/formatarMesAno.dart';
 import '../widgets/mensagem.dart';
 
 class TelaContas extends StatefulWidget {
-  const TelaContas({super.key});
+  const TelaContas();
 
   @override
   State<TelaContas> createState() => _TelaContasState();
 }
 
 class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateMixin {
-  var geral;
-  var contasDebito;
-  var contasCredito;
-  var windowsIdFono;
-  double somaDespesas = 0;
-  double somaGanhos = 0;
-  late double? saldo = 0.0;
-  late TabController _tabController;
-  String? selecioneMes;
-  int? selecioneAno;
-  NumberFormat numberFormat = NumberFormat("#,##0.00", "pt_BR");
-
   Future<void> atualizarDados() async {
     await carregarDados();
   }
 
   carregarDados() async {
     var financias = await calcularFinanceiro();
-    geral = await recuperarGeral();
-    contasDebito = await recuperarDebito();
-    contasCredito = await recuperarCredito();
+    AppVariaveis().geralContas = await recuperarGeral();
+    AppVariaveis().contasDebito = await recuperarDebito();
+    AppVariaveis().contasCredito = await recuperarCredito();
 
     setState(() {
       int mesAtual = DateTime.now().month;
       int anoAtual = DateTime.now().year;
-      selecioneMes = intMesToAbrev[mesAtual] ?? 'Desconhecido';
-      selecioneAno = anoAtual;
-      saldo = financias['somaRenda'];
+      AppVariaveis().selecioneMesConta = intMesToAbrev[mesAtual] ?? 'Todos';
+      AppVariaveis().selecioneAnoConta = anoAtual;
+      AppVariaveis().saldoConta = financias['somaRenda']!;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 3);
-    calcularFinanceiro();
+    AppVariaveis().tabController = TabController(vsync: this, length: 3);
     carregarDados();
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
   }
 
   @override
@@ -78,6 +60,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
             color: cores('corSimbolo'),
           ),
           onPressed: () {
+            AppVariaveis().resetContabilidadeConta();
             Navigator.pop(context);
           },
         ),
@@ -135,10 +118,10 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                         underline: Container(
                           height: 0,
                         ),
-                        value: selecioneMes,
+                        value: AppVariaveis().selecioneMesConta,
                         onChanged: (String? newValue) {
                           setState(() {
-                            selecioneMes = newValue!;
+                            AppVariaveis().selecioneMesConta = newValue!;
                           });
                         },
                         items: nomeMesesAbrev.map((state) {
@@ -169,10 +152,10 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                         underline: Container(
                           height: 0,
                         ),
-                        value: selecioneAno,
+                        value: AppVariaveis().selecioneAnoConta,
                         onChanged: (int? newValue) {
                           setState(() {
-                            selecioneAno = newValue!;
+                            AppVariaveis().selecioneAnoConta = newValue!;
                           });
                         },
                         items: getAnos().map((int ano) {
@@ -198,7 +181,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                                   fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              'R\$ ${numberFormat.format(saldo)}',
+                              'R\$ ${AppVariaveis().numberFormat.format(AppVariaveis().saldoConta)}',
                               style: TextStyle(
                                   color: cores('corTexto'),
                                   fontSize: tamanhoFonte.letraMedia(context),
@@ -219,7 +202,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                 ),
               ),
               child: TabBar(
-                controller: _tabController,
+                controller: AppVariaveis().tabController,
                 tabs: const [
                   Tab(text: 'Saídas'),
                   Tab(text: 'Entradas'),
@@ -236,11 +219,11 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
             ),
             Expanded(
               child: TabBarView(
-                controller: _tabController,
+                controller: AppVariaveis().tabController,
                 children: [
-                  TabContent(contasCredito),
-                  TabContent(contasDebito),
-                  TabContent(geral),
+                  TabContent(AppVariaveis().contasCredito),
+                  TabContent(AppVariaveis().contasDebito),
+                  TabContent(AppVariaveis().geralContas),
                 ],
               ),
             ),
@@ -289,15 +272,17 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
 
                   String mesSelecionadoFormatado = intMesToAbrev.entries
                       .firstWhere(
-                        (entry) => entry.value == selecioneMes,
+                        (entry) => entry.value == AppVariaveis().selecioneMesConta,
                         orElse: () => MapEntry(0, ''),
                       )
                       .key
                       .toString()
                       .padLeft(2, '0');
 
-                  if ((selecioneMes == 'Todos' || mesAno.startsWith(mesSelecionadoFormatado)) &&
-                      (selecioneAno == 0 || ano == selecioneAno.toString())) {
+                  if ((AppVariaveis().selecioneMesConta == 'Todos' ||
+                          mesAno.startsWith(mesSelecionadoFormatado)) &&
+                      (AppVariaveis().selecioneAnoConta == 0 ||
+                          ano == AppVariaveis().selecioneAnoConta.toString())) {
                     if (!contasPorMes.containsKey(mesAno)) {
                       contasPorMes[mesAno] = [];
                     }
@@ -452,7 +437,6 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
             });
           }
           atualizarDados();
-          //sucesso(context, 'Atualizado com sucesso!');
         },
         child: Container(
           child: Column(

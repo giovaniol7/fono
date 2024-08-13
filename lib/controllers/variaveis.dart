@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 enum Gender { male, female }
@@ -41,7 +42,7 @@ class AppVariaveis extends ChangeNotifier {
   String nomePaciente = '';
   String uidPaciente = '';
   var uidFono = '';
-  String paciente = '';
+  String pacienteNome = '';
   Map<String, dynamic> pacienteEdit = {};
   String varAtivoPaciente = '1';
   List<String> toggleOptionsPaciente = ['Presente', 'Faltou'];
@@ -130,6 +131,7 @@ class AppVariaveis extends ChangeNotifier {
   //PRONTUÁRIOS
   var prontuarios;
   var prontuariosPac;
+  var prontuariosAdd;
   var pacientePront;
   String nomePacientePront = '';
   String? selecioneMes;
@@ -159,7 +161,7 @@ class AppVariaveis extends ChangeNotifier {
 
   //AGENDA
   CalendarController controller = CalendarController();
-  late Future<List<Appointment>> futureAppointments;
+  Future<List<Appointment>> futureAppointments = Future.value([]);
   TextEditingController txtNomeConsulta = TextEditingController();
   TextEditingController txtDataConsulta = TextEditingController();
   TextEditingController txtHorarioConsulta = TextEditingController();
@@ -174,7 +176,7 @@ class AppVariaveis extends ChangeNotifier {
   String selecioneFrequenciaConsulta = 'DAILY';
   String selecioneSemanaConsulta = 'SU';
   String uidAgenda = '';
-  Map<String, dynamic> appointment = {};
+  Map<String, dynamic> appointmentAgenda = {};
   Map<String, String> consulta = {};
 
   //CONTABILIDADE
@@ -208,6 +210,16 @@ class AppVariaveis extends ChangeNotifier {
   bool selecioneQtdPagamentoPaciente = true;
   String selecioneFormaPagamento = 'Cartão Débito';
   String selecioneQntdParcelas = '1x';
+  var geralContas;
+  var contasDebito;
+  var contasCredito;
+  var windowsIdFono;
+  double somaDespesasConta = 0;
+  double somaGanhosConta = 0;
+  double saldoConta = 0.0;
+  TabController? tabController;
+  String selecioneMesConta = 'Todos';
+  int selecioneAnoConta = DateTime.now().year;
 
   //BLOCO DE NOTAS
   var blocoNotas = null;
@@ -230,6 +242,7 @@ class AppVariaveis extends ChangeNotifier {
   double aPagar = 0.0;
 
   //OUTRAS VARIÁVEIS
+  NumberFormat numberFormat = NumberFormat("#,##0.00", "pt_BR");
   DateTime nowTimer = DateTime.now();
   int mesAtual = DateTime.now().month;
   int anoAtual = DateTime.now().year;
@@ -259,7 +272,6 @@ class AppVariaveis extends ChangeNotifier {
     notifyListeners();
   }
 
-
   void resetGeral(){
     reset();
     resetUser();
@@ -270,8 +282,8 @@ class AppVariaveis extends ChangeNotifier {
     resetContabilidade();
   }
 
+  //OUTRAS VARIÁVEIS
   void reset() {
-    //OUTRAS VARIÁVEIS
     nome = '';
     urlImage = '';
     genero = 'Gender.male';
@@ -280,7 +292,7 @@ class AppVariaveis extends ChangeNotifier {
     saldo = 0.0;
     aReceber = 0.0;
     aPagar = 0.0;
-    paciente = '';
+    pacienteNome = '';
     listaPaciente = [];
     selectedDate = DateTime.now();
     selectedTime = TimeOfDay.now();
@@ -314,7 +326,7 @@ class AppVariaveis extends ChangeNotifier {
     labelText = "Nome do Paciente";
     uidPaciente = '';
     uidFono = '';
-    paciente = '';
+    pacienteNome = '';
     pacienteEdit = {};
     varAtivoPaciente = '1';
     toggleOptionsPaciente = ['Presente', 'Faltou'];
@@ -390,6 +402,7 @@ class AppVariaveis extends ChangeNotifier {
 
   //PRONTUÁRIOS
   void resetProntuario() {
+    prontuariosAdd = null;
     labelText = "Nome do Paciente";
     uidProntuario = '';
     txtNomeProntuario.clear();
@@ -431,8 +444,9 @@ class AppVariaveis extends ChangeNotifier {
     selecioneSemanaConsulta = 'SU';
     uidAgenda = '';
     uidPaciente = '';
-    appointment = {};
+    appointmentAgenda = {};
     consulta = {};
+    pacienteNome = '';
     notifyListeners();
   }
 
@@ -461,6 +475,20 @@ class AppVariaveis extends ChangeNotifier {
     selecioneQtdPagamentoPaciente = true;
     selecioneFormaPagamento = 'Cartão Débito';
     selecioneQntdParcelas = '1x';
+    notifyListeners();
+  }
+
+  void resetContabilidadeConta() {
+    contasDebito = null;
+    geralContas = null;
+    contasCredito = null;
+    windowsIdFono = null;
+    somaDespesasConta = 0;
+    somaGanhosConta = 0;
+    saldoConta = 0.0;
+    tabController = null;
+    selecioneMesConta = 'Todos';
+    selecioneAnoConta = DateTime.now().year;
     notifyListeners();
   }
 

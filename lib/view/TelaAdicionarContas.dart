@@ -41,7 +41,7 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
     if (tipo == 'editar') {
       setState(() {
         AppVariaveis().labelText = AppVariaveis().conta['nomeConta']!;
-        AppVariaveis().paciente = AppVariaveis().conta['nomeConta']!;
+        AppVariaveis().pacienteNome = AppVariaveis().conta['nomeConta']!;
         AppVariaveis().uidConta = AppVariaveis().conta['uidConta']!;
         AppVariaveis().txtNomeConta.text = AppVariaveis().conta['nomeConta']!;
         AppVariaveis().txtPrecoConta.text = AppVariaveis().conta['preco']!;
@@ -208,8 +208,8 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                           outlineInputBorderColor: cores('corTexto'),
                           returnedValue: (String value) {
                             setState(() {
-                              AppVariaveis().paciente = value;
-                              AppVariaveis().txtNomeConta.text = AppVariaveis().paciente;
+                              AppVariaveis().pacienteNome = value;
+                              AppVariaveis().txtNomeConta.text = AppVariaveis().pacienteNome;
                             });
                           },
                           onTap: () {},

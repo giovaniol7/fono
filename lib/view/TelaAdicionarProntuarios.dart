@@ -15,22 +15,19 @@ import '../widgets/campoTexto.dart';
 import '../widgets/toggleSwitch.dart';
 
 class TelaAdicionarProntuarios extends StatefulWidget {
-  const TelaAdicionarProntuarios({super.key});
+  const TelaAdicionarProntuarios();
 
   @override
   State<TelaAdicionarProntuarios> createState() => _TelaAdicionarProntuariosState();
 }
 
 class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
+  int verificar = 0;
   late String? tipo;
   late Appointment? tappedAppointment;
   late DateTime? dataClicada;
 
-  Future<void> atualizarDados() async {
-    await carregarDados();
-  }
-
-  carregarDados() async {
+   carregarDados() async {
     List<String> lista = await fazerListaPacientes(AppVariaveis().varAtivoPaciente);
     AppVariaveis().appointmentProntuario = await carregarAppointment(tappedAppointment);
 
@@ -39,13 +36,13 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
       var paciente = await recuperarPacientePorNome(context, nome);
       AppVariaveis().uidPaciente = paciente['uidPaciente'];
       DateTime dataSeteDiasAtras = dataClicada!.subtract(Duration(days: 7));
-      AppVariaveis().prontuarios = await recuperarProntuarioData(
+      AppVariaveis().prontuariosAdd = await recuperarProntuarioData(
           context, AppVariaveis().uidPaciente, DateFormat('dd/MM/yyyy').format(dataSeteDiasAtras));
     } else if (tipo == 'editar') {
       String nome = tappedAppointment!.subject;
       var paciente = await recuperarPacientePorNome(context, nome);
       AppVariaveis().uidPaciente = paciente['uidPaciente'];
-      AppVariaveis().prontuarios = await recuperarProntuarioData(
+      AppVariaveis().prontuariosAdd = await recuperarProntuarioData(
           context, AppVariaveis().uidPaciente, DateFormat('dd/MM/yyyy').format(dataClicada!));
     }
 
@@ -57,16 +54,15 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
 
       AppVariaveis().listaPaciente = lista;
       String dataFormatada = DateFormat('dd/MM/yyyy').format(dataClicada!);
-
       AppVariaveis().labelText = AppVariaveis().appointmentProntuario['nomeConsulta'];
-      AppVariaveis().paciente = AppVariaveis().appointmentProntuario['nomeConsulta'];
+      AppVariaveis().pacienteNome = AppVariaveis().appointmentProntuario['nomeConsulta'];
       AppVariaveis().txtNomePaciente.text = AppVariaveis().appointmentProntuario['nomeConsulta'];
       AppVariaveis().txtDataProntuario.text = dataFormatada;
       AppVariaveis().txtTimeProntuario.text = AppVariaveis().appointmentProntuario['horarioConsulta'];
-      AppVariaveis().uidProntuario = AppVariaveis().prontuarios['uidProntuario'];
-      AppVariaveis().txtObjetivosProntuarios.text = AppVariaveis().prontuarios['objetivosProntuario'];
-      AppVariaveis().txtMateriaisProntuarios.text = AppVariaveis().prontuarios['materiaisProntuario'];
-      AppVariaveis().txtResultadosProntuarios.text = AppVariaveis().prontuarios['resultadosProntuario'];
+      AppVariaveis().uidProntuario = AppVariaveis().prontuariosAdd['uidProntuario'];
+      AppVariaveis().txtObjetivosProntuarios.text = AppVariaveis().prontuariosAdd['objetivosProntuario'];
+      AppVariaveis().txtMateriaisProntuarios.text = AppVariaveis().prontuariosAdd['materiaisProntuario'];
+      AppVariaveis().txtResultadosProntuarios.text = AppVariaveis().prontuariosAdd['resultadosProntuario'];
     });
   }
 
@@ -77,12 +73,15 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
   }
 
   Widget build(BuildContext context) {
-    final arguments = ModalRoute.of(context)?.settings.arguments as Map?;
-    tipo = arguments?['tipo'] as String?;
-    tappedAppointment = arguments?['tappedAppointment'] as Appointment?;
-    dataClicada = arguments?['dataClicada'] as DateTime?;
-
     TamanhoFonte tamanhoFonte = TamanhoFonte();
+    final arguments = ModalRoute.of(context)?.settings.arguments as Map?;
+    if (arguments != null && verificar == 0) {
+      tipo = arguments['tipo'] as String?;
+      tappedAppointment = arguments['tappedAppointment'] as Appointment?;
+      dataClicada = arguments['dataClicada'] as DateTime?;
+      verificar = 1;
+      carregarDados();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -176,8 +175,8 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
                     outlineInputBorderColor: cores('corSombra'),
                     returnedValue: (String value) {
                       setState(() {
-                        AppVariaveis().paciente = value;
-                        AppVariaveis().txtNomePaciente.text = AppVariaveis().paciente;
+                        AppVariaveis().pacienteNome = value;
+                        AppVariaveis().txtNomePaciente.text = AppVariaveis().pacienteNome;
                       });
                     },
                     onTap: () {},
@@ -197,15 +196,15 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
                               DateFormat('dd/MM/yyyy').parse(AppVariaveis().txtDataProntuario.text);
                           DateTime dataSeteDiasAtras = data.subtract(Duration(days: 7));
                           String dataFormatada = DateFormat('dd/MM/yyyy').format(dataSeteDiasAtras);
-                          AppVariaveis().prontuarios = await recuperarProntuarioData(
+                          AppVariaveis().prontuariosAdd = await recuperarProntuarioData(
                               context, AppVariaveis().uidPaciente, dataFormatada);
                           setState(() {
                             AppVariaveis().txtObjetivosProntuarios.text =
-                                AppVariaveis().prontuarios['objetivosProntuario'];
+                                AppVariaveis().prontuariosAdd['objetivosProntuario'];
                             AppVariaveis().txtMateriaisProntuarios.text =
-                                AppVariaveis().prontuarios['materiaisProntuario'];
+                                AppVariaveis().prontuariosAdd['materiaisProntuario'];
                             AppVariaveis().txtResultadosProntuarios.text =
-                                AppVariaveis().prontuarios['resultadosProntuario'];
+                                AppVariaveis().prontuariosAdd['resultadosProntuario'];
                           });
                         },
                         iconPressed: () async {

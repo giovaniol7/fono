@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fonocare/controllers/uploadDoc.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
 import '../connections/fireCloudPacientes.dart';
 import '../controllers/calcularIdade.dart';
+import '../controllers/uploadDoc.dart';
 import '../controllers/estilos.dart';
 import '../controllers/variaveis.dart';
 import '../models/maps.dart';

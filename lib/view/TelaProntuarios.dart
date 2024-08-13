@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fonocare/controllers/variaveis.dart';
 
 import '../connections/fireCloudPacientes.dart';
-import '../widgets/TextFieldSuggestions.dart';
+import '../controllers/variaveis.dart';
 import '../controllers/estilos.dart';
+import '../widgets/TextFieldSuggestions.dart';
 import '../widgets/cardPaciente.dart';
 
 class TelaProntuarios extends StatefulWidget {
@@ -22,7 +21,6 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
   var varAtivo = '1';
   String _paciente = '';
   List<String> listaPaciente = [];
-  String _outroPaciente = "";
 
   carregarDados() async {
     List<String> lista = await fazerListaPacientes(varAtivo);
@@ -49,7 +47,6 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
             size: 30,
           ),
           onPressed: () {
-            AppVariaveis().reset();
             Navigator.pop(context);
           },
         ),
@@ -69,7 +66,7 @@ class _TelaProntuariosState extends State<TelaProntuarios> {
                   tipo: 'paciente',
                   margem: EdgeInsets.only(top: 5, left: 24, bottom: 20, right: 24),
                   list: listaPaciente,
-                  labelText: _outroPaciente,
+                  labelText: AppVariaveis().labelText,
                   textSuggetionsColor: cores('corTexto'),
                   suggetionsBackgroundColor: cores('branco'),
                   outlineInputBorderColor: cores('corTexto'),

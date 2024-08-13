@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:fonocare/connections/fireAuth.dart';
-import 'package:fonocare/controllers/variaveis.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../connections/fireAuth.dart';
 import '../connections/fireCloudPacientes.dart';
-import '../widgets/TextFieldSuggestions.dart';
 import '../controllers/estilos.dart';
+import '../widgets/TextFieldSuggestions.dart';
 import '../widgets/cardPaciente.dart';
 
 class TelaPacientes extends StatefulWidget {
@@ -51,7 +49,6 @@ class _TelaPacientesState extends State<TelaPacientes> {
             size: 30,
           ),
           onPressed: () {
-            AppVariaveis().reset();
             Navigator.pop(context);
           },
         ),

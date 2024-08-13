@@ -1,10 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fonocare/view/TelaAgenda.dart';
-import 'package:fonocare/view/TelaBlocoDeNotas.dart';
-import 'package:fonocare/view/TelaContas.dart';
-import 'package:fonocare/view/TelaEditarPerfil.dart';
-import 'package:fonocare/view/TelaPacientes.dart';
-import 'package:fonocare/view/TelaProntuarios.dart';
 
 import '../connections/fireAuth.dart';
 import '../controllers/estilos.dart';
@@ -117,12 +111,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TelaPacientes(),
-                  ));
-              //Navigator.pushNamed(context, '/pacientes');
+              Navigator.pushNamed(context, '/pacientes');
             },
           ),
           ListTile(
@@ -135,12 +124,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TelaAgenda(),
-                  ));
-              //Navigator.pushNamed(context, '/agenda');
+              Navigator.pushNamed(context, '/agenda');
             },
           ),
           ListTile(
@@ -153,18 +137,10 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TelaProntuarios(),
-                  ));
-              /*Navigator.pushNamed(
-                  context,
-                  '/pacientes'
-              );  */
+              Navigator.pushNamed(context, '/prontuarios');
             },
           ),
-          ListTile(
+          /*ListTile(
             leading: Icon(
               Icons.analytics_outlined,
               color: cores(corSimbolo),
@@ -176,7 +152,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
             onTap: () {
               /*Navigator.pushNamed(context, '/pacientes');*/
             },
-          ),
+          ),*/
           ListTile(
             leading: Icon(
               Icons.note_alt_sharp,
@@ -187,12 +163,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TelaBlocoDeNotas(),
-                  ));
-              /*Navigator.pushNamed(context, '/pacientes');*/
+              Navigator.pushNamed(context, '/blocoNotas');
             },
           ),
           ListTile(
@@ -209,12 +180,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               ),
             ),
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TelaContas(),
-                  ));
-              //Navigator.pushNamed(context, '/contas');
+              Navigator.pushNamed(context, '/contas');
             },
           ),
           Divider(
@@ -231,12 +197,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
             ),
             onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TelaEditarPerfil(),
-                  ));
-              //Navigator.pushNamed(context, '/editarPerfil');
+              Navigator.pushNamed(context, '/editarPerfil');
             },
           ),
           ListTile(

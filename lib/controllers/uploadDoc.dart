@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:fonocare/widgets/mensagem.dart';
 import 'package:path/path.dart';
+import '../widgets/mensagem.dart';
 
 Future<String?> uploadDocToFirebase(File file) async {
   try {

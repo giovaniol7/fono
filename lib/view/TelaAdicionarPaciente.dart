@@ -55,9 +55,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
 
   carregarDados() async {
     List<String> lista = await fazerListaEscolas();
-    setState(() {
-      AppVariaveis().listaEscolaPaciente = lista;
-    });
+    AppVariaveis().listaEscolaPaciente = lista;
 
     tipo == 'editar' ? AppVariaveis().pacienteEdit = await recuperarPaciente(context, uidPaciente) : null;
 
@@ -65,8 +63,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
       if (tipo == 'editar') {
         AppVariaveis().uidPaciente = AppVariaveis().pacienteEdit['uidPaciente']!;
         AppVariaveis().uidFono = AppVariaveis().pacienteEdit['uidFono']!;
-        AppVariaveis().urlImagePaciente =
-            AppVariaveis().pacienteEdit['urlImagePaciente'] ?? '';
+        AppVariaveis().urlImagePaciente = AppVariaveis().pacienteEdit['urlImagePaciente'] ?? '';
         AppVariaveis().txtDataAnamnesePaciente.text = AppVariaveis().pacienteEdit['dataAnamnesePaciente']!;
         AppVariaveis().txtNomePaciente.text = AppVariaveis().pacienteEdit['nomePaciente']!;
         AppVariaveis().txtDataNascimentoPaciente.text = AppVariaveis().pacienteEdit['dtNascimentoPaciente']!;
@@ -128,8 +125,10 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
 
   Widget build(BuildContext context) {
     final arguments = ModalRoute.of(context)?.settings.arguments as Map?;
-    tipo = arguments?['tipo'] as String?;
-    uidPaciente = arguments?['uidPaciente'] as String?;
+    if (arguments != null && arguments['uidPaciente'] != null) {
+      tipo = arguments['tipo'] as String?;
+      uidPaciente = arguments['uidPaciente'] as String?;
+    }
 
     return Scaffold(
       appBar: AppBar(

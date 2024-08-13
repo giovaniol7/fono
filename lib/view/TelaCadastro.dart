@@ -93,7 +93,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            AppVariaveis().reset();
+            AppVariaveis().resetUser();
             Navigator.pop(context);
           },
         ),
@@ -304,6 +304,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
                           style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                         ),
                         onPressed: () {
+                          AppVariaveis().resetUser();
                           Navigator.pop(context);
                         },
                       ),

@@ -11,7 +11,7 @@ Future<Map<String, double>> calcularFinanceiro() async {
       .collection('contas')
       .where('uidFono', isEqualTo: idFonoAuth())
       .where('tipoTransacao', isEqualTo: 'Recebido')
-      .where('estadoPago', isEqualTo: true)
+      .where('estadoPago', isEqualTo: 'Pago')
       .get();
 
   if (usersSnapshot.docs.isNotEmpty) {
@@ -29,7 +29,7 @@ Future<Map<String, double>> calcularFinanceiro() async {
       .collection('contas')
       .where('uidFono', isEqualTo: idFonoAuth())
       .where('tipoTransacao', isEqualTo: 'Gasto')
-      .where('estadoPago', isEqualTo: true)
+      .where('estadoPago', isEqualTo: 'Pago')
       .get();
 
   if (recebidosSnapshot.docs.isNotEmpty) {
@@ -62,7 +62,7 @@ Future<double> calcularAReceber() async {
       .collection('contas')
       .where('uidFono', isEqualTo: idFonoAuth())
       .where('tipoTransacao', isEqualTo: 'Recebido')
-      .where('estadoPago', isEqualTo: false)
+      .where('estadoPago', isEqualTo: 'Não Pago')
       .get();
 
   if (usersSnapshot.docs.isNotEmpty) {
@@ -86,7 +86,7 @@ Future<double> calcularAPagar() async {
       .collection('contas')
       .where('uidFono', isEqualTo: idFonoAuth())
       .where('tipoTransacao', isEqualTo: 'Gasto')
-      .where('estadoPago', isEqualTo: false)
+      .where('estadoPago', isEqualTo: 'Não Pago')
       .get();
 
   if (recebidosSnapshot.docs.isNotEmpty) {

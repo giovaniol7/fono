@@ -234,7 +234,7 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
                         todayHighlightColor: cores('corSimbolo'),
                         onTap: (CalendarTapDetails details) {
                           if (details.targetElement == CalendarElement.appointment) {
-                            Appointment tappedAppointment = details.appointments!.first;
+                            Appointment? tappedAppointment = details.appointments!.first;
                             DateTime dataClicada = details.date!;
                             Navigator.pushNamed(context, '/adicionarProntuarios', arguments: {
                               'tipo': 'adicionar',

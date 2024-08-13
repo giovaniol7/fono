@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:brasil_fields/brasil_fields.dart';
-import 'package:fonocare/controllers/variaveis.dart';
 import 'package:provider/provider.dart';
 
 import '../connections/fireCloudUser.dart';
+import '../controllers/variaveis.dart';
 import '../controllers/uploadImage.dart';
 import '../controllers/verificarDados.dart';
 import '../controllers/estilos.dart';
@@ -232,6 +232,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                         style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
                       ),
                       onPressed: () {
+                        AppVariaveis().resetUser();
                         Navigator.pop(context);
                       },
                     ),

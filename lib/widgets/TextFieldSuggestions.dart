@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fonocare/controllers/estilos.dart';
+import '../controllers/estilos.dart';
 
 class TextFieldSuggestions extends StatefulWidget {
   final String tipo;

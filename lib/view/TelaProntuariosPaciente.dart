@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../connections/fireCloudProntuarios.dart';
 import '../connections/fireCloudConsultas.dart';
@@ -259,7 +260,7 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
       floatingActionButton: FloatingActionButton(
         shape: CircleBorder(),
         onPressed: () async {
-          var tappedAppointment = await appointmentsPorUIDPaciente(uidPaciente);
+          Appointment? tappedAppointment = await appointmentsPorUIDPaciente(uidPaciente);
           DateTime dataProntuario = DateTime.now();
           Navigator.pushNamed(context, '/adicionarProntuarios', arguments: {
             'tipo': 'adicionar',
@@ -304,7 +305,7 @@ Widget cardProntuario(context, doc) {
             color: cores('corSimbolo'),
           ),
           onPressed: () async {
-            var tappedAppointment = await appointmentsPorUIDPaciente(doc.data()['uidPaciente']);
+            Appointment? tappedAppointment = await appointmentsPorUIDPaciente(doc.data()['uidPaciente']);
             String dataProntuarioString = doc.data()['dataProntuario'];
             DateTime dataProntuario = DateFormat('dd/MM/yyyy').parse(dataProntuarioString);
             Navigator.pushNamed(context, '/adicionarProntuarios', arguments: {

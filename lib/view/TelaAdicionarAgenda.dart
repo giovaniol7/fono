@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:brasil_fields/brasil_fields.dart';
-import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../connections/fireAuth.dart';
@@ -14,52 +13,47 @@ import '../controllers/estilos.dart';
 import '../controllers/variaveis.dart';
 
 class TelaAdicionarAgenda extends StatefulWidget {
-  const TelaAdicionarAgenda({super.key});
+  const TelaAdicionarAgenda();
 
   @override
   State<TelaAdicionarAgenda> createState() => _TelaAdicionarAgendaState();
 }
 
 class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
+  int verificar = 0;
   late String? tipo;
   late Appointment? tappedAppointment;
 
-  Future<void> atualizarDados() async {
-    await carregarDados();
-  }
-
   carregarDados() async {
+    AppVariaveis().varAtivoPaciente = '1';
     List<String> lista = await fazerListaPacientes(AppVariaveis().varAtivoPaciente);
-    tipo == 'editar' ? AppVariaveis().appointment = (await carregarAppointment(tappedAppointment)) : null;
-    AppVariaveis().txtNomeConsulta.text = tappedAppointment!.subject;
-    AppVariaveis().txtDataConsulta.text = DateFormat('dd/MM/yyyy').format(tappedAppointment!.startTime);
-    AppVariaveis().txtHorarioConsulta.text = DateFormat('HH:mm').format(tappedAppointment!.startTime);
-    AppVariaveis().consulta = await buscarPorNomeHoraConsultas(
-        context, AppVariaveis().txtNomeConsulta.text, AppVariaveis().txtHorarioConsulta.text);
 
-    setState(() {
-      tipo == 'adicionar'
-          ? AppVariaveis().txtDataConsulta.text =
-              "${AppVariaveis().nowTimer.day.toString().padLeft(2, '0')}/${AppVariaveis().nowTimer.month.toString().padLeft(2, '0')}/${AppVariaveis().nowTimer.year.toString()}"
-          : null;
-
+    if (tipo == 'editar') {
       AppVariaveis().listaPaciente = lista;
-      AppVariaveis().uidAgenda = AppVariaveis().consulta['uidAgenda'] ?? '';
-      AppVariaveis().uidPaciente = AppVariaveis().consulta['uidPaciente'] ?? '';
-      AppVariaveis().selecioneFrequenciaConsulta = 'WEEKLY';
-      AppVariaveis().txtDuracaoConsulta.text = '00:50';
-
-      if (tipo == 'editar') {
-        AppVariaveis().labelText = AppVariaveis().appointment['nomeConsulta']!;
-        AppVariaveis().paciente = AppVariaveis().appointment['nomeConsulta']!;
-        AppVariaveis().txtNomeConsulta.text = AppVariaveis().appointment['nomeConsulta']!;
-        AppVariaveis().txtDataConsulta.text = AppVariaveis().appointment['dataConsulta']!;
-        AppVariaveis().txtHorarioConsulta.text = AppVariaveis().appointment['horarioConsulta']!;
-        AppVariaveis().txtDuracaoConsulta.text = AppVariaveis().appointment['duracaoConsulta']!;
-        AppVariaveis().selecioneCorConsulta = AppVariaveis().appointment['selecioneCorConsulta'];
-        AppVariaveis().selecioneSemanaConsulta = AppVariaveis().appointment['selecioneSemanaConsulta'];
+      AppVariaveis().appointmentAgenda = await carregarAppointment(tappedAppointment!);
+      AppVariaveis().consulta = await buscarPorNomeHoraConsultas(
+          context, AppVariaveis().appointmentAgenda['nomeConsulta'], AppVariaveis().appointmentAgenda['horarioConsulta']);
+    }
+    setState(() {
+      if (tipo == 'adicionar') {
+        AppVariaveis().listaPaciente = lista;
+        AppVariaveis().txtDataConsulta.text =
+            "${AppVariaveis().nowTimer.day.toString().padLeft(2, '0')}/${AppVariaveis().nowTimer.month.toString().padLeft(2, '0')}/${AppVariaveis().nowTimer.year.toString()}";
+        AppVariaveis().selecioneFrequenciaConsulta = 'WEEKLY';
+        AppVariaveis().txtDuracaoConsulta.text = '00:50';
+      } else if (tipo == 'editar') {
+        AppVariaveis().txtNomeConsulta.text = AppVariaveis().appointmentAgenda['nomeConsulta']!;
+        AppVariaveis().txtDataConsulta.text = AppVariaveis().appointmentAgenda['dataConsulta']!;
+        AppVariaveis().txtHorarioConsulta.text = AppVariaveis().appointmentAgenda['horarioConsulta']!;
+        AppVariaveis().txtDuracaoConsulta.text = AppVariaveis().appointmentAgenda['duracaoConsulta']!;
+        AppVariaveis().selecioneCorConsulta = AppVariaveis().appointmentAgenda['selecioneCorConsulta']!;
+        AppVariaveis().selecioneSemanaConsulta = AppVariaveis().appointmentAgenda['selecioneSemanaConsulta']!;
         AppVariaveis().selecioneFrequenciaConsulta =
-            AppVariaveis().appointment['selecioneFrequenciaConsulta'];
+            AppVariaveis().appointmentAgenda['selecioneFrequenciaConsulta']!;
+        AppVariaveis().uidAgenda = AppVariaveis().consulta['uidAgenda'] ?? '';
+        AppVariaveis().uidPaciente = AppVariaveis().consulta['uidPaciente'] ?? '';
+        AppVariaveis().labelText = AppVariaveis().appointmentAgenda['nomeConsulta']!;
+        AppVariaveis().pacienteNome = AppVariaveis().appointmentAgenda['nomeConsulta']!;
       }
     });
   }
@@ -70,12 +64,13 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
     carregarDados();
   }
 
-  @override
   Widget build(BuildContext context) {
     final arguments = ModalRoute.of(context)?.settings.arguments as Map?;
-    tipo = arguments?['tipo'] as String?;
-    tappedAppointment = arguments?['appointment'] as Appointment?;
-
+    if (arguments != null && verificar == 0) {
+      tipo = arguments['tipo'] as String?;
+      tappedAppointment = arguments['tappedAppointment'] as Appointment?;
+      verificar = 1;
+    }
     TamanhoFonte tamanhoFonte = TamanhoFonte();
 
     return Scaffold(
@@ -157,8 +152,8 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                     outlineInputBorderColor: cores('corSombra'),
                     returnedValue: (String value) {
                       setState(() {
-                        AppVariaveis().paciente = value;
-                        AppVariaveis().txtNomeConsulta.text = AppVariaveis().paciente;
+                        AppVariaveis().pacienteNome = value;
+                        AppVariaveis().txtNomeConsulta.text = AppVariaveis().pacienteNome;
                       });
                     },
                     onTap: () {},

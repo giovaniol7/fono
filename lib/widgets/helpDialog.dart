@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fonocare/controllers/estilos.dart';
+import '../controllers/estilos.dart';
 
 helpDialog(context) {
   TamanhoFonte tamanhoFonte = TamanhoFonte();

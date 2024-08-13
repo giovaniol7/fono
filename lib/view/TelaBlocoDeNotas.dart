@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fonocare/controllers/variaveis.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../connections/fireCloudBlocoNotas.dart';
+import '../controllers/variaveis.dart';
 import '../controllers/estilos.dart';
 import '../models/maps.dart';
 
@@ -40,7 +40,6 @@ class _TelaBlocoDeNotasState extends State<TelaBlocoDeNotas> {
             color: cores('corSimbolo'),
           ),
           onPressed: () {
-            AppVariaveis().reset();
             Navigator.pop(context);
           },
         ),

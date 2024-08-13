@@ -130,17 +130,17 @@ apagarConsultas(context, uidConsulta) async {
   }
 }
 
-Future<Map<String, dynamic>> carregarAppointment(appointment) async {
+Future<Map<String, dynamic>> carregarAppointment(Appointment? appointment) async {
   String nomeConsulta = '';
   String dataConsulta = '';
   String horarioConsulta = '';
   String duracaoConsulta = '';
-  Color? selecioneCorConsulta = Colors.red;
+  Color selecioneCorConsulta = Colors.red;
   String selecioneSemanaConsulta = '';
   String selecioneFrequenciaConsulta = '';
   Map<String, dynamic> consulta = {};
 
-  nomeConsulta = appointment.subject;
+  nomeConsulta = appointment!.subject;
 
   String dateTimeStart = appointment.startTime.toString();
   DateTime timeStart = DateTime.parse(dateTimeStart);
@@ -155,13 +155,12 @@ Future<Map<String, dynamic>> carregarAppointment(appointment) async {
   List<String> durationParts = formattedDuration.split(':');
   duracaoConsulta = '${durationParts[0].padLeft(2, '0')}:${durationParts[1].padLeft(2, '0')}';
 
-  String colorString = appointment.color.toString();
-  String colorHex = colorString.substring(colorString.indexOf("0x") + 2, colorString.length - 1);
-  Color? color = getColorNameFromHex(colorHex);
+  String colorHex = appointment.color.value.toRadixString(16).padLeft(8, '0');
+  Color color = getColorNameFromHex(colorHex)!;
   selecioneCorConsulta = color;
 
-  String recurrenceRule = appointment.recurrenceRule;
-  List<String> parts = recurrenceRule.split(';');
+  String? recurrenceRule = appointment.recurrenceRule;
+  List<String> parts = recurrenceRule!.split(';');
   String frequencyPart = parts[0];
   String byDayPart = parts[1];
   String frequency = frequencyPart.split('=')[1];
