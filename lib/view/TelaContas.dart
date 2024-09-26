@@ -48,8 +48,6 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -88,10 +86,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                 children: <Widget>[
                   Text(
                     'Selecione o Mês e Ano: ',
-                    style: TextStyle(
-                        fontSize: tamanhoFonte.letraPequena(context),
-                        color: cores('corTexto'),
-                        fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                   ),
                   SizedBox(width: 10),
                   Row(
@@ -110,11 +105,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                         ),
                         iconSize: 30,
                         iconEnabledColor: cores('corTexto'),
-                        style: TextStyle(
-                          color: cores('corTexto'),
-                          fontWeight: FontWeight.w400,
-                          fontSize: tamanhoFonte.letraPequena(context),
-                        ),
+                        style: TextStyle(color: cores('corTexto'), fontWeight: FontWeight.w400, fontSize: 16),
                         underline: Container(
                           height: 0,
                         ),
@@ -144,11 +135,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                         ),
                         iconSize: 30,
                         iconEnabledColor: cores('corTexto'),
-                        style: TextStyle(
-                          color: cores('corTexto'),
-                          fontWeight: FontWeight.w400,
-                          fontSize: tamanhoFonte.letraPequena(context),
-                        ),
+                        style: TextStyle(color: cores('corTexto'), fontWeight: FontWeight.w400, fontSize: 16),
                         underline: Container(
                           height: 0,
                         ),
@@ -176,16 +163,12 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                             Text(
                               'Saldo: ',
                               style: TextStyle(
-                                  color: cores('corTexto'),
-                                  fontSize: tamanhoFonte.letraMedia(context),
-                                  fontWeight: FontWeight.bold),
+                                  color: cores('corTexto'), fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             Text(
                               'R\$ ${AppVariaveis().numberFormat.format(AppVariaveis().saldoConta)}',
                               style: TextStyle(
-                                  color: cores('corTexto'),
-                                  fontSize: tamanhoFonte.letraMedia(context),
-                                  fontWeight: FontWeight.bold),
+                                  color: cores('corTexto'), fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                           ],
                         )),
@@ -211,10 +194,7 @@ class _TelaContasState extends State<TelaContas> with SingleTickerProviderStateM
                 indicatorColor: cores('corTexto'),
                 labelColor: cores('corDetalhe'),
                 unselectedLabelColor: cores('corTexto'),
-                labelStyle: TextStyle(
-                    color: cores('corTexto'),
-                    fontSize: tamanhoFonte.letraPequena(context),
-                    fontWeight: FontWeight.bold),
+                labelStyle: TextStyle(color: cores('corTexto'), fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
             Expanded(

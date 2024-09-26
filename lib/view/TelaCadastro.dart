@@ -35,8 +35,6 @@ class _TelaCadastroState extends State<TelaCadastro> {
 
   @override
   Widget build(BuildContext context) {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     void verificarSenhas() async {
       final DateFormat formatter = DateFormat('dd/MM/yyyy');
       final DateTime dataNascimento = formatter.parse(AppVariaveis().txtDtNascimento.text);
@@ -280,10 +278,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
                             )),
-                        child: Text(
-                          'Criar',
-                          style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-                        ),
+                        child: Text('Criar', style: TextStyle(fontSize: 16)),
                         onPressed: () {
                           if (validarCampos()) {
                             verificarSenhas();
@@ -299,10 +294,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
                             )),
-                        child: Text(
-                          'Cancelar',
-                          style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-                        ),
+                        child: Text('Cancelar', style: TextStyle(fontSize: 16)),
                         onPressed: () {
                           AppVariaveis().resetUser();
                           Navigator.pop(context);

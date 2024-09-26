@@ -42,8 +42,6 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
 
   @override
   Widget build(BuildContext context) {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: true,
@@ -90,11 +88,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                           });
                         },
                         child: AppVariaveis().fileImageFono == null
-                            ? Icon(
-                                Icons.person_add_alt_rounded,
-                                color: cores('corTextoBotao'),
-                                size: tamanhoFonte.iconPequeno(context),
-                              )
+                            ? Icon(Icons.person_add_alt_rounded, color: cores('corTextoBotao'), size: 16)
                             : CircleAvatar(
                                 maxRadius: 5,
                                 minRadius: 1,
@@ -115,11 +109,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                           ),
                           child: Center(
                             child: IconButton(
-                              icon: Icon(
-                                Icons.delete,
-                                color: cores('corSimbolo'),
-                                size: tamanhoFonte.iconPequeno(context),
-                              ),
+                              icon: Icon(Icons.delete, color: cores('corSimbolo'), size: 16),
                               onPressed: () {
                                 setState(() {
                                   AppVariaveis().boolApagarImagem = true;
@@ -189,10 +179,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32),
                           )),
-                      child: Text(
-                        'Editar',
-                        style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-                      ),
+                      child: Text('Editar', style: TextStyle(fontSize: 16)),
                       onPressed: () async {
                         AppVariaveis().fileImageFono != null
                             ? AppVariaveis().urlImageFono =
@@ -227,10 +214,7 @@ class _TelaEditarPerfilState extends State<TelaEditarPerfil> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32),
                           )),
-                      child: Text(
-                        'Cancelar',
-                        style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-                      ),
+                      child: Text('Cancelar', style: TextStyle(fontSize: 16)),
                       onPressed: () {
                         AppVariaveis().resetUser();
                         Navigator.pop(context);

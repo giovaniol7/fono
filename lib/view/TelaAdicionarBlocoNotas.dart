@@ -159,8 +159,6 @@ class _TelaAdicionarBlocoNotasState extends State<TelaAdicionarBlocoNotas> {
   }
 
   rowBotao() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -173,10 +171,7 @@ class _TelaAdicionarBlocoNotasState extends State<TelaAdicionarBlocoNotas> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(32),
                 )),
-            child: Text(
-              tipo == 'editar' ? 'Atualizar' : 'Criar',
-              style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-            ),
+            child: Text(tipo == 'editar' ? 'Atualizar' : 'Criar', style: TextStyle(fontSize: 16)),
             onPressed: () async {
               tipo == 'editar'
                   ? editarBlocoNota(
@@ -204,10 +199,7 @@ class _TelaAdicionarBlocoNotasState extends State<TelaAdicionarBlocoNotas> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(32),
               )),
-          child: Text(
-            'Cancelar',
-            style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-          ),
+          child: Text('Cancelar', style: TextStyle(fontSize: 16)),
           onPressed: () {
             AppVariaveis().resetBlocoNotas();
             Navigator.pop(context);

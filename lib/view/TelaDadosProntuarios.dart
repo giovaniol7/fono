@@ -50,8 +50,6 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
   }
 
   Widget build(BuildContext context) {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -103,7 +101,7 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: cores('corTexto'),
-                              fontSize: tamanhoFonte.letraMedia(context)),
+                              fontSize: 16),
                         ),
                       ),
                       SizedBox(height: 5),
@@ -115,13 +113,13 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: cores('corTexto'),
-                                fontSize: tamanhoFonte.letraPequena(context)),
+                                fontSize: 16),
                           ),
                           Expanded(
                             child: Text(
                               AppVariaveis().nomeProntuario,
                               style: TextStyle(
-                                  color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                                  color: cores('corTexto'), fontSize: 16),
                               maxLines: 1,
                             ),
                           ),
@@ -136,12 +134,12 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: cores('corTexto'),
-                                fontSize: tamanhoFonte.letraPequena(context)),
+                                fontSize: 16),
                           ),
                           Text(
                             AppVariaveis().dataProntuario,
                             style: TextStyle(
-                                color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                                color: cores('corTexto'), fontSize: 16),
                           ),
                         ],
                       ),
@@ -154,12 +152,12 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: cores('corTexto'),
-                                fontSize: tamanhoFonte.letraPequena(context)),
+                                fontSize: 16),
                           ),
                           Text(
                             AppVariaveis().horarioProntuario,
                             style: TextStyle(
-                                color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                                color: cores('corTexto'), fontSize: 16),
                           ),
                         ],
                       ),
@@ -181,14 +179,14 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: cores('corTexto'),
-                              fontSize: tamanhoFonte.letraMedia(context)),
+                              fontSize: 16),
                         ),
                       ),
                       SizedBox(height: 5),
                       Text(
                         AppVariaveis().objetivosProntuario,
                         style:
-                            TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                            TextStyle(color: cores('corTexto'), fontSize: 16),
                       ),
                     ],
                   )),
@@ -208,14 +206,14 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: cores('corTexto'),
-                              fontSize: tamanhoFonte.letraMedia(context)),
+                              fontSize: 16),
                         ),
                       ),
                       SizedBox(height: 5),
                       Text(
                         AppVariaveis().materiaisProntuario,
                         style:
-                            TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                            TextStyle(color: cores('corTexto'), fontSize: 16),
                       ),
                     ],
                   )),
@@ -235,14 +233,14 @@ class _TelaDadosProntuariosState extends State<TelaDadosProntuarios> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: cores('corTexto'),
-                              fontSize: tamanhoFonte.letraMedia(context)),
+                              fontSize: 16),
                         ),
                       ),
                       SizedBox(height: 5),
                       Text(
                         AppVariaveis().resultadosProntuario,
                         style:
-                            TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                            TextStyle(color: cores('corTexto'), fontSize: 16),
                       ),
                     ],
                   )),

@@ -43,6 +43,7 @@ dependencies:
   path: ^1.9.0
   http: ^1.2.2
   provider: ^6.1.2
+  googleapis: ^13.2.0
 
 flutter_native_splash:
   color: #B4CABB

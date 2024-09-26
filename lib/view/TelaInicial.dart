@@ -64,7 +64,6 @@ class _TelaInicialState extends State<TelaInicial> {
 
   Widget build(BuildContext context) {
     TamanhoWidgets tamanhoWidgets = TamanhoWidgets();
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
 
     return Scaffold(
         key: _scaffoldKey,
@@ -82,20 +81,10 @@ class _TelaInicialState extends State<TelaInicial> {
                             child: Column(
                               children: [
                                 const SizedBox(height: 60),
-                                calendarHome(context, tamanhoWidgets, tamanhoFonte),
-                                const SizedBox(height: 10),
-                                contaHome(
-                                    context,
-                                    setState,
-                                    tamanhoWidgets,
-                                    tamanhoFonte,
-                                    ratio,
-                                    AppVariaveis().entradas,
-                                    AppVariaveis().saidas,
-                                    AppVariaveis().saldo,
-                                    AppVariaveis().aReceber,
-                                    AppVariaveis().aPagar,
-                                    AppVariaveis().obscureNum),
+                                calendarHome(context, tamanhoWidgets),
+                                const SizedBox(height: 20),
+                                prontuariosHome(context, setState, tamanhoWidgets,
+                                    AppVariaveis().varAtivoPaciente, AppVariaveis().pacientes),
                                 const SizedBox(height: 10),
                               ],
                             ),
@@ -104,10 +93,11 @@ class _TelaInicialState extends State<TelaInicial> {
                             padding: EdgeInsets.all(10),
                             child: Row(
                               children: [
-                                Expanded(child: calendarHome(context, tamanhoWidgets, tamanhoFonte)),
-                                const SizedBox(width: 10),
+                                const SizedBox(height: 60),
+                                Expanded(child: calendarHome(context, tamanhoWidgets)),
+                                const SizedBox(width: 20),
                                 Expanded(
-                                    child: prontuariosHome(context, setState, tamanhoWidgets, tamanhoFonte,
+                                    child: prontuariosHome(context, setState, tamanhoWidgets,
                                         AppVariaveis().varAtivoPaciente, AppVariaveis().pacientes))
                               ],
                             ),
@@ -120,40 +110,14 @@ class _TelaInicialState extends State<TelaInicial> {
                         children: [
                           kIsWeb || Platform.isWindows || Platform.isIOS
                               ? IconButton(
-                                  icon: Icon(
-                                    Icons.refresh,
-                                    color: cores('corSimbolo'),
-                                    size: tamanhoFonte.iconPequeno(context),
-                                  ),
+                                  icon: Icon(Icons.refresh, color: cores('corSimbolo')),
                                   onPressed: () {
                                     atualizarDados();
                                   },
                                 )
                               : Container(),
-                          kIsWeb || Platform.isWindows || Platform.isIOS
-                              ? Container()
-                              : Consumer<AppVariaveis>(builder: (context, appVariaveis, child) {
-                                  return IconButton(
-                                    icon: Icon(
-                                      AppVariaveis().obscureNum == false
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                      color: cores('corSimbolo'),
-                                      size: tamanhoFonte.iconPequeno(context),
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        AppVariaveis().toggleObscureNum();
-                                      });
-                                    },
-                                  );
-                                }),
                           IconButton(
-                            icon: Icon(
-                              Icons.help,
-                              color: cores('corSimbolo'),
-                              size: tamanhoFonte.iconPequeno(context),
-                            ),
+                            icon: Icon(Icons.help, color: cores('corSimbolo')),
                             onPressed: () {
                               helpDialog(context);
                             },
@@ -168,13 +132,8 @@ class _TelaInicialState extends State<TelaInicial> {
                         },
                         child: Container(
                           margin: EdgeInsets.only(left: 10, top: 16),
-                          height: tamanhoFonte.iconPequeno(context),
-                          width: tamanhoFonte.iconPequeno(context),
                           decoration: decoracaoContainer('decDraw'),
-                          child: Icon(
-                            Icons.menu,
-                            color: cores('corSimbolo'),
-                          ),
+                          child: Icon(Icons.menu, color: cores('corSimbolo')),
                         ),
                       ),
                     ),
@@ -185,7 +144,7 @@ class _TelaInicialState extends State<TelaInicial> {
   }
 }
 
-calendarHome(context, tamanhoWidgets, tamanhoFonte) {
+calendarHome(context, tamanhoWidgets) {
   final CalendarController _calendarController = CalendarController();
 
   return Container(
@@ -287,7 +246,65 @@ calendarHome(context, tamanhoWidgets, tamanhoFonte) {
   );
 }
 
-contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, entradas, saidas, saldo, aReceber, aPagar,
+prontuariosHome(context, setState, tamanhoWidgets, varAtivo, pacientes) {
+  final ScrollController _scrollController = ScrollController();
+
+  return Container(
+    width: tamanhoWidgets.getWidth(context),
+    height: tamanhoWidgets.getHeight(context),
+    decoration: decoracaoContainer('decPadrao'),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text('Prontuários', style: textStyle(context, 'styleTitulo')),
+        SizedBox(height: 10),
+        Expanded(
+            child: Container(
+          padding: EdgeInsets.all(10),
+          child: StreamBuilder<QuerySnapshot>(
+            stream: pacientes != null
+                ? pacientes.orderBy('nomePaciente').where('ativoPaciente', isEqualTo: varAtivo).snapshots()
+                : null,
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                  return const Center(
+                    child: Text('Não foi possível conectar'),
+                  );
+                case ConnectionState.waiting:
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                default:
+                  final dados = snapshot.requireData;
+                  return Scrollbar(
+                      controller: _scrollController,
+                      trackVisibility: true,
+                      thumbVisibility: true,
+                      interactive: true,
+                      thickness: 15.0,
+                      child: ListView.separated(
+                        controller: _scrollController,
+                        padding: EdgeInsets.all(10),
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (context, index) =>
+                            listarPaciente(context, dados.docs[index], 'prontuario'),
+                        separatorBuilder: (context, _) => SizedBox(
+                          width: 1,
+                        ),
+                        itemCount: dados.size,
+                      ));
+              }
+            },
+          ),
+        )),
+      ],
+    ),
+  );
+}
+
+/*contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, entradas, saidas, saldo, aReceber, aPagar,
     obscureNum) {
   NumberFormat numberFormat = NumberFormat("#,##0.00", "pt_BR");
 
@@ -481,61 +498,4 @@ contaHome(context, setState, tamanhoWidgets, tamanhoFonte, ratio, entradas, said
       ],
     ),
   );
-}
-
-prontuariosHome(context, setState, tamanhoWidgets, tamanhoFonte, varAtivo, pacientes) {
-  final ScrollController _scrollController = ScrollController();
-
-  return Container(
-    width: tamanhoWidgets.getWidth(context),
-    height: tamanhoWidgets.getHeight(context),
-    decoration: decoracaoContainer('decPadrao'),
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text('Prontuários', style: textStyle(context, 'styleTitulo')),
-        SizedBox(height: 10),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.85,
-          child: StreamBuilder<QuerySnapshot>(
-            stream: pacientes != null
-                ? pacientes.orderBy('nomePaciente').where('ativoPaciente', isEqualTo: varAtivo).snapshots()
-                : null,
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                  return const Center(
-                    child: Text('Não foi possível conectar'),
-                  );
-                case ConnectionState.waiting:
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                default:
-                  final dados = snapshot.requireData;
-                  return Scrollbar(
-                      controller: _scrollController,
-                      trackVisibility: true,
-                      thumbVisibility: true,
-                      interactive: true,
-                      thickness: 20.0,
-                      child: ListView.separated(
-                        controller: _scrollController,
-                        padding: EdgeInsets.all(10),
-                        scrollDirection: Axis.vertical,
-                        itemBuilder: (context, index) =>
-                            listarPaciente(context, dados.docs[index], 'prontuario'),
-                        separatorBuilder: (context, _) => SizedBox(
-                          width: 1,
-                        ),
-                        itemCount: dados.size,
-                      ));
-              }
-            },
-          ),
-        ),
-      ],
-    ),
-  );
-}
+}*/

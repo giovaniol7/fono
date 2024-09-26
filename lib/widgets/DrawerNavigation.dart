@@ -40,9 +40,6 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
   }
 
   menuHeader() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-    double tamanhoLetra = tamanhoFonte.letraPequena(context);
-
     return Container(
       alignment: Alignment.center,
       color: cores('corFundo'),
@@ -68,7 +65,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                   widget.nomeUsuario.toString(),
-                  style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+                  style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: 20),
                 ),
                 SizedBox(
                   height: 10,
@@ -89,9 +86,6 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
   }
 
   menuItens() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-    double tamanhoLetra = tamanhoFonte.letraPequena(context);
-
     return Container(
       padding: EdgeInsets.all(10),
       child: Wrap(
@@ -108,7 +102,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
             ),
             title: Text(
               'Pacientes',
-              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: 16),
             ),
             onTap: () {
               Navigator.pushNamed(context, '/pacientes');
@@ -121,7 +115,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
             ),
             title: Text(
               'Agenda',
-              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: 16),
             ),
             onTap: () {
               Navigator.pushNamed(context, '/agenda');
@@ -134,7 +128,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
             ),
             title: Text(
               'Prontuários',
-              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: 16),
             ),
             onTap: () {
               Navigator.pushNamed(context, '/prontuarios');
@@ -147,7 +141,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
             ),
             title: Text(
               'Dados',
-              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: 16),
             ),
             onTap: () {
               /*Navigator.pushNamed(context, '/pacientes');*/
@@ -160,7 +154,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
             ),
             title: Text(
               'Bloco de Notas',
-              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: 16),
             ),
             onTap: () {
               Navigator.pushNamed(context, '/blocoNotas');
@@ -176,7 +170,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
               style: TextStyle(
                 color: cores(corTexto),
                 fontWeight: FontWeight.bold,
-                fontSize: tamanhoLetra,
+                fontSize: 16,
               ),
             ),
             onTap: () {
@@ -194,7 +188,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
             ),
             title: Text(
               'Editar Perfil',
-              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: 16),
             ),
             onTap: () {
               Navigator.pushNamed(context, '/editarPerfil');
@@ -207,7 +201,7 @@ class _DrawerNavigationState extends State<DrawerNavigation> {
             ),
             title: Text(
               'Sair',
-              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: tamanhoLetra),
+              style: TextStyle(color: cores(corTexto), fontWeight: FontWeight.bold, fontSize: 16),
             ),
             onTap: () {
               signOut(context);

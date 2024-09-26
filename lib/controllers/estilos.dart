@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fonocare/controllers/resolucoesTela.dart';
 
 cores(cor) {
   switch (cor) {
@@ -74,14 +75,13 @@ cores(cor) {
 }
 
 textStyle(context, style) {
-  TamanhoFonte tamanhoFonte = TamanhoFonte();
   switch (style) {
     case 'styleTitulo':
       return TextStyle(
-          color: cores('corTitulo'), fontSize: tamanhoFonte.letraGrande(context), fontWeight: FontWeight.bold);
+          color: cores('corTitulo'), fontSize: 20, fontWeight: FontWeight.bold);
     case 'styleSubtitulo':
       return TextStyle(
-          color: cores('corTitulo'), fontSize: tamanhoFonte.letraMedia(context), fontWeight: FontWeight.bold);
+          color: cores('corTitulo'), fontSize: 16, fontWeight: FontWeight.bold);
     default:
       return;
   }
@@ -124,67 +124,11 @@ sombra(somb) {
   }
 }
 
-class TamanhoFonte {
-  double iconGrande(BuildContext context) {
-    if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
-      return MediaQuery.of(context).size.height * 0.1;
-    } else {
-      return MediaQuery.of(context).size.width * 0.3;
-    }
-  }
-
-  double iconMedio(BuildContext context) {
-    if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
-      return MediaQuery.of(context).size.height * 0.07;
-    } else {
-      return MediaQuery.of(context).size.width * 0.2;
-    }
-  }
-
-  double iconPequeno(BuildContext context) {
-    if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
-      return MediaQuery.of(context).size.height * 0.05;
-    } else {
-      return MediaQuery.of(context).size.width * 0.1;
-    }
-  }
-
-  double letraGrande(BuildContext context) {
-    if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
-      return MediaQuery.of(context).size.height * 0.05;
-    } else {
-      return MediaQuery.of(context).size.width * 0.08;
-    }
-  }
-
-  double letraMedia(BuildContext context) {
-    if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
-      return MediaQuery.of(context).size.height * 0.04;
-    } else {
-      return MediaQuery.of(context).size.width * 0.05;
-    }
-  }
-
-  double letraPequena(BuildContext context) {
-    if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
-      return MediaQuery.of(context).size.height * 0.02;
-    } else {
-      return MediaQuery.of(context).size.width * 0.04;
-    }
-  }
-
-  double outroTamanho(BuildContext context, double tamanho) {
-    if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
-      return MediaQuery.of(context).size.height * tamanho;
-    } else {
-      return MediaQuery.of(context).size.width * tamanho;
-    }
-  }
-}
-
 class TamanhoWidgets {
+  ratioScreen ratio = ratioScreen();
+
   double getWidth(BuildContext context) {
-    if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
+    if (ratio.screen(context) == 'medio') {
       return MediaQuery.of(context).size.width * 0.48;
     } else {
       return MediaQuery.of(context).size.width * 0.9;
@@ -192,8 +136,8 @@ class TamanhoWidgets {
   }
 
   double getHeight(BuildContext context) {
-    if (kIsWeb || Platform.isWindows || Platform.isMacOS) {
-      return MediaQuery.of(context).size.height * 0.97;
+    if (ratio.screen(context) == 'grande') {
+      return MediaQuery.of(context).size.height * 0.93;
     } else {
       return MediaQuery.of(context).size.height * 0.7;
     }

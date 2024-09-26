@@ -89,7 +89,6 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
     tipo = arguments?['tipo'] as String?;
     nomeContaProc = arguments?['nomeConta'] as String?;
 
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: cores('corFundo'),
@@ -373,10 +372,8 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
                             )),
-                        child: Text(
-                          tipo == 'adicionar' ? 'Adicionar' : 'Editar',
-                          style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-                        ),
+                        child: Text(tipo == 'adicionar' ? 'Adicionar' : 'Editar',
+                            style: TextStyle(fontSize: 16)),
                         onPressed: () {
                           AppVariaveis().selecioneEstadoRecebido == 'Pacientes'
                               ? AppVariaveis().selecioneEstadoTipo = 'Trabalho'
@@ -426,10 +423,7 @@ class _TelaAdicionarContasState extends State<TelaAdicionarContas> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(32),
                             )),
-                        child: Text(
-                          'Cancelar',
-                          style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-                        ),
+                        child: Text('Cancelar', style: TextStyle(fontSize: 16)),
                         onPressed: () {
                           AppVariaveis().resetContabilidade();
                           Navigator.pop(context);

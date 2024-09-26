@@ -15,7 +15,6 @@ class TelaBlocoDeNotas extends StatefulWidget {
 }
 
 class _TelaBlocoDeNotasState extends State<TelaBlocoDeNotas> {
-
   carregarDados() async {
     var notas = await recuperarBlocosNotas();
     setState(() {
@@ -48,7 +47,9 @@ class _TelaBlocoDeNotasState extends State<TelaBlocoDeNotas> {
         child: Container(
           height: MediaQuery.of(context).size.height,
           child: StreamBuilder<QuerySnapshot>(
-              stream: AppVariaveis().blocoNotas != null ? AppVariaveis().blocoNotas.orderBy('dataBloco').snapshots() : null,
+              stream: AppVariaveis().blocoNotas != null
+                  ? AppVariaveis().blocoNotas.orderBy('dataBloco').snapshots()
+                  : null,
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
@@ -90,8 +91,6 @@ class _TelaBlocoDeNotasState extends State<TelaBlocoDeNotas> {
 }
 
 Widget cardNotas(context, doc) {
-  TamanhoFonte tamanhoFonte = TamanhoFonte();
-
   return Container(
     padding: EdgeInsets.all(5),
     child: Card(
@@ -104,17 +103,9 @@ Widget cardNotas(context, doc) {
       margin: EdgeInsets.all(5),
       child: ListTile(
         minLeadingWidth: 5,
-        title: Text(
-          doc.data()['nomeBloco'],
-          style: TextStyle(
-              color: cores('corTexto'),
-              fontSize: tamanhoFonte.letraMedia(context),
-              fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(
-          doc.data()['dataBloco'],
-          style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
-        ),
+        title: Text(doc.data()['nomeBloco'],
+            style: TextStyle(color: cores('corTexto'), fontSize: 16, fontWeight: FontWeight.bold)),
+        subtitle: Text(doc.data()['dataBloco'], style: TextStyle(color: cores('corTexto'), fontSize: 16)),
         trailing: IconButton(
           icon: Icon(
             Icons.edit,

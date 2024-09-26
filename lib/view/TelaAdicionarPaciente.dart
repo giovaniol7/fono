@@ -204,8 +204,6 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   }
 
   containerCabecalho() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Column(
       children: [
         Container(
@@ -238,11 +236,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                             });
                           },
                           child: AppVariaveis().fileImagePaciente == null
-                              ? Icon(
-                                  Icons.person_add_alt_rounded,
-                                  color: cores('corTextoBotao'),
-                                  size: tamanhoFonte.iconPequeno(context),
-                                )
+                              ? Icon(Icons.person_add_alt_rounded, color: cores('corTextoBotao'))
                               : CircleAvatar(
                                   maxRadius: 5,
                                   minRadius: 1,
@@ -261,11 +255,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                             ),
                             child: Center(
                               child: IconButton(
-                                icon: Icon(
-                                  Icons.delete,
-                                  color: cores('corSimbolo'),
-                                  size: tamanhoFonte.iconPequeno(context),
-                                ),
+                                icon: Icon(Icons.delete, color: cores('corSimbolo')),
                                 onPressed: () {
                                   setState(() {
                                     AppVariaveis().apagarImagemPaciente == true;
@@ -286,8 +276,6 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   }
 
   containerDados() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Container(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -296,10 +284,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
           containerDadosEndereco(),
           Text(
             'Selecione o tipo de Consulta:',
-            style: TextStyle(
-                fontSize: tamanhoFonte.letraPequena(context),
-                color: cores('corTexto'),
-                fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
           ),
           Container(
             padding: const EdgeInsets.only(left: 10),
@@ -315,11 +300,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
               icon: const Icon(Icons.arrow_drop_down),
               iconSize: 30,
               iconEnabledColor: cores('corTexto'),
-              style: TextStyle(
-                color: cores('corTexto'),
-                fontWeight: FontWeight.w400,
-                fontSize: tamanhoFonte.letraPequena(context),
-              ),
+              style: TextStyle(color: cores('corTexto'), fontWeight: FontWeight.w400, fontSize: 16),
               underline: Container(
                 height: 0,
               ),
@@ -348,8 +329,6 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   }
 
   containerDadosPaciente() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Column(
       children: [
         campoTexto('Data Anamnese', AppVariaveis().txtDataAnamnesePaciente, Icons.calendar_today,
@@ -391,10 +370,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         const SizedBox(height: 20),
         Text(
           'Sexo:',
-          style: TextStyle(
-              fontSize: tamanhoFonte.letraPequena(context),
-              color: cores('corTexto'),
-              fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
         ),
         Row(
           children: [
@@ -457,10 +433,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                 children: [
                   Text(
                     'Escolaridade: ',
-                    style: TextStyle(
-                        fontSize: tamanhoFonte.letraPequena(context),
-                        color: cores('corTexto'),
-                        fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                   ),
                   Container(
                     padding: const EdgeInsets.only(left: 10),
@@ -477,10 +450,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                       icon: Icon(Icons.arrow_drop_down, color: cores('corTexto')),
                       iconSize: 30,
                       iconEnabledColor: cores('corTexto'),
-                      style: TextStyle(
-                          color: cores('corTexto'),
-                          fontWeight: FontWeight.w400,
-                          fontSize: tamanhoFonte.letraPequena(context)),
+                      style: TextStyle(color: cores('corTexto'), fontWeight: FontWeight.w400, fontSize: 16),
                       underline: Container(height: 0),
                       isExpanded: true,
                       value: AppVariaveis().selecioneEscolaridadePaciente,
@@ -501,10 +471,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                 children: [
                   Text(
                     'Selecione o Período:',
-                    style: TextStyle(
-                        fontSize: tamanhoFonte.letraPequena(context),
-                        color: cores('corTexto'),
-                        fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                   ),
                   Container(
                     padding: const EdgeInsets.only(left: 10),
@@ -523,7 +490,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                       style: TextStyle(
                         color: cores('corTexto'),
                         fontWeight: FontWeight.w400,
-                        fontSize: tamanhoFonte.letraPequena(context),
+                        fontSize: 16,
                       ),
                       underline: Container(
                         height: 0,
@@ -564,8 +531,6 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   }
 
   containerDadosEndereco() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Column(
       children: [
         Row(
@@ -600,10 +565,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
               children: [
                 Text(
                   'Selecione um Estado:',
-                  style: TextStyle(
-                      fontSize: tamanhoFonte.letraPequena(context),
-                      color: cores('corTexto'),
-                      fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                 ),
                 Container(
                   height: 40,
@@ -630,7 +592,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                     style: TextStyle(
                       color: cores('corTexto'),
                       fontWeight: FontWeight.w400,
-                      fontSize: tamanhoFonte.letraPequena(context),
+                      fontSize: 16,
                     ),
                     underline: Container(
                       height: 0,
@@ -678,8 +640,6 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   }
 
   containerResponsavel() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Column(
       children: [
         Divider(
@@ -689,10 +649,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         ),
         Text(
           'Dados dos Responsáveis:',
-          style: TextStyle(
-              fontSize: tamanhoFonte.letraPequena(context),
-              color: cores('corTexto'),
-              fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
         ),
         //------------------------------------------------------------------------------
         columnResponsavel(),
@@ -773,8 +730,6 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   }
 
   containerAnexo() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Column(
       children: [
         Divider(
@@ -798,7 +753,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
               AppVariaveis().nomeArquivoPaciente.isEmpty
                   ? 'Anexar Documento'
                   : AppVariaveis().nomeArquivoPaciente,
-              style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+              style: TextStyle(color: cores('corTexto'), fontSize: 16),
             ),
           ),
         ),
@@ -807,16 +762,11 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   }
 
   containerAtivo() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Column(
       children: [
         SizedBox(height: 20),
         Text("Arquivar Paciente?",
-            style: TextStyle(
-                fontSize: tamanhoFonte.letraPequena(context),
-                color: cores('corTexto'),
-                fontWeight: FontWeight.bold)),
+            style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold)),
         SizedBox(height: 5),
         Center(
           child: FlutterSwitch(
@@ -853,8 +803,6 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   }
 
   rowBotao() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -869,7 +817,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
                 )),
             child: Text(
               tipo == 'editar' ? 'Atualizar' : 'Criar',
-              style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
+              style: TextStyle(fontSize: 16),
             ),
             onPressed: () async {
               if (validarCampos()) {
@@ -1036,7 +984,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
               )),
           child: Text(
             'Cancelar',
-            style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
+            style: TextStyle(fontSize: 16),
           ),
           onPressed: () {
             AppVariaveis().resetPaciente();
@@ -1048,8 +996,6 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
   }
 
   Widget columnResponsavel() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Column(
       children: [
         Divider(
@@ -1060,7 +1006,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         Text(
           'Sexo:',
           style: TextStyle(
-            fontSize: tamanhoFonte.letraPequena(context),
+            fontSize: 16,
             color: cores('corTexto'),
             fontWeight: FontWeight.bold,
           ),
@@ -1136,10 +1082,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
         const SizedBox(height: 20),
         Text(
           'Qual a relação do Responsável com Paciente?',
-          style: TextStyle(
-              fontSize: tamanhoFonte.letraPequena(context),
-              color: cores('corTexto'),
-              fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
         ),
         Container(
           padding: const EdgeInsets.only(left: 10),
@@ -1162,7 +1105,7 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
             style: TextStyle(
               color: cores('corTexto'),
               fontWeight: FontWeight.w400,
-              fontSize: tamanhoFonte.letraPequena(context),
+              fontSize: 16,
             ),
             underline: Container(
               height: 0,
@@ -1187,22 +1130,14 @@ class _TelaAdicionarPacienteState extends State<TelaAdicionarPaciente> {
             border: Border.all(color: cores('corBorda')),
             color: cores('branco'),
             boxShadow: [
-              BoxShadow(
-                offset: const Offset(0, 3),
-                color: cores('corSombra'),
-                blurRadius: 5,
-              ), // changes position of shadow
+              BoxShadow(offset: const Offset(0, 3), color: cores('corSombra'), blurRadius: 5),
             ],
           ),
           child: DropdownButton<String>(
             icon: const Icon(Icons.arrow_drop_down),
             iconSize: 30,
             iconEnabledColor: cores('corSimbolo'),
-            style: TextStyle(
-              color: cores('corTexto'),
-              fontWeight: FontWeight.w400,
-              fontSize: tamanhoFonte.letraPequena(context),
-            ),
+            style: TextStyle(color: cores('corTexto'), fontWeight: FontWeight.w400, fontSize: 16),
             underline: Container(
               height: 0,
             ),

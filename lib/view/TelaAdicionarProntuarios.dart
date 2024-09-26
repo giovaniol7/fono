@@ -27,7 +27,7 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
   late Appointment? tappedAppointment;
   late DateTime? dataClicada;
 
-   carregarDados() async {
+  carregarDados() async {
     List<String> lista = await fazerListaPacientes(AppVariaveis().varAtivoPaciente);
     AppVariaveis().appointmentProntuario = await carregarAppointment(tappedAppointment);
 
@@ -73,7 +73,6 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
   }
 
   Widget build(BuildContext context) {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
     final arguments = ModalRoute.of(context)?.settings.arguments as Map?;
     if (arguments != null && verificar == 0) {
       tipo = arguments['tipo'] as String?;
@@ -211,15 +210,28 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
                           AppVariaveis().pickedDate = await showDatePicker(
                             context: context,
                             initialDate: AppVariaveis().selectedDate,
-                            firstDate: DateTime.now(),
+                            firstDate: DateTime.now().subtract(Duration(days: 90)),
                             lastDate: DateTime(2100),
                           );
                           if (AppVariaveis().pickedDate != null &&
                               AppVariaveis().pickedDate != AppVariaveis().selectedDate) {
+                            AppVariaveis().selectedDate = AppVariaveis().pickedDate!;
+                            AppVariaveis().txtDataProntuario.text =
+                                "${AppVariaveis().selectedDate.day.toString().padLeft(2, '0')}/${AppVariaveis().selectedDate.month.toString().padLeft(2, '0')}/${AppVariaveis().selectedDate.year.toString()}";
+
+                            DateTime data =
+                                DateFormat('dd/MM/yyyy').parse(AppVariaveis().txtDataProntuario.text);
+                            DateTime dataSeteDiasAtras = data.subtract(Duration(days: 7));
+                            String dataFormatada = DateFormat('dd/MM/yyyy').format(dataSeteDiasAtras);
+                            AppVariaveis().prontuariosAdd = await recuperarProntuarioData(
+                                context, AppVariaveis().uidPaciente, dataFormatada);
                             setState(() {
-                              AppVariaveis().selectedDate = AppVariaveis().pickedDate!;
-                              AppVariaveis().txtDataProntuario.text =
-                                  "${AppVariaveis().selectedDate.day.toString().padLeft(2, '0')}/${AppVariaveis().selectedDate.month.toString().padLeft(2, '0')}/${AppVariaveis().selectedDate.year.toString()}";
+                              AppVariaveis().txtObjetivosProntuarios.text =
+                                  AppVariaveis().prontuariosAdd['objetivosProntuario'];
+                              AppVariaveis().txtMateriaisProntuarios.text =
+                                  AppVariaveis().prontuariosAdd['materiaisProntuario'];
+                              AppVariaveis().txtResultadosProntuarios.text =
+                                  AppVariaveis().prontuariosAdd['resultadosProntuario'];
                             });
                           }
                         },
@@ -272,10 +284,8 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32),
                           )),
-                      child: Text(
-                        tipo == 'editar' ? 'Atualizar' : "Adicionar",
-                        style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-                      ),
+                      child:
+                          Text(tipo == 'editar' ? 'Atualizar' : "Adicionar", style: TextStyle(fontSize: 16)),
                       onPressed: () async {
                         if (AppVariaveis().txtNomePaciente.text.isNotEmpty &&
                             AppVariaveis().txtDataProntuario.text.isNotEmpty &&
@@ -319,10 +329,7 @@ class _TelaAdicionarProntuariosState extends State<TelaAdicionarProntuarios> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32),
                           )),
-                      child: Text(
-                        'Cancelar',
-                        style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-                      ),
+                      child: Text('Cancelar', style: TextStyle(fontSize: 16)),
                       onPressed: () {
                         AppVariaveis().resetProntuario();
                         Navigator.pop(context);

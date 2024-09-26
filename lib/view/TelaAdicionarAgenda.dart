@@ -32,7 +32,9 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
       AppVariaveis().listaPaciente = lista;
       AppVariaveis().appointmentAgenda = await carregarAppointment(tappedAppointment!);
       AppVariaveis().consulta = await buscarPorNomeHoraConsultas(
-          context, AppVariaveis().appointmentAgenda['nomeConsulta'], AppVariaveis().appointmentAgenda['horarioConsulta']);
+          context,
+          AppVariaveis().appointmentAgenda['nomeConsulta'],
+          AppVariaveis().appointmentAgenda['horarioConsulta']);
     }
     setState(() {
       if (tipo == 'adicionar') {
@@ -71,7 +73,6 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
       tappedAppointment = arguments['tappedAppointment'] as Appointment?;
       verificar = 1;
     }
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
 
     return Scaffold(
         appBar: AppBar(
@@ -172,7 +173,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                           AppVariaveis().pickedDate = await showDatePicker(
                             context: context,
                             initialDate: AppVariaveis().selectedDate,
-                            firstDate: DateTime.now(),
+                            firstDate: DateTime.now().subtract(Duration(days: 90)),
                             lastDate: DateTime(2100),
                           );
                           if (AppVariaveis().pickedDate != null &&
@@ -216,25 +217,8 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                   children: [
                     Expanded(
                       child: campoTexto(
-                        'Duração da Consulta',
-                        AppVariaveis().txtDuracaoConsulta,
-                        Icons.hourglass_top_sharp,
-                        formato: HoraInputFormatter(),
-                        boardType: 'numeros',
-                        iconPressed: () async {
-                          final TimeOfDay? pickedTime = await showTimePicker(
-                            context: context,
-                            initialTime: AppVariaveis().selectedTime,
-                          );
-                          if (pickedTime != null && pickedTime != AppVariaveis().selectedTime) {
-                            setState(() {
-                              AppVariaveis().selectedTime = pickedTime;
-                              AppVariaveis().txtDuracaoConsulta.text =
-                                  AppVariaveis().selectedTime.format(context);
-                            });
-                          }
-                        },
-                      ),
+                          'Duração da Consulta', AppVariaveis().txtDuracaoConsulta, Icons.hourglass_top_sharp,
+                          formato: HoraInputFormatter(), boardType: 'numeros'),
                     ),
                     const Padding(padding: EdgeInsets.only(right: 10)),
                     Expanded(
@@ -400,7 +384,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                             )),
                         child: Text(
                           tipo == 'adicionar' ? 'Adicionar' : 'Atualizar',
-                          style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
+                          style: TextStyle(fontSize: 16),
                         ),
                         onPressed: () async {
                           String colorHex =
@@ -441,10 +425,7 @@ class _TelaAdicionarAgendaState extends State<TelaAdicionarAgenda> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(32),
                           )),
-                      child: Text(
-                        'Cancelar',
-                        style: TextStyle(fontSize: tamanhoFonte.letraPequena(context)),
-                      ),
+                      child: Text('Cancelar', style: TextStyle(fontSize: 16)),
                       onPressed: () {
                         AppVariaveis().resetAgenda();
                         Navigator.pop(context);

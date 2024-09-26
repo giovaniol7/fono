@@ -402,6 +402,7 @@ class AppVariaveis extends ChangeNotifier {
 
   //PRONTUÁRIOS
   void resetProntuario() {
+    selectedDate = DateTime.now();
     prontuariosAdd = null;
     labelText = "Nome do Paciente";
     uidProntuario = '';
@@ -424,6 +425,7 @@ class AppVariaveis extends ChangeNotifier {
   }
 
   void resetProntuarioPac() {
+    selectedDate = DateTime.now();
     prontuarios = null;
     prontuariosPac = null;
     pacientePront = null;
@@ -434,6 +436,8 @@ class AppVariaveis extends ChangeNotifier {
   //AGENDA
   void resetAgenda() {
     labelText = "Nome do Paciente";
+    selectedDate = DateTime.now();
+    selectedTime = TimeOfDay.now();
     txtNomeConsulta.clear();
     txtDataConsulta.clear();
     txtHorarioConsulta.clear();

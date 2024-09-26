@@ -133,8 +133,6 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
   }
 
   containerCabecalho() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Container(
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
@@ -146,10 +144,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
           Center(
             child: Text(
               'Data de Anamnese: ${AppVariaveis().dataAnamnesePaciente}',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: cores('corTexto'),
-                  fontSize: tamanhoFonte.letraPequena(context)),
+              style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
             ),
           ),
           SizedBox(height: 10),
@@ -161,14 +156,11 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 children: <Widget>[
                   Text(
                     'Idade',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: cores('corTexto'),
-                        fontSize: tamanhoFonte.letraPequena(context)),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                   ),
                   Text(
                     AppVariaveis().idadePaciente,
-                    style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                    style: TextStyle(color: cores('corTexto'), fontSize: 16),
                   ),
                 ],
               ),
@@ -192,14 +184,11 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 children: <Widget>[
                   Text(
                     'Data Nasc.',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: cores('corTexto'),
-                        fontSize: tamanhoFonte.letraPequena(context)),
+                    style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                   ),
                   Text(
                     AppVariaveis().dtNascimentoPaciente,
-                    style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                    style: TextStyle(color: cores('corTexto'), fontSize: 16),
                   ),
                 ],
               ),
@@ -213,10 +202,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               softWrap: true,
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
-              style: TextStyle(
-                  color: cores('corTexto'),
-                  fontSize: tamanhoFonte.letraMedia(context),
-                  fontWeight: FontWeight.bold),
+              style: TextStyle(color: cores('corTexto'), fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ),
           SizedBox(height: 20),
@@ -236,7 +222,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                         maxLines: 1,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          fontSize: tamanhoFonte.letraPequena(context),
+                          fontSize: 16,
                           color: cores('corTexto'),
                         ),
                       ),
@@ -247,8 +233,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                         softWrap: true,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
-                        style:
-                            TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                        style: TextStyle(color: cores('corTexto'), fontSize: 16),
                       ),
                     ],
                   ),
@@ -263,11 +248,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                     },
                     child: Column(
                       children: <Widget>[
-                        Icon(
-                          Icons.phone,
-                          color: cores('corSimbolo'),
-                          size: tamanhoFonte.outroTamanho(context, 0.07),
-                        ),
+                        Icon(Icons.phone, color: cores('corSimbolo')),
                         Text(
                           AppVariaveis().ListaTelefoneResponsavelPaciente.isEmpty
                               ? ''
@@ -275,8 +256,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                           softWrap: true,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
-                          style: TextStyle(
-                              color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                          style: TextStyle(color: cores('corTexto'), fontSize: 16),
                         ),
                       ],
                     ),
@@ -291,8 +271,6 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
   }
 
   containerPaciente() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Container(
         padding: EdgeInsets.all(20),
         //height: tamanhoWidgets.getHeight(context),
@@ -303,10 +281,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
             Center(
               child: Text(
                 'Dados Paciente:',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: cores('corTexto'),
-                    fontSize: tamanhoFonte.letraMedia(context)),
+                style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
               ),
             ),
             SizedBox(height: 5),
@@ -315,14 +290,11 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Gênero: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Text(
                   AppVariaveis().generoPaciente,
-                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(color: cores('corTexto'), fontSize: 16),
                 ),
               ],
             ),
@@ -332,14 +304,11 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'CPF: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Text(
                   AppVariaveis().CPFPaciente,
-                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(color: cores('corTexto'), fontSize: 16),
                 ),
               ],
             ),
@@ -349,14 +318,11 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'RG: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Text(
                   AppVariaveis().RGPaciente,
-                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(color: cores('corTexto'), fontSize: 16),
                 ),
               ],
             ),
@@ -366,14 +332,11 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Tipo da Consulta: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Text(
                   AppVariaveis().tipoConsultaPaciente,
-                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(color: cores('corTexto'), fontSize: 16),
                 ),
               ],
             ),
@@ -383,15 +346,12 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Escola: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Expanded(
                   child: Text(
                     AppVariaveis().escolaPaciente,
-                    style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                    style: TextStyle(color: cores('corTexto'), fontSize: 16),
                   ),
                 ),
               ],
@@ -402,14 +362,11 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Escolaridade: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Text(
                   AppVariaveis().escolaridadePaciente,
-                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(color: cores('corTexto'), fontSize: 16),
                 ),
               ],
             ),
@@ -419,14 +376,11 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Período: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Text(
                   AppVariaveis().periodoEscolaPaciente,
-                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(color: cores('corTexto'), fontSize: 16),
                 ),
               ],
             ),
@@ -436,14 +390,11 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Professor(a): ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Text(
                   AppVariaveis().professoraPaciente,
-                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(color: cores('corTexto'), fontSize: 16),
                 ),
               ],
             ),
@@ -453,10 +404,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Telefone Prof(a): ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 InkWell(
                   onTap: () async {
@@ -466,7 +414,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                   },
                   child: Text(
                     AppVariaveis().telefoneProfessoraPaciente,
-                    style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                    style: TextStyle(color: cores('corTexto'), fontSize: 16),
                   ),
                 ),
               ],
@@ -476,8 +424,6 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
   }
 
   containerDescricao() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Container(
         padding: EdgeInsets.all(20),
         //height: tamanhoWidgets.getHeight(context),
@@ -488,24 +434,19 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
             Center(
               child: Text(
                 'Descrição/Queixa:',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: cores('corTexto'),
-                    fontSize: tamanhoFonte.letraMedia(context)),
+                style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
               ),
             ),
             SizedBox(height: 5),
             Text(
               AppVariaveis().descricaoPaciente,
-              style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+              style: TextStyle(color: cores('corTexto'), fontSize: 16),
             ),
           ],
         ));
   }
 
   containerResponsaveis() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Container(
         padding: EdgeInsets.all(20),
         //height: tamanhoWidgets.getHeight(context),
@@ -516,10 +457,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
             Center(
               child: Text(
                 'Dados Responsáveis:',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: cores('corTexto'),
-                    fontSize: tamanhoFonte.letraMedia(context)),
+                style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
               ),
             ),
             SizedBox(height: 5),
@@ -529,7 +467,6 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
   }
 
   List<Widget> gerarResponsaveis() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
     List<Widget> responsaveisWidgets = [];
 
     for (int indexResp = 0; indexResp < AppVariaveis().qtdResponsavelPaciente; indexResp++) {
@@ -541,10 +478,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Grau Responsável: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Expanded(
                   child: Text(
@@ -554,7 +488,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                    style: TextStyle(color: cores('corTexto'), fontSize: 16),
                   ),
                 ),
               ],
@@ -565,10 +499,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Nome Responsável ${indexResp + 1}: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Expanded(
                   child: Text(
@@ -578,7 +509,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                    style: TextStyle(color: cores('corTexto'), fontSize: 16),
                   ),
                 ),
               ],
@@ -589,10 +520,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Gênero: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Text(
                   AppVariaveis().ListaGeneroResponsavelPaciente.isEmpty
@@ -601,7 +529,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                   softWrap: true,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(color: cores('corTexto'), fontSize: 16),
                 ),
               ],
             ),
@@ -611,10 +539,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Idade: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Text(
                   AppVariaveis().ListaIdadeResponsavelPaciente.isEmpty
@@ -623,7 +548,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                   softWrap: true,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
-                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(color: cores('corTexto'), fontSize: 16),
                 ),
               ],
             ),
@@ -633,10 +558,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Telefone: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Expanded(
                   child: Text(
@@ -646,7 +568,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                    style: TextStyle(color: cores('corTexto'), fontSize: 16),
                   ),
                 ),
               ],
@@ -657,10 +579,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Escolaridade: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Expanded(
                   child: Text(
@@ -670,7 +589,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                    style: TextStyle(color: cores('corTexto'), fontSize: 16),
                   ),
                 ),
               ],
@@ -681,10 +600,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
               children: <Widget>[
                 Text(
                   'Profissão: ',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: cores('corTexto'),
-                      fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
                 ),
                 Expanded(
                   child: Text(
@@ -694,7 +610,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                     softWrap: true,
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
-                    style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                    style: TextStyle(color: cores('corTexto'), fontSize: 16),
                   ),
                 ),
               ],
@@ -709,8 +625,6 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
   }
 
   containerEndereco() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Container(
         padding: EdgeInsets.all(20),
         //height: tamanhoWidgets.getHeight(context),
@@ -721,24 +635,19 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
             Center(
               child: Text(
                 'Endereço: ',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: cores('corTexto'),
-                    fontSize: tamanhoFonte.letraMedia(context)),
+                style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
               ),
             ),
             SizedBox(height: 5),
             Text(
               "${AppVariaveis().lougradouroPaciente}, ${AppVariaveis().numeroPaciente} - ${AppVariaveis().bairroPaciente}, ${AppVariaveis().cidadePaciente} - ${AppVariaveis().estadoPaciente}, ${AppVariaveis().cepPaciente}",
-              style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+              style: TextStyle(color: cores('corTexto'), fontSize: 16),
             ),
           ],
         ));
   }
 
   containerAnexo() {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Container(
         padding: EdgeInsets.all(20),
         //height: tamanhoWidgets.getHeight(context),
@@ -749,10 +658,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
             Center(
               child: Text(
                 'Anexo:',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: cores('corTexto'),
-                    fontSize: tamanhoFonte.letraMedia(context)),
+                style: TextStyle(fontWeight: FontWeight.bold, color: cores('corTexto'), fontSize: 16),
               ),
             ),
             SizedBox(height: 5),
@@ -770,7 +676,7 @@ class _TelaDadosPacientesState extends State<TelaDadosPacientes> {
                 },
                 child: Text(
                   AppVariaveis().nomeArquivo.isEmpty ? 'Anexar Documento' : AppVariaveis().nomeArquivo,
-                  style: TextStyle(color: cores('corTexto'), fontSize: tamanhoFonte.letraPequena(context)),
+                  style: TextStyle(color: cores('corTexto'), fontSize: 16),
                 ),
               ),
             ),

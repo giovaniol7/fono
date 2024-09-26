@@ -29,8 +29,6 @@ class _TelaAgendaState extends State<TelaAgenda> {
 
   @override
   Widget build(BuildContext context) {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Scaffold(
       appBar: AppBar(
         actions: [
@@ -131,11 +129,7 @@ class _TelaAgendaState extends State<TelaAgenda> {
           Navigator.pushNamed(context, '/adicionarAgenda',
               arguments: {'tipo': 'adicionar', 'tappedAppointment': tappedAppointment});
         },
-        child: Icon(
-          Icons.add,
-          size: tamanhoFonte.iconPequeno(context),
-          color: cores('corTextoBotao'),
-        ),
+        child: Icon(Icons.add, size: 16, color: cores('corTextoBotao')),
         backgroundColor: cores('corBotao'),
       ),
     );

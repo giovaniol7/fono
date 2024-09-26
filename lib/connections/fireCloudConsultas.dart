@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -7,6 +6,7 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../controllers/variaveis.dart';
 import '../models/maps.dart';
 import '../widgets/mensagem.dart';
+import 'connectionGoogle.dart';
 import 'fireAuth.dart';
 import 'fireCloudPacientes.dart';
 
@@ -80,6 +80,8 @@ adicionarConsultas(context, nomePaciente, dataConsulta, horarioConsulta, duracao
         uidConsulta = us.docs[0].id;
       });
       await docRef.update({'uidConsulta': uidConsulta});
+      await handleSignIn;
+      await addEventToGoogleCalendar(data);
       sucesso(context, 'O horário foi agendado com sucesso.');
       AppVariaveis().reset();
       Navigator.pop(context);

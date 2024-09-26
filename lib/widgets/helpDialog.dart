@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import '../controllers/estilos.dart';
 
 helpDialog(context) {
-  TamanhoFonte tamanhoFonte = TamanhoFonte();
   return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -12,12 +10,12 @@ helpDialog(context) {
               'Na tela inicial temos a agenda do dia e dos próximos horários.\n'
               'Ao clicar no horário da agenda irá direcionar para adicionar Prontuário. \n'
               'E abaixo resumo financeiro.',
-              style: TextStyle(fontSize: tamanhoFonte.letraPequena(context))),
+              style: TextStyle(fontSize: 16)),
           actions: <Widget>[
             TextButton(
               child: Text(
                 'Cancelar',
-                style: TextStyle(color: Colors.blue, fontSize: tamanhoFonte.letraPequena(context)),
+                style: TextStyle(color: Colors.blue, fontSize: 16),
               ),
               onPressed: () {
                 Navigator.of(context).pop();

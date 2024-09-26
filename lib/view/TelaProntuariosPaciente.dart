@@ -48,8 +48,6 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
   }
 
   Widget build(BuildContext context) {
-    TamanhoFonte tamanhoFonte = TamanhoFonte();
-
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: cores('corSimbolo')),
@@ -85,10 +83,7 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
                   children: <Widget>[
                     Text(
                       'Selecione o Mês e Ano: ',
-                      style: TextStyle(
-                          fontSize: tamanhoFonte.letraPequena(context),
-                          color: cores('corTexto'),
-                          fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, color: cores('corTexto'), fontWeight: FontWeight.bold),
                     ),
                     SizedBox(width: 10),
                     Row(
@@ -110,7 +105,7 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
                           style: TextStyle(
                             color: cores('corTexto'),
                             fontWeight: FontWeight.w400,
-                            fontSize: tamanhoFonte.letraPequena(context),
+                            fontSize: 16,
                           ),
                           underline: Container(
                             height: 0,
@@ -147,7 +142,7 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
                           style: TextStyle(
                             color: cores('corTexto'),
                             fontWeight: FontWeight.w400,
-                            fontSize: tamanhoFonte.letraPequena(context),
+                            fontSize: 16,
                           ),
                           underline: Container(
                             height: 0,
@@ -280,8 +275,6 @@ class _TelaProntuariosPacienteState extends State<TelaProntuariosPaciente> {
 }
 
 Widget cardProntuario(context, doc) {
-  TamanhoFonte tamanhoFonte = TamanhoFonte();
-
   return Container(
     child: Card(
       color: Colors.red.shade50,
@@ -294,10 +287,7 @@ Widget cardProntuario(context, doc) {
       child: ListTile(
         title: Text(
           doc.data()['dataProntuario'],
-          style: TextStyle(
-              color: cores('corTexto'),
-              fontSize: tamanhoFonte.letraMedia(context),
-              fontWeight: FontWeight.bold),
+          style: TextStyle(color: cores('corTexto'), fontSize: 16, fontWeight: FontWeight.bold),
         ),
         trailing: IconButton(
           icon: Icon(
